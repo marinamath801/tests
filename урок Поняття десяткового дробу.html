@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Поняття десяткового дробу</title>
+    <style>
+        :root {
+            --primary-color: #0284c7;
+            --primary-hover: #0369a1;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+            --correct-color: #16a34a;
+            --correct-bg: #f0fdf4;
+            --wrong-color: #dc2626;
+            --wrong-bg: #fef2f2;
+            --accent-bg: #e0f2fe;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background-color: var(--accent-bg);
+            color: #0369a1;
+            padding: 12px 18px;
+            border-left: 5px solid var(--primary-color);
+            margin: 35px 0 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 15px;
+        }
+
+        .task-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-question {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"], select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .status-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .fraction > span {
+            display: block;
+            padding: 0 2px;
+        }
+
+        .fraction span.numerator {
+            border-bottom: 2px solid var(--text-color);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        /* Класи перевірки */
+        .task-card.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+        }
+
+        .task-card.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+        }
+
+        .correct-ans-text {
+            font-size: 0.85rem;
+            color: var(--correct-color);
+            margin-top: 5px;
+            display: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер з математики</h1>
+    <div class="subtitle">Тема: Поняття десяткового дробу</div>
+
+    <form id="quizForm">
+
+        <!-- № 1281 -->
+        <div class="section-title">№ 1281. Обери правильний текстовий запис десяткового дробу</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1281_1">
+                <div class="task-question">1) 0,5</div>
+                <div class="input-group">
+                    <select id="task_1281_1">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="5 десятих">5 десятих</option>
+                        <option value="0 цілих 5 десятих">0 цілих 5 десятих</option>
+                        <option value="0 цілих 5 сотих">0 цілих 5 сотих</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_2">
+                <div class="task-question">2) 0,05</div>
+                <div class="input-group">
+                    <select id="task_1281_2">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="0 цілих 5 сотих">0 цілих 5 сотих</option>
+                        <option value="0 цілих 5 десятих">0 цілих 5 десятих</option>
+                        <option value="0 цілих 5 тисячних">0 цілих 5 тисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_3">
+                <div class="task-question">3) 1,7</div>
+                <div class="input-group">
+                    <select id="task_1281_3">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="1 ціла 7 сотих">1 ціла 7 сотих</option>
+                        <option value="1 ціла 7 десятих">1 ціла 7 десятих</option>
+                        <option value="17 десятих">17 десятих</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_4">
+                <div class="task-question">4) 1,007</div>
+                <div class="input-group">
+                    <select id="task_1281_4">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="1 ціла 7 сотих">1 ціла 7 сотих</option>
+                        <option value="1 ціла 7 тисячних">1 ціла 7 тисячних</option>
+                        <option value="1 ціла 7 десятитисячних">1 ціла 7 десятитисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_5">
+                <div class="task-question">5) 5,113</div>
+                <div class="input-group">
+                    <select id="task_1281_5">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="5 цілих 113 сотих">5 цілих 113 сотих</option>
+                        <option value="5 цілих 113 тисячних">5 цілих 113 тисячних</option>
+                        <option value="5 цілих 113 десятитисячних">5 цілих 113 десятитисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_6">
+                <div class="task-question">6) 0,125</div>
+                <div class="input-group">
+                    <select id="task_1281_6">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="0 цілих 125 тисячних">0 цілих 125 тисячних</option>
+                        <option value="0 цілих 125 сотих">0 цілих 125 сотих</option>
+                        <option value="125 тисячних">125 тисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_6"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_7">
+                <div class="task-question">7) 4,037</div>
+                <div class="input-group">
+                    <select id="task_1281_7">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="4 цілих 37 сотих">4 цілих 37 сотих</option>
+                        <option value="4 цілих 37 тисячних">4 цілих 37 тисячних</option>
+                        <option value="4 цілих 370 тисячних">4 цілих 370 тисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_7"></div>
+            </div>
+
+            <div class="task-card" id="card_1281_8">
+                <div class="task-question">8) 5,2703</div>
+                <div class="input-group">
+                    <select id="task_1281_8">
+                        <option value="">-- Оберіть варіант --</option>
+                        <option value="5 цілих 2703 тисячних">5 цілих 2703 тисячних</option>
+                        <option value="5 цілих 2703 десятитисячних">5 цілих 2703 десятитисячних</option>
+                        <option value="5 цілих 273 десятитисячних">5 цілих 273 десятитисячних</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1281_8"></div>
+            </div>
+        </div>
+
+        <!-- № 1282 -->
+        <div class="section-title">№ 1282. Запиши звичайний дріб або мішане число десятковим дробом</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1282_1">
+                <div class="task-question">1) <div class="fraction"><span class="numerator">9</span><span>10</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_1" placeholder="Запишіть дріб (наприклад: 0,9)"></div>
+                <div class="correct-ans-text" id="ans_1282_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_2">
+                <div class="task-question">2) <div class="fraction"><span class="numerator">37</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_2" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_3">
+                <div class="task-question">3) <div class="fraction"><span class="numerator">5</span><span>1000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_3" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_4">
+                <div class="task-question">4) 2<div class="fraction"><span class="numerator">7</span><span>10</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_4" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_5">
+                <div class="task-question">5) 7<div class="fraction"><span class="numerator">83</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_5" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_6">
+                <div class="task-question">6) <div class="fraction"><span class="numerator">491</span><span>1000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_6" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_6"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_7">
+                <div class="task-question">7) 1<div class="fraction"><span class="numerator">3</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_7" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_7"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_8">
+                <div class="task-question">8) 5<div class="fraction"><span class="numerator">63</span><span>1000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_8" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_8"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_9">
+                <div class="task-question">9) <div class="fraction"><span class="numerator">36</span><span>10 000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_9" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_9"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_10">
+                <div class="task-question">10) 8<div class="fraction"><span class="numerator">131</span><span>10 000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_10" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_10"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_11">
+                <div class="task-question">11) 8<div class="fraction"><span class="numerator">9</span><span>1000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_11" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_11"></div>
+            </div>
+
+            <div class="task-card" id="card_1282_12">
+                <div class="task-question">12) 12<div class="fraction"><span class="numerator">19</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1282_12" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1282_12"></div>
+            </div>
+        </div>
+
+        <!-- № 1284 -->
+        <div class="section-title">№ 1284. Запиши десятковим дробом за словами</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1284_1">
+                <div class="task-question">1) 25 цілих 8 десятих</div>
+                <div class="input-group"><input type="text" id="task_1284_1" placeholder="Наприклад: 25,8"></div>
+                <div class="correct-ans-text" id="ans_1284_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1284_2">
+                <div class="task-question">2) 9 десятих</div>
+                <div class="input-group"><input type="text" id="task_1284_2" placeholder="Введіть число"></div>
+                <div class="correct-ans-text" id="ans_1284_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1284_3">
+                <div class="task-question">3) 9 цілих 7 десятих 2 сотих</div>
+                <div class="input-group"><input type="text" id="task_1284_3" placeholder="Введіть число"></div>
+                <div class="correct-ans-text" id="ans_1284_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1284_4">
+                <div class="task-question">4) 8 десятих 1 сота</div>
+                <div class="input-group"><input type="text" id="task_1284_4" placeholder="Введіть число"></div>
+                <div class="correct-ans-text" id="ans_1284_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1284_5">
+                <div class="task-question">5) 5 цілих 5 сотих 7 тисячних</div>
+                <div class="input-group"><input type="text" id="task_1284_5" placeholder="Введіть число"></div>
+                <div class="correct-ans-text" id="ans_1284_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1284_6">
+                <div class="task-question">6) 3 тисячних</div>
+                <div class="input-group"><input type="text" id="task_1284_6" placeholder="Введіть число"></div>
+                <div class="correct-ans-text" id="ans_1284_6"></div>
+            </div>
+        </div>
+
+        <!-- № 1286 -->
+        <div class="section-title">№ 1286. Яке число треба записати в клітинку (замість &#9633;), щоб рівність була правильна?</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1286_1">
+                <div class="task-question">1) <div class="fraction"><span class="numerator">3</span><span>&#9633;</span></div> = 0,3</div>
+                <div class="input-group"><input type="text" id="task_1286_1" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1286_2">
+                <div class="task-question">2) <div class="fraction"><span class="numerator">27</span><span>&#9633;</span></div> = 0,27</div>
+                <div class="input-group"><input type="text" id="task_1286_2" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1286_3">
+                <div class="task-question">3) <div class="fraction"><span class="numerator">31</span><span>&#9633;</span></div> = 0,031</div>
+                <div class="input-group"><input type="text" id="task_1286_3" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1286_4">
+                <div class="task-question">4) <div class="fraction"><span class="numerator">&#9633;</span><span>10</span></div> = 0,72</div>
+                <div class="input-group"><input type="text" id="task_1286_4" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1286_5">
+                <div class="task-question">5) <div class="fraction"><span class="numerator">&#9633;</span><span>1000</span></div> = 0,219</div>
+                <div class="input-group"><input type="text" id="task_1286_5" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1286_6">
+                <div class="task-question">6) <div class="fraction"><span class="numerator">&#9633;</span><span>100</span></div> = 0,08</div>
+                <div class="input-group"><input type="text" id="task_1286_6" placeholder="Введіть число клітинки"></div>
+                <div class="correct-ans-text" id="ans_1286_6"></div>
+            </div>
+        </div>
+
+        <!-- № 1292 -->
+        <div class="section-title">№ 1292. Запиши у вигляді правильного дробу або мішаного числа (у форматі "4 7/10" або "7/10")</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1292_1">
+                <div class="task-question">1) 4,7</div>
+                <div class="input-group"><input type="text" id="task_1292_1" placeholder="Наприклад: 4 7/10"></div>
+                <div class="correct-ans-text" id="ans_1292_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1292_2">
+                <div class="task-question">2) 17,39</div>
+                <div class="input-group"><input type="text" id="task_1292_2" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1292_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1292_3">
+                <div class="task-question">3) 0,013</div>
+                <div class="input-group"><input type="text" id="task_1292_3" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1292_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1292_4">
+                <div class="task-question">4) 5,623</div>
+                <div class="input-group"><input type="text" id="task_1292_4" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1292_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1292_5">
+                <div class="task-question">5) 7,0009</div>
+                <div class="input-group"><input type="text" id="task_1292_5" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1292_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1292_6">
+                <div class="task-question">6) 0,0102</div>
+                <div class="input-group"><input type="text" id="task_1292_6" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1292_6"></div>
+            </div>
+        </div>
+
+        <!-- № 1304 -->
+        <div class="section-title">№ 1304. Виділи цілу і дробову частини числа та запиши десятковим дробом</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1304_1">
+                <div class="task-question">1) <div class="fraction"><span class="numerator">47</span><span>10</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_1" placeholder="Наприклад: 4,7"></div>
+                <div class="correct-ans-text" id="ans_1304_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1304_2">
+                <div class="task-question">2) <div class="fraction"><span class="numerator">319</span><span>10</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_2" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1304_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1304_3">
+                <div class="task-question">3) <div class="fraction"><span class="numerator">713</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_3" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1304_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1304_4">
+                <div class="task-question">4) <div class="fraction"><span class="numerator">1003</span><span>100</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_4" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1304_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1304_5">
+                <div class="task-question">5) <div class="fraction"><span class="numerator">5117</span><span>1000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_5" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1304_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1304_6">
+                <div class="task-question">6) <div class="fraction"><span class="numerator">271 413</span><span>10 000</span></div></div>
+                <div class="input-group"><input type="text" id="task_1304_6" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1304_6"></div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn" onclick="checkAnswers()">Перевірити відповіді</button>
+        </div>
+    </form>
+
+    <div id="resultBox" class="result-box"></div>
+</div>
+
+<script>
+    const correctAnswers = {
+        // 1281
+        task_1281_1: ["0 цілих 5 десятих"],
+        task_1281_2: ["0 цілих 5 сотих"],
+        task_1281_3: ["1 ціла 7 десятих"],
+        task_1281_4: ["1 ціла 7 тисячних"],
+        task_1281_5: ["5 цілих 113 тисячних"],
+        task_1281_6: ["0 цілих 125 тисячних"],
+        task_1281_7: ["4 цілих 37 тисячних"],
+        task_1281_8: ["5 цілих 2703 десятитисячних"],
+
+        // 1282
+        task_1282_1: ["0,9", "0.9"],
+        task_1282_2: ["0,37", "0.37"],
+        task_1282_3: ["0,005", "0.005"],
+        task_1282_4: ["2,7", "2.7"],
+        task_1282_5: ["7,83", "7.83"],
+        task_1282_6: ["0,491", "0.491"],
+        task_1282_7: ["1,03", "1.03"],
+        task_1282_8: ["5,063", "5.063"],
+        task_1282_9: ["0,0036", "0.0036"],
+        task_1282_10: ["8,0131", "8.0131"],
+        task_1282_11: ["8,009", "8.009"],
+        task_1282_12: ["12,19", "12.19"],
+
+        // 1284
+        task_1284_1: ["25,8", "25.8"],
+        task_1284_2: ["0,9", "0.9"],
+        task_1284_3: ["9,72", "9.72"],
+        task_1284_4: ["0,81", "0.81"],
+        task_1284_5: ["5,057", "5.057"],
+        task_1284_6: ["0,003", "0.003"],
+
+        // 1286
+        task_1286_1: ["10"],
+        task_1286_2: ["100"],
+        task_1286_3: ["1000"],
+        task_1286_4: ["7,2", "7.2"],
+        task_1286_5: ["219"],
+        task_1286_6: ["8"],
+
+        // 1292
+        task_1292_1: ["4 7/10"],
+        task_1292_2: ["17 39/100"],
+        task_1292_3: ["13/1000"],
+        task_1292_4: ["5 623/1000"],
+        task_1292_5: ["7 9/10000", "7 9/10 000"],
+        task_1292_6: ["102/10000", "102/10 000"],
+
+        // 1304
+        task_1304_1: ["4,7", "4.7"],
+        task_1304_2: ["31,9", "31.9"],
+        task_1304_3: ["7,13", "7.13"],
+        task_1304_4: ["10,03", "10.03"],
+        task_1304_5: ["5,117", "5.117"],
+        task_1304_6: ["27,1413", "27.1413"]
+    };
+
+    function normalizeText(text) {
+        return text.toString().trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function checkAnswers() {
+        let score = 0;
+        const total = Object.keys(correctAnswers).length;
+
+        for (let key in correctAnswers) {
+            const card = document.getElementById('card_' + key.replace('task_', ''));
+            const input = document.getElementById(key);
+            const ansTextDiv = document.getElementById('ans_' + key.replace('task_', ''));
+            const userVal = normalizeText(input.value);
+            
+            const validOptions = correctAnswers[key].map(v => normalizeText(v));
+
+            card.classList.remove('correct', 'wrong');
+            ansTextDiv.style.display = 'none';
+
+            if (userVal !== "" && validOptions.includes(userVal)) {
+                score++;
+                card.classList.add('correct');
+            } else {
+                card.classList.add('wrong');
+                ansTextDiv.style.display = 'block';
+                ansTextDiv.textContent = 'Правильна відповідь: ' + correctAnswers[key][0];
+            }
+        }
+
+        const resultBox = document.getElementById('resultBox');
+        resultBox.style.display = 'block';
+        const percent = Math.round((score / total) * 100);
+
+        resultBox.innerHTML = `Ваш результат: ${score} з ${total} (${percent}%)`;
+
+        if (percent >= 80) {
+            resultBox.style.backgroundColor = 'var(--correct-bg)';
+            resultBox.style.color = 'var(--correct-color)';
+            resultBox.style.border = '2px solid var(--correct-color)';
+        } else {
+            resultBox.style.backgroundColor = 'var(--wrong-bg)';
+            resultBox.style.color = 'var(--wrong-color)';
+            resultBox.style.border = '2px solid var(--wrong-color)';
+        }
+
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
