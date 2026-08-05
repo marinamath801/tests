@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Порівняння десяткових дробів</title>
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --primary-hover: #0f766e;
+            --bg-color: #f0fdfa;
+            --card-bg: #ffffff;
+            --text-color: #134e4a;
+            --border-color: #ccfbf1;
+            --card-border: #99f6e4;
+            --correct-color: #16a34a;
+            --correct-bg: #f0fdf4;
+            --wrong-color: #dc2626;
+            --wrong-bg: #fef2f2;
+            --accent-bg: #ccfbf1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5eead4;
+            background-color: var(--primary-hover);
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 auto 30px auto;
+            font-size: 0.95rem;
+        }
+
+        .header-wrapper {
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background-color: var(--accent-bg);
+            color: var(--primary-hover);
+            padding: 12px 18px;
+            border-left: 5px solid var(--primary-color);
+            margin: 35px 0 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+        }
+
+        .task-card {
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-question {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"], select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .task-card.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+        }
+
+        .task-card.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+        }
+
+        .correct-ans-text {
+            font-size: 0.85rem;
+            color: var(--correct-color);
+            margin-top: 5px;
+            display: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-wrapper">
+        <h1>Тренажер з математики</h1>
+        <div class="subtitle">Тема: Порівняння десяткових дробів</div>
+    </div>
+
+    <form id="quizForm">
+
+        <!-- № 1326 -->
+        <div class="section-title">№ 1326. Чи правильно, що:</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1326_1">
+                <div class="task-question">1) 15,20 = 15,2</div>
+                <div class="input-group">
+                    <select id="task_1326_1">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1326_2">
+                <div class="task-question">2) 47 = 47,00</div>
+                <div class="input-group">
+                    <select id="task_1326_2">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1326_3">
+                <div class="task-question">3) 9,03 = 9,30</div>
+                <div class="input-group">
+                    <select id="task_1326_3">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1326_4">
+                <div class="task-question">4) 1,700 = 1,70</div>
+                <div class="input-group">
+                    <select id="task_1326_4">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1326_5">
+                <div class="task-question">5) 240 = 24</div>
+                <div class="input-group">
+                    <select id="task_1326_5">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1326_6">
+                <div class="task-question">6) 7,01 = 7,01000</div>
+                <div class="input-group">
+                    <select id="task_1326_6">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="Правильно">Правильно</option>
+                        <option value="Неправильно">Неправильно</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1326_6"></div>
+            </div>
+        </div>
+
+        <!-- № 1328 -->
+        <div class="section-title">№ 1328. Запиши дріб коротше (відкинь зайві нулі справа)</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1328_1">
+                <div class="task-question">1) 0,80 (в оригіналі 0,8 — без змін)</div>
+                <div class="input-group"><input type="text" id="task_1328_1" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1328_2">
+                <div class="task-question">2) 29,00</div>
+                <div class="input-group"><input type="text" id="task_1328_2" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1328_3">
+                <div class="task-question">3) 12,0110</div>
+                <div class="input-group"><input type="text" id="task_1328_3" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1328_4">
+                <div class="task-question">4) 2,020200</div>
+                <div class="input-group"><input type="text" id="task_1328_4" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1328_5">
+                <div class="task-question">5) 14,2000</div>
+                <div class="input-group"><input type="text" id="task_1328_5" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1328_6">
+                <div class="task-question">6) 7,05000</div>
+                <div class="input-group"><input type="text" id="task_1328_6" placeholder="Запишіть дріб"></div>
+                <div class="correct-ans-text" id="ans_1328_6"></div>
+            </div>
+        </div>
+
+        <!-- № 1332 -->
+        <div class="section-title">№ 1332. Порівняй числа (обри знак: &lt;, &gt; або =)</div>
+        <div class="grid-container">
+            <div class="task-card" id="card_1332_1">
+                <div class="task-question">1) 18,29 i 19,1</div>
+                <div class="input-group">
+                    <select id="task_1332_1">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_1"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_2">
+                <div class="task-question">2) 23,50 i 23,5</div>
+                <div class="input-group">
+                    <select id="task_1332_2">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_2"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_3">
+                <div class="task-question">3) 17,03 i 17,3</div>
+                <div class="input-group">
+                    <select id="task_1332_3">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_3"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_4">
+                <div class="task-question">4) 9,23 i 9,31</div>
+                <div class="input-group">
+                    <select id="task_1332_4">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_4"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_5">
+                <div class="task-question">5) 12,02 i 12</div>
+                <div class="input-group">
+                    <select id="task_1332_5">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_5"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_6">
+                <div class="task-question">6) 1,51 i 1,5</div>
+                <div class="input-group">
+                    <select id="task_1332_6">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_6"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_7">
+                <div class="task-question">7) 29 i 28,99</div>
+                <div class="input-group">
+                    <select id="task_1332_7">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_7"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_8">
+                <div class="task-question">8) 17,142 i 17,15</div>
+                <div class="input-group">
+                    <select id="task_1332_8">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_8"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_9">
+                <div class="task-question">9) 209 i 209,00</div>
+                <div class="input-group">
+                    <select id="task_1332_9">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_9"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_10">
+                <div class="task-question">10) 2,2 i 2,0234</div>
+                <div class="input-group">
+                    <select id="task_1332_10">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_10"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_11">
+                <div class="task-question">11) 37,153 i 37,152</div>
+                <div class="input-group">
+                    <select id="task_1332_11">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_11"></div>
+            </div>
+
+            <div class="task-card" id="card_1332_12">
+                <div class="task-question">12) 17,003 i 17,0003</div>
+                <div class="input-group">
+                    <select id="task_1332_12">
+                        <option value="">-- Оберіть знак --</option>
+                        <option value="<">&lt; (менше)</option>
+                        <option value=">">&gt; (більше)</option>
+                        <option value="=">= (дорівнює)</option>
+                    </select>
+                </div>
+                <div class="correct-ans-text" id="ans_1332_12"></div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn" onclick="checkAnswers()">Перевірити відповіді</button>
+        </div>
+    </form>
+
+    <div id="resultBox" class="result-box"></div>
+</div>
+
+<script>
+    const correctAnswers = {
+        // № 1326
+        task_1326_1: ["Правильно"],
+        task_1326_2: ["Правильно"],
+        task_1326_3: ["Неправильно"],
+        task_1326_4: ["Правильно"],
+        task_1326_5: ["Неправильно"],
+        task_1326_6: ["Правильно"],
+
+        // № 1328
+        task_1328_1: ["0,8", "0.8"],
+        task_1328_2: ["29"],
+        task_1328_3: ["12,011", "12.011"],
+        task_1328_4: ["2,0202", "2.0202"],
+        task_1328_5: ["14,2", "14.2"],
+        task_1328_6: ["7,05", "7.05"],
+
+        // № 1332
+        task_1332_1: ["<"],
+        task_1332_2: ["="],
+        task_1332_3: ["<"],
+        task_1332_4: ["<"],
+        task_1332_5: [">"],
+        task_1332_6: [">"],
+        task_1332_7: [">"],
+        task_1332_8: ["<"],
+        task_1332_9: ["="],
+        task_1332_10: [">"],
+        task_1332_11: [">"],
+        task_1332_12: [">"]
+    };
+
+    function normalizeText(text) {
+        return text.toString().trim().toLowerCase().replace(/\s+/g, '');
+    }
+
+    function checkAnswers() {
+        let score = 0;
+        const total = Object.keys(correctAnswers).length;
+
+        for (let key in correctAnswers) {
+            const card = document.getElementById('card_' + key.replace('task_', ''));
+            const input = document.getElementById(key);
+            const ansTextDiv = document.getElementById('ans_' + key.replace('task_', ''));
+            const userVal = normalizeText(input.value);
+            
+            const validOptions = correctAnswers[key].map(v => normalizeText(v));
+
+            card.classList.remove('correct', 'wrong');
+            ansTextDiv.style.display = 'none';
+
+            if (userVal !== "" && validOptions.includes(userVal)) {
+                score++;
+                card.classList.add('correct');
+            } else {
+                card.classList.add('wrong');
+                ansTextDiv.style.display = 'block';
+                ansTextDiv.textContent = 'Правильна відповідь: ' + correctAnswers[key][0];
+            }
+        }
+
+        const resultBox = document.getElementById('resultBox');
+        resultBox.style.display = 'block';
+        const percent = Math.round((score / total) * 100);
+
+        resultBox.innerHTML = `Ваш результат: ${score} з ${total} (${percent}%)`;
+
+        if (percent >= 80) {
+            resultBox.style.backgroundColor = 'var(--correct-bg)';
+            resultBox.style.color = 'var(--correct-color)';
+            resultBox.style.border = '2px solid var(--correct-color)';
+        } else {
+            resultBox.style.backgroundColor = 'var(--wrong-bg)';
+            resultBox.style.color = 'var(--wrong-color)';
+            resultBox.style.border = '2px solid var(--wrong-color)';
+        }
+
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
