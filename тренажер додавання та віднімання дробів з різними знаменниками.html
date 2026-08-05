@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Додавання та віднімання дробів з різними знаменниками</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Comic Sans equivalent for math -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .math-font {
+            font-family: 'Comfortaa', cursive;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md py-4 px-6 sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-indigo-600 p-2 rounded-lg shadow-inner">
+                    <i class="fa-solid fa-calculator text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Математичний Тренажер</h1>
+                    <p class="text-xs text-indigo-200">Додавання та віднімання дробів з різними знаменниками</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Sound Toggle -->
+                <button id="sound-toggle-btn" class="bg-indigo-700 hover:bg-indigo-800 text-white p-2.5 rounded-full transition-all duration-200 shadow" title="Увімкнути/Вимкнути звук">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <!-- Score Tracker -->
+                <div class="bg-indigo-800/60 px-4 py-1.5 rounded-full border border-indigo-500/30 flex items-center gap-3 text-sm">
+                    <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                        <i class="fa-solid fa-circle-check"></i> <span id="stats-correct">0</span>
+                    </span>
+                    <span class="text-indigo-300">|</span>
+                    <span class="flex items-center gap-1.5 text-amber-400 font-semibold" title="Серія правильних відповідей поспіль">
+                        <i class="fa-solid fa-fire animate-pulse"></i> Серія: <span id="stats-streak">0</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow w-full">
+        
+        <!-- LEFT COLUMN: MODE SELECTION & STATS -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+            <!-- Mode and Difficulty Box -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-500"></i> Налаштування тренування
+                </h2>
+                
+                <!-- Tab Switching (Textbook vs Generator) -->
+                <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4">
+                    <button id="tab-textbook" class="py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-indigo-700 shadow-sm">
+                        <i class="fa-solid fa-book-open mr-1"></i> Зображення
+                    </button>
+                    <button id="tab-generator" class="py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-indigo-600">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Генератор
+                    </button>
+                </div>
+
+                <!-- Textbook Mode Options -->
+                <div id="textbook-controls" class="space-y-3">
+                    <p class="text-xs text-slate-500 mb-2 leading-relaxed">
+                        Тут завантажені всі 8 прикладів із надісланого зображення <strong>image_e0eecf.png</strong>. Оберіть приклад для розв'язання:
+                    </p>
+                    <div class="grid grid-cols-4 gap-2" id="textbook-buttons-container">
+                        <!-- Buttons 1-8 injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Generator Mode Options (Hidden initially) -->
+                <div id="generator-controls" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Рівень складності:</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button data-diff="easy" class="diff-btn py-1.5 text-xs font-semibold rounded-lg border-2 border-slate-200 bg-white text-slate-700 hover:border-emerald-500 transition-all">Легкий</button>
+                            <button data-diff="medium" class="diff-btn py-1.5 text-xs font-semibold rounded-lg border-2 border-indigo-500 bg-indigo-50 text-indigo-700 hover:border-indigo-600 transition-all">Середній</button>
+                            <button data-diff="hard" class="diff-btn py-1.5 text-xs font-semibold rounded-lg border-2 border-slate-200 bg-white text-slate-700 hover:border-rose-500 transition-all">Складний</button>
+                        </div>
+                    </div>
+                    <button id="btn-next-random" class="w-full bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate"></i> Згенерувати новий дріб
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCRATCHPAD (ЧЕРНЕТКА) FOR CALCULATIONS -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 flex flex-col flex-grow min-h-[250px] relative">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-fancy text-emerald-500"></i> Інтерактивна чернетка
+                    </h3>
+                    <div class="flex gap-1.5">
+                        <button id="scratchpad-clear" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded transition" title="Очистити все">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button id="scratchpad-eraser" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded transition" title="Гумка / Олівець">
+                            <i class="fa-solid fa-eraser"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-grow bg-amber-50/40 rounded-xl border border-dashed border-amber-200 relative overflow-hidden min-h-[160px]">
+                    <canvas id="scratchpad" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
+                    <div class="absolute bottom-2 right-2 text-[10px] text-amber-600/60 pointer-events-none select-none">
+                        Рахуйте НСК та додаткові множники тут!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: PLAYGROUND & MATH CONTAINER -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+            <!-- Central Task Display Card -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 p-6 md:p-8 flex flex-col items-center justify-center relative min-h-[350px]">
+                
+                <!-- Ribbon indicator -->
+                <div class="absolute top-4 left-4 bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-question"></i> <span id="current-task-info">Приклад 1 із зображення</span>
+                </div>
+
+                <!-- TASK EXPRESSION DISPLAY -->
+                <div class="my-10 flex items-center justify-center gap-4 text-3xl md:text-5xl font-semibold text-slate-800 math-font select-none">
+                    <!-- Fraction 1 -->
+                    <div class="flex flex-col items-center">
+                        <span id="task-n1">3</span>
+                        <div class="w-8 md:w-12 h-1 bg-slate-800 my-1 rounded-full"></div>
+                        <span id="task-d1">8</span>
+                    </div>
+
+                    <!-- Operator -->
+                    <span id="task-op" class="text-indigo-600 font-bold mx-2">+</span>
+
+                    <!-- Fraction 2 -->
+                    <div class="flex flex-col items-center">
+                        <span id="task-n2">2</span>
+                        <div class="w-8 md:w-12 h-1 bg-slate-800 my-1 rounded-full"></div>
+                        <span id="task-d2">9</span>
+                    </div>
+
+                    <!-- Equals Sign -->
+                    <span class="text-slate-400 font-light mx-2">=</span>
+
+                    <!-- INPUT FIELDS FOR ANSWER -->
+                    <div class="flex flex-col items-center relative group">
+                        <input type="number" id="ans-num" class="w-16 md:w-24 text-center border-2 border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 rounded-xl p-1 md:p-2 text-2xl md:text-4xl font-bold bg-slate-50 transition-all outline-none" placeholder="?" min="1" required>
+                        <div class="w-16 md:w-24 h-1 bg-slate-800 my-2 rounded-full"></div>
+                        <input type="number" id="ans-den" class="w-16 md:w-24 text-center border-2 border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 rounded-xl p-1 md:p-2 text-2xl md:text-4xl font-bold bg-slate-50 transition-all outline-none" placeholder="?" min="1" required>
+                    </div>
+                </div>
+
+                <!-- ACTIONS BUTTONS -->
+                <div class="w-full max-w-md flex flex-col sm:flex-row gap-3 mt-4">
+                    <button id="btn-check" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 text-base">
+                        <i class="fa-solid fa-circle-check"></i> Перевірити відповідь
+                    </button>
+                    <button id="btn-show-solution" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-3.5 px-5 rounded-2xl border border-indigo-200 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lightbulb"></i> Підказка
+                    </button>
+                </div>
+
+                <!-- FEEDBACK TOAST / MESSAGE AREA -->
+                <div id="feedback-panel" class="mt-6 w-full max-w-md hidden transform translate-y-2 opacity-0 transition-all duration-300">
+                    <div id="feedback-alert" class="p-4 rounded-xl flex items-start gap-3">
+                        <div id="feedback-icon" class="text-2xl mt-0.5"></div>
+                        <div>
+                            <h4 id="feedback-title" class="font-bold text-sm"></h4>
+                            <p id="feedback-msg" class="text-xs leading-relaxed mt-0.5"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETAILED STEP-BY-STEP EXPLANATION (COLLAPSED BY DEFAULT) -->
+            <div id="solution-panel" class="bg-indigo-50/50 rounded-2xl border border-indigo-100 p-6 hidden">
+                <h3 class="text-base font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> Детальний покроковий розв'язок
+                </h3>
+                
+                <div class="space-y-4 text-slate-700 text-sm md:text-base">
+                    <!-- Step 1: LCD -->
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</div>
+                        <div>
+                            <p class="font-semibold text-indigo-950">Знаходимо Спільний Знаменник:</p>
+                            <p class="text-slate-600 mt-1">
+                                Нам потрібно знайти Найменше Спільне Кратне (НСК) для чисел <span class="font-bold" id="sol-d1-val"></span> та <span class="font-bold" id="sol-d2-val"></span>.
+                                <br>
+                                <span class="bg-white px-2 py-0.5 border border-indigo-100 rounded text-xs font-semibold mt-1 inline-block">
+                                    НСК(<span id="sol-d1-val2"></span>, <span id="sol-d2-val2"></span>) = <span class="text-indigo-700 font-bold" id="sol-lcd"></span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Extra multipliers -->
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</div>
+                        <div>
+                            <p class="font-semibold text-indigo-950">Додаткові множники:</p>
+                            <p class="text-slate-600 mt-1">
+                                Ділимо спільний знаменник на старий знаменник кожного дробу:
+                                <br>
+                                • Для першого дробу: <span id="sol-lcd-1"></span> ÷ <span id="sol-d1-val3"></span> = <span class="font-bold text-indigo-700" id="sol-m1"></span>
+                                <br>
+                                • Для другого дробу: <span id="sol-lcd-2"></span> ÷ <span id="sol-d2-val3"></span> = <span class="font-bold text-indigo-700" id="sol-m2"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Expansion & Equation -->
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</div>
+                        <div>
+                            <p class="font-semibold text-indigo-950">Зводимо дроби та обчислюємо:</p>
+                            <div class="mt-2 bg-white p-3 rounded-xl border border-indigo-100 flex items-center justify-center gap-2 font-semibold math-font text-sm md:text-lg select-none">
+                                <div class="flex flex-col items-center">
+                                    <span><span id="sol-n1-val"></span> <span class="text-slate-400 text-xs">×<span id="sol-m1-sm"></span></span></span>
+                                    <div class="w-10 h-0.5 bg-slate-700 my-0.5"></div>
+                                    <span><span id="sol-lcd-formula1"></span></span>
+                                </div>
+                                <span id="sol-op-formula">+</span>
+                                <div class="flex flex-col items-center">
+                                    <span><span id="sol-n2-val"></span> <span class="text-slate-400 text-xs">×<span id="sol-m2-sm"></span></span></span>
+                                    <div class="w-10 h-0.5 bg-slate-700 my-0.5"></div>
+                                    <span><span id="sol-lcd-formula2"></span></span>
+                                </div>
+                                <span class="text-slate-400">=</span>
+                                <div class="flex flex-col items-center">
+                                    <span><span id="sol-calc-num1"></span> <span id="sol-op-calc"></span> <span id="sol-calc-num2"></span></span>
+                                    <div class="w-20 h-0.5 bg-slate-700 my-0.5"></div>
+                                    <span id="sol-lcd-formula3"></span>
+                                </div>
+                                <span class="text-indigo-600">=</span>
+                                <div class="flex flex-col items-center text-indigo-700">
+                                    <span id="sol-final-unsimplified-num"></span>
+                                    <div class="w-10 h-0.5 bg-indigo-700 my-0.5"></div>
+                                    <span id="sol-final-unsimplified-den"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Simplification (Optional show) -->
+                    <div id="sol-step-simplification" class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">4</div>
+                        <div>
+                            <p class="font-semibold text-indigo-950">Скорочуємо отриманий дріб:</p>
+                            <p class="text-slate-600 mt-1">
+                                Чисельник <span id="sol-simpl-num"></span> та знаменник <span id="sol-simpl-den"></span> мають спільний дільник: <span class="font-bold text-emerald-600" id="sol-gcd"></span>. Поділимо обидві частини на це число:
+                            </p>
+                            <div class="mt-2 flex justify-center">
+                                <div class="flex items-center gap-1.5 math-font font-bold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
+                                    <div class="flex flex-col items-center">
+                                        <span id="sol-simpl-num-orig"></span>
+                                        <div class="w-8 h-0.5 bg-emerald-700 my-0.5"></div>
+                                        <span id="sol-simpl-den-orig"></span>
+                                    </div>
+                                    <span>=</span>
+                                    <div class="flex flex-col items-center">
+                                        <span><span id="sol-simpl-num-orig2"></span> ÷ <span id="sol-gcd-div1"></span></span>
+                                        <div class="w-16 h-0.5 bg-emerald-700 my-0.5"></div>
+                                        <span><span id="sol-simpl-den-orig2"></span> ÷ <span id="sol-gcd-div2"></span></span>
+                                    </div>
+                                    <span>=</span>
+                                    <div class="flex flex-col items-center">
+                                        <span id="sol-simpl-final-num"></span>
+                                        <div class="w-8 h-0.5 bg-emerald-700 my-0.5"></div>
+                                        <span id="sol-simpl-final-den"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER WITH CREDITS -->
+    <footer class="bg-slate-100 border-t border-slate-200 text-center py-4 mt-auto text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>© 2026 Навчальний Математичний Тренажер</span>
+            <span class="flex items-center gap-1">Базується на програмі 6 класу • Повністю інтерактивно</span>
+        </div>
+    </footer>
+
+    <!-- CONFETTI CANVAS FOR WIN CELEBRATIONS -->
+    <canvas id="confetti-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- DATA & PROBLEMS FROM THE IMAGE e0eecf.png ---
+        const textbookProblems = [
+            { id: 1, n1: 3, d1: 8, op: '+', n2: 2, d2: 9 },
+            { id: 2, n1: 1, d1: 6, op: '+', n2: 2, d2: 5 },
+            { id: 3, n1: 2, d1: 9, op: '+', n2: 11, d2: 15 },
+            { id: 4, n1: 7, d1: 12, op: '+', n2: 2, d2: 9 },
+            { id: 5, n1: 13, d1: 15, op: '-', n2: 1, d2: 2 },
+            { id: 6, n1: 9, d1: 20, op: '-', n2: 13, d2: 30 },
+            { id: 7, n1: 11, d1: 16, op: '-', n2: 7, d2: 12 },
+            { id: 8, n1: 21, d1: 26, op: '-', n2: 8, d2: 13 }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        const state = {
+            mode: 'textbook', // 'textbook' or 'generator'
+            textbookIndex: 0,
+            difficulty: 'medium', // 'easy', 'medium', 'hard'
+            currentProblem: {},
+            score: 0,
+            streak: 0,
+            soundEnabled: true
+        };
+
+        // --- MATH FUNCTIONS ---
+        // Greatest Common Divisor (НСД)
+        function getGCD(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b) {
+                let t = b;
+                b = a % b;
+                a = t;
+            }
+            return a;
+        }
+
+        // Least Common Multiple (НСК)
+        function getLCM(a, b) {
+            return (a * b) / getGCD(a, b);
+        }
+
+        // Simplify a fraction
+        function simplifyFraction(num, den) {
+            const gcd = getGCD(num, den);
+            return {
+                num: num / gcd,
+                den: den / gcd,
+                gcd: gcd
+            };
+        }
+
+        // Calculate actual operation
+        function solveProblem(n1, d1, op, n2, d2) {
+            const lcd = getLCM(d1, d2);
+            const m1 = lcd / d1;
+            const m2 = lcd / d2;
+            
+            const expN1 = n1 * m1;
+            const expN2 = n2 * m2;
+            
+            let resultNum;
+            if (op === '+') {
+                resultNum = expN1 + expN2;
+            } else {
+                resultNum = expN1 - expN2;
+            }
+
+            const unsimplified = { num: resultNum, den: lcd };
+            const simplified = simplifyFraction(resultNum, lcd);
+
+            return {
+                lcd,
+                m1,
+                m2,
+                expN1,
+                expN2,
+                unsimplified,
+                simplified
+            };
+        }
+
+        // --- GENERATOR OF RANDOM PROBLEMS ---
+        function generateRandomProblem() {
+            let n1, d1, n2, d2, op;
+            op = Math.random() > 0.5 ? '+' : '-';
+
+            if (state.difficulty === 'easy') {
+                // Easy: denominators 2-9, simple numbers
+                d1 = Math.floor(Math.random() * 8) + 2;
+                do {
+                    d2 = Math.floor(Math.random() * 8) + 2;
+                } while (d1 === d2); // ensure different denominators
+                
+                n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+            } else if (state.difficulty === 'medium') {
+                // Medium: denominators 4-15
+                d1 = Math.floor(Math.random() * 12) + 4;
+                do {
+                    d2 = Math.floor(Math.random() * 12) + 4;
+                } while (d1 === d2 || getGCD(d1, d2) === d1 || getGCD(d1, d2) === d2);
+                
+                n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+            } else {
+                // Hard: denominators 8-30 (very similar to image textbook exercises)
+                const hardDenoms = [8, 9, 12, 13, 15, 16, 20, 26, 30];
+                d1 = hardDenoms[Math.floor(Math.random() * hardDenoms.length)];
+                do {
+                    d2 = hardDenoms[Math.floor(Math.random() * hardDenoms.length)];
+                } while (d1 === d2);
+
+                n1 = Math.floor(Math.random() * (d1 - 2)) + 2;
+                n2 = Math.floor(Math.random() * (d2 - 2)) + 2;
+            }
+
+            // For subtraction, make sure first fraction is larger
+            if (op === '-') {
+                const val1 = n1 / d1;
+                const val2 = n2 / d2;
+                if (val1 < val2) {
+                    // Swap fractions
+                    let tempN = n1, tempD = d1;
+                    n1 = n2; d1 = d2;
+                    n2 = tempN; d2 = tempD;
+                } else if (val1 === val2) {
+                    // Shift slightly to avoid 0 result
+                    n1 = Math.min(d1 - 1, n1 + 1);
+                }
+            }
+
+            return { n1, d1, op, n2, d2 };
+        }
+
+        // --- WEB AUDIO API FOR SOUND EFFECTS ---
+        let audioCtx = null;
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'success') {
+                    // Happy double beep
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.12); // E5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime + 0.12);
+                    
+                    osc.stop(audioCtx.currentTime + 0.35);
+                } else if (type === 'fail') {
+                    // Sad buzz
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    osc.start();
+                    
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'click') {
+                    // Click noise
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    osc.start();
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.stop(audioCtx.currentTime + 0.08);
+                }
+            } catch (e) {
+                console.log('Audio Context error: ', e);
+            }
+        }
+
+        // --- CANVAS CONFETTI CELEBRATION ---
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctxConfetti = confettiCanvas.getContext('2d');
+        let confettiList = [];
+        let confettiAnimationId = null;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        class Confetti {
+            constructor() {
+                this.x = Math.random() * confettiCanvas.width;
+                this.y = Math.random() * -confettiCanvas.height - 20;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 4 + 3;
+                this.speedX = Math.random() * 2 - 1;
+                this.color = `hsl(${Math.random() * 360}, 90%, 65%)`;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 4 - 2;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+            }
+            draw() {
+                ctxConfetti.save();
+                ctxConfetti.translate(this.x, this.y);
+                ctxConfetti.rotate((this.rotation * Math.PI) / 180);
+                ctxConfetti.fillStyle = this.color;
+                ctxConfetti.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctxConfetti.restore();
+            }
+        }
+
+        function triggerConfetti() {
+            confettiList = [];
+            for (let i = 0; i < 80; i++) {
+                confettiList.push(new Confetti());
+            }
+            if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            let active = false;
+            confettiList.forEach(c => {
+                c.update();
+                c.draw();
+                if (c.y < confettiCanvas.height) active = true;
+            });
+            if (active) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        // --- UI DRAWING & RENDER HANDLERS ---
+        const elTaskN1 = document.getElementById('task-n1');
+        const elTaskD1 = document.getElementById('task-d1');
+        const elTaskN2 = document.getElementById('task-n2');
+        const elTaskD2 = document.getElementById('task-d2');
+        const elTaskOp = document.getElementById('task-op');
+        const elAnsNum = document.getElementById('ans-num');
+        const elAnsDen = document.getElementById('ans-den');
+        const elCurrentTaskInfo = document.getElementById('current-task-info');
+
+        function renderProblem() {
+            const prob = state.currentProblem;
+            elTaskN1.textContent = prob.n1;
+            elTaskD1.textContent = prob.d1;
+            elTaskN2.textContent = prob.n2;
+            elTaskD2.textContent = prob.d2;
+            elTaskOp.textContent = prob.op;
+
+            // Clear inputs
+            elAnsNum.value = '';
+            elAnsDen.value = '';
+            
+            // Hide previous solutions / feedbacks
+            document.getElementById('feedback-panel').classList.add('hidden');
+            document.getElementById('solution-panel').classList.add('hidden');
+
+            // Update Header info
+            if (state.mode === 'textbook') {
+                elCurrentTaskInfo.innerHTML = `<i class="fa-solid fa-book"></i> Завдання ${state.textbookIndex + 1} із зображення`;
+            } else {
+                let diffText = 'Легкий';
+                if (state.difficulty === 'medium') diffText = 'Середній';
+                if (state.difficulty === 'hard') diffText = 'Складний';
+                elCurrentTaskInfo.innerHTML = `<i class="fa-solid fa-cube"></i> Генератор (${diffText})`;
+            }
+        }
+
+        // Compile and render the solution breakdown in the card
+        function populateSolutionDetails() {
+            const prob = state.currentProblem;
+            const sol = solveProblem(prob.n1, prob.d1, prob.op, prob.n2, prob.d2);
+
+            // Step 1 values
+            document.getElementById('sol-d1-val').textContent = prob.d1;
+            document.getElementById('sol-d2-val').textContent = prob.d2;
+            document.getElementById('sol-d1-val2').textContent = prob.d1;
+            document.getElementById('sol-d2-val2').textContent = prob.d2;
+            document.getElementById('sol-lcd').textContent = sol.lcd;
+
+            // Step 2 values
+            document.getElementById('sol-lcd-1').textContent = sol.lcd;
+            document.getElementById('sol-d1-val3').textContent = prob.d1;
+            document.getElementById('sol-m1').textContent = sol.m1;
+
+            document.getElementById('sol-lcd-2').textContent = sol.lcd;
+            document.getElementById('sol-d2-val3').textContent = prob.d2;
+            document.getElementById('sol-m2').textContent = sol.m2;
+
+            // Step 3 Formula
+            document.getElementById('sol-n1-val').textContent = prob.n1;
+            document.getElementById('sol-m1-sm').textContent = sol.m1;
+            document.getElementById('sol-lcd-formula1').textContent = sol.lcd;
+
+            document.getElementById('sol-op-formula').textContent = prob.op;
+
+            document.getElementById('sol-n2-val').textContent = prob.n2;
+            document.getElementById('sol-m2-sm').textContent = sol.m2;
+            document.getElementById('sol-lcd-formula2').textContent = sol.lcd;
+
+            document.getElementById('sol-calc-num1').textContent = sol.expN1;
+            document.getElementById('sol-op-calc').textContent = prob.op;
+            document.getElementById('sol-calc-num2').textContent = sol.expN2;
+            document.getElementById('sol-lcd-formula3').textContent = sol.lcd;
+
+            document.getElementById('sol-final-unsimplified-num').textContent = sol.unsimplified.num;
+            document.getElementById('sol-final-unsimplified-den').textContent = sol.unsimplified.den;
+
+            // Step 4 (Simplification)
+            const stepSimpl = document.getElementById('sol-step-simplification');
+            if (sol.simplified.gcd > 1) {
+                stepSimpl.classList.remove('hidden');
+                document.getElementById('sol-simpl-num').textContent = sol.unsimplified.num;
+                document.getElementById('sol-simpl-den').textContent = sol.unsimplified.den;
+                document.getElementById('sol-gcd').textContent = sol.simplified.gcd;
+
+                document.getElementById('sol-simpl-num-orig').textContent = sol.unsimplified.num;
+                document.getElementById('sol-simpl-den-orig').textContent = sol.unsimplified.den;
+
+                document.getElementById('sol-simpl-num-orig2').textContent = sol.unsimplified.num;
+                document.getElementById('sol-simpl-den-orig2').textContent = sol.unsimplified.den;
+                document.getElementById('sol-gcd-div1').textContent = sol.simplified.gcd;
+                document.getElementById('sol-gcd-div2').textContent = sol.simplified.gcd;
+
+                document.getElementById('sol-simpl-final-num').textContent = sol.simplified.num;
+                document.getElementById('sol-simpl-final-den').textContent = sol.simplified.den;
+            } else {
+                stepSimpl.classList.add('hidden');
+            }
+        }
+
+        // --- INTERACTIVE SCRATCHPAD CANVAS ---
+        const canvas = document.getElementById('scratchpad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let isEraser = false;
+
+        function setupCanvas() {
+            // Match CSS dimensions
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            
+            // Set styles
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#059669'; // Emerald-600
+        }
+
+        // Resize observer to handle canvas responsive bounds
+        const resizeObserver = new ResizeObserver(entries => {
+            setupCanvas();
+        });
+        resizeObserver.observe(canvas.parentElement);
+
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const coords = getCoordinates(e);
+            lastX = coords.x;
+            lastY = coords.y;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const coords = getCoordinates(e);
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(coords.x, coords.y);
+            
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 15;
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = '#059669';
+                ctx.lineWidth = 3;
+            }
+            
+            ctx.stroke();
+            lastX = coords.x;
+            lastY = coords.y;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Canvas events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        // Buttons for Canvas
+        document.getElementById('scratchpad-clear').addEventListener('click', () => {
+            playSound('click');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        const eraserBtn = document.getElementById('scratchpad-eraser');
+        eraserBtn.addEventListener('click', () => {
+            playSound('click');
+            isEraser = !isEraser;
+            if (isEraser) {
+                eraserBtn.classList.replace('bg-slate-100', 'bg-rose-100');
+                eraserBtn.classList.replace('text-slate-600', 'text-rose-600');
+                eraserBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
+            } else {
+                eraserBtn.classList.replace('bg-rose-100', 'bg-slate-100');
+                eraserBtn.classList.replace('text-rose-600', 'text-slate-600');
+                eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i>';
+            }
+        });
+
+        // --- CORE INTERACTIVE EVENT HANDLERS ---
+        const btnCheck = document.getElementById('btn-check');
+        const feedbackPanel = document.getElementById('feedback-panel');
+        const feedbackAlert = document.getElementById('feedback-alert');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackMsg = document.getElementById('feedback-msg');
+
+        btnCheck.addEventListener('click', checkUserAnswer);
+
+        function checkUserAnswer() {
+            const userNum = parseInt(elAnsNum.value);
+            const userDen = parseInt(elAnsDen.value);
+
+            if (isNaN(userNum) || isNaN(userDen) || userNum <= 0 || userDen <= 0) {
+                showToast('warning', 'Помилка введення', 'Будь ласка, вкажіть додатні чисельник та знаменник для відповіді.');
+                playSound('fail');
+                return;
+            }
+
+            const prob = state.currentProblem;
+            const sol = solveProblem(prob.n1, prob.d1, prob.op, prob.n2, prob.d2);
+
+            // Compare simplified vs unsimplified fraction
+            const userFraction = simplifyFraction(userNum, userDen);
+
+            const isFullyCorrect = (userNum === sol.simplified.num && userDen === sol.simplified.den);
+            const isUnsimplifiedCorrect = (userNum === sol.unsimplified.num && userDen === sol.unsimplified.den) || 
+                                          (userFraction.num === sol.simplified.num && userFraction.den === sol.simplified.den);
+
+            if (isFullyCorrect) {
+                // Correct and Simplified
+                triggerSuccess();
+                showToast('success', 'Чудово! Правильно!', 'Ви вказали ідеально правильний та скорочений дріб!');
+            } else if (isUnsimplifiedCorrect) {
+                // Correct but can be simplified further
+                triggerSemiSuccess();
+                showToast('info', 'Дріб правильний, але скоротіть!', `Чудова робота! Ви знайшли правильну суму/різницю. Проте отриманий дріб можна скоротити: поділіть чисельник і знаменник на <b>${sol.simplified.gcd}</b>.`);
+            } else {
+                // Incorrect
+                triggerFailure();
+                showToast('danger', 'Неправильно. Спробуйте ще раз!', `Помилка в обчисленнях. Спробуйте розібратися покроково за допомогою кнопки «Підказка».`);
+            }
+        }
+
+        function triggerSuccess() {
+            playSound('success');
+            triggerConfetti();
+            state.score++;
+            state.streak++;
+            updateStats();
+        }
+
+        function triggerSemiSuccess() {
+            playSound('success');
+            state.score++;
+            state.streak++;
+            updateStats();
+        }
+
+        function triggerFailure() {
+            playSound('fail');
+            state.streak = 0;
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stats-correct').textContent = state.score;
+            document.getElementById('stats-streak').textContent = state.streak;
+        }
+
+        function showToast(type, title, text) {
+            feedbackPanel.classList.remove('hidden');
+            // Reset styles
+            feedbackAlert.className = 'p-4 rounded-xl flex items-start gap-3 transition-all';
+            
+            if (type === 'success') {
+                feedbackAlert.classList.add('bg-emerald-50', 'border', 'border-emerald-200', 'text-emerald-900');
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
+            } else if (type === 'info') {
+                feedbackAlert.classList.add('bg-blue-50', 'border', 'border-blue-200', 'text-blue-900');
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-info text-blue-500"></i>';
+            } else if (type === 'warning') {
+                feedbackAlert.classList.add('bg-amber-50', 'border', 'border-amber-200', 'text-amber-900');
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>';
+            } else {
+                feedbackAlert.classList.add('bg-rose-50', 'border', 'border-rose-200', 'text-rose-900');
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
+            }
+
+            feedbackTitle.textContent = title;
+            feedbackMsg.innerHTML = text;
+
+            // Animate entrance
+            feedbackPanel.classList.remove('translate-y-2', 'opacity-0');
+        }
+
+        // Show detailed solution walkthrough
+        const btnShowSolution = document.getElementById('btn-show-solution');
+        const solutionPanel = document.getElementById('solution-panel');
+
+        btnShowSolution.addEventListener('click', () => {
+            playSound('click');
+            populateSolutionDetails();
+            solutionPanel.classList.toggle('hidden');
+            if (!solutionPanel.classList.contains('hidden')) {
+                solutionPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+
+        // --- NAVIGATION & TABS ---
+        const tabTextbook = document.getElementById('tab-textbook');
+        const tabGenerator = document.getElementById('tab-generator');
+        const textbookControls = document.getElementById('textbook-controls');
+        const generatorControls = document.getElementById('generator-controls');
+
+        tabTextbook.addEventListener('click', () => {
+            playSound('click');
+            state.mode = 'textbook';
+            
+            tabTextbook.className = 'py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-indigo-700 shadow-sm';
+            tabGenerator.className = 'py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-indigo-600';
+            
+            textbookControls.classList.remove('hidden');
+            generatorControls.classList.add('hidden');
+
+            loadTextbookProblem(state.textbookIndex);
+        });
+
+        tabGenerator.addEventListener('click', () => {
+            playSound('click');
+            state.mode = 'generator';
+
+            tabGenerator.className = 'py-2 text-sm font-semibold rounded-lg transition-all duration-200 bg-white text-indigo-700 shadow-sm';
+            tabTextbook.className = 'py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-slate-600 hover:text-indigo-600';
+
+            generatorControls.classList.remove('hidden');
+            textbookControls.classList.add('hidden');
+
+            loadRandomProblem();
+        });
+
+        // Load specific exercise from image e0eecf.png
+        function loadTextbookProblem(index) {
+            state.textbookIndex = index;
+            state.currentProblem = textbookProblems[index];
+            renderProblem();
+            highlightActiveTextbookButton(index);
+        }
+
+        function loadRandomProblem() {
+            state.currentProblem = generateRandomProblem();
+            renderProblem();
+        }
+
+        document.getElementById('btn-next-random').addEventListener('click', () => {
+            playSound('click');
+            loadRandomProblem();
+        });
+
+        // Difficulty selection
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                playSound('click');
+                // Remove active classes from all difficulty buttons
+                document.querySelectorAll('.diff-btn').forEach(b => {
+                    b.className = 'diff-btn py-1.5 text-xs font-semibold rounded-lg border-2 border-slate-200 bg-white text-slate-700 hover:border-indigo-400 transition-all';
+                });
+                
+                const diff = e.target.dataset.diff;
+                state.difficulty = diff;
+
+                // Mark current active
+                let borderCol = 'indigo-500';
+                let bgCol = 'indigo-50';
+                let textCol = 'indigo-700';
+                if (diff === 'easy') { borderCol = 'emerald-500'; bgCol = 'emerald-50'; textCol = 'emerald-700'; }
+                if (diff === 'hard') { borderCol = 'rose-500'; bgCol = 'rose-50'; textCol = 'rose-700'; }
+
+                e.target.className = `diff-btn py-1.5 text-xs font-semibold rounded-lg border-2 border-${borderCol} bg-${bgCol} text-${textCol} transition-all`;
+
+                loadRandomProblem();
+            });
+        });
+
+        // Setup Textbook problems selector buttons list
+        const textbookBtnContainer = document.getElementById('textbook-buttons-container');
+        function buildTextbookButtons() {
+            textbookBtnContainer.innerHTML = '';
+            textbookProblems.forEach((prob, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'textbook-item-btn py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all';
+                btn.innerHTML = `${index + 1}) <span class="math-font">${prob.op}</span>`;
+                btn.addEventListener('click', () => {
+                    playSound('click');
+                    loadTextbookProblem(index);
+                });
+                textbookBtnContainer.appendChild(btn);
+            });
+        }
+
+        function highlightActiveTextbookButton(activeIndex) {
+            document.querySelectorAll('.textbook-item-btn').forEach((btn, index) => {
+                if (index === activeIndex) {
+                    btn.className = 'textbook-item-btn py-2 text-xs font-semibold rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 font-bold transition-all';
+                } else {
+                    btn.className = 'textbook-item-btn py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all';
+                }
+            });
+        }
+
+        // Sound Toggle Button listener
+        const soundToggleBtn = document.getElementById('sound-toggle-btn');
+        const soundIcon = document.getElementById('sound-icon');
+        soundToggleBtn.addEventListener('click', () => {
+            state.soundEnabled = !state.soundEnabled;
+            if (state.soundEnabled) {
+                soundIcon.className = 'fa-solid fa-volume-high';
+                playSound('click');
+            } else {
+                soundIcon.className = 'fa-solid fa-volume-xmark';
+            }
+        });
+
+        // INITIALIZATION ON WINDOW LOAD
+        window.onload = function() {
+            buildTextbookButtons();
+            loadTextbookProblem(0); // Load problem 1 initially
+            setupCanvas();
+        };
+
+    </script>
+</body>
+</html>
