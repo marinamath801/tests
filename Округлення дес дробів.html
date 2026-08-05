@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Округлення десяткових дробів</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --correct-color: #059669;
+            --correct-bg: #ecfdf5;
+            --wrong-color: #dc2626;
+            --wrong-bg: #fef2f2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #eeefec;
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            margin: 25px 0 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .explanation {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        /* Стилі для стану після перевірки */
+        .correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: var(--correct-color);
+        }
+
+        .wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: var(--wrong-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тест з математики</h1>
+    <p class="description">Тема: Округлення десяткових дробів</p>
+
+    <form id="quizForm">
+        <!-- Секція 1 -->
+        <div class="section-title">1. Округліть числа до десятих</div>
+        
+        <div class="question-card" id="q1">
+            <div class="question-title">1) Округліть число 4,43 до десятих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q1" value="A"> А) 4,4</label>
+                <label class="option-label"><input type="radio" name="q1" value="B"> Б) 4,5</label>
+                <label class="option-label"><input type="radio" name="q1" value="C"> В) 4,0</label>
+            </div>
+            <div class="explanation" id="exp1"></div>
+        </div>
+
+        <div class="question-card" id="q2">
+            <div class="question-title">2) Округліть число 5,75 до десятих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q2" value="A"> А) 5,7</label>
+                <label class="option-label"><input type="radio" name="q2" value="B"> Б) 5,8</label>
+                <label class="option-label"><input type="radio" name="q2" value="C"> В) 6,0</label>
+            </div>
+            <div class="explanation" id="exp2"></div>
+        </div>
+
+        <div class="question-card" id="q3">
+            <div class="question-title">3) Округліть число 9,02 до десятих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q3" value="A"> А) 9,1</label>
+                <label class="option-label"><input type="radio" name="q3" value="B"> Б) 9,0</label>
+                <label class="option-label"><input type="radio" name="q3" value="C"> В) 9,2</label>
+            </div>
+            <div class="explanation" id="exp3"></div>
+        </div>
+
+        <div class="question-card" id="q4">
+            <div class="question-title">4) Округліть число 4,07 до десятих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q4" value="A"> А) 4,0</label>
+                <label class="option-label"><input type="radio" name="q4" value="B"> Б) 4,1</label>
+                <label class="option-label"><input type="radio" name="q4" value="C"> В) 4,7</label>
+            </div>
+            <div class="explanation" id="exp4"></div>
+        </div>
+
+        <!-- Секція 2 -->
+        <div class="section-title">2. Округліть числа до сотих</div>
+
+        <div class="question-card" id="q5">
+            <div class="question-title">5) Округліть число 9,119 до сотих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q5" value="A"> А) 9,11</label>
+                <label class="option-label"><input type="radio" name="q5" value="B"> Б) 9,12</label>
+                <label class="option-label"><input type="radio" name="q5" value="C"> В) 9,20</label>
+            </div>
+            <div class="explanation" id="exp5"></div>
+        </div>
+
+        <div class="question-card" id="q6">
+            <div class="question-title">6) Округліть число 4,2951 до сотих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q6" value="A"> А) 4,29</label>
+                <label class="option-label"><input type="radio" name="q6" value="B"> Б) 4,30</label>
+                <label class="option-label"><input type="radio" name="q6" value="C"> В) 4,31</label>
+            </div>
+            <div class="explanation" id="exp6"></div>
+        </div>
+
+        <div class="question-card" id="q7">
+            <div class="question-title">7) Округліть число 2,115 до сотих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q7" value="A"> А) 2,11</label>
+                <label class="option-label"><input type="radio" name="q7" value="B"> Б) 2,12</label>
+                <label class="option-label"><input type="radio" name="q7" value="C"> В) 2,20</label>
+            </div>
+            <div class="explanation" id="exp7"></div>
+        </div>
+
+        <div class="question-card" id="q8">
+            <div class="question-title">8) Округліть число 18,911 до сотих:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q8" value="A"> А) 18,91</label>
+                <label class="option-label"><input type="radio" name="q8" value="B"> Б) 18,92</label>
+                <label class="option-label"><input type="radio" name="q8" value="C"> В) 18,90</label>
+            </div>
+            <div class="explanation" id="exp8"></div>
+        </div>
+
+        <!-- Секція 3 -->
+        <div class="section-title">3. Округліть числа до одиниць</div>
+
+        <div class="question-card" id="q9">
+            <div class="question-title">9) Округліть число 4,154 до одиниць:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q9" value="A"> А) 4</label>
+                <label class="option-label"><input type="radio" name="q9" value="B"> Б) 5</label>
+                <label class="option-label"><input type="radio" name="q9" value="C"> В) 4,2</label>
+            </div>
+            <div class="explanation" id="exp9"></div>
+        </div>
+
+        <div class="question-card" id="q10">
+            <div class="question-title">10) Округліть число 4,514 до одиниць:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q10" value="A"> А) 4</label>
+                <label class="option-label"><input type="radio" name="q10" value="B"> Б) 5</label>
+                <label class="option-label"><input type="radio" name="q10" value="C"> В) 4,5</label>
+            </div>
+            <div class="explanation" id="exp10"></div>
+        </div>
+
+        <div class="question-card" id="q11">
+            <div class="question-title">11) Округліть число 5,92 до одиниць:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q11" value="A"> А) 5</label>
+                <label class="option-label"><input type="radio" name="q11" value="B"> Б) 6</label>
+                <label class="option-label"><input type="radio" name="q11" value="C"> В) 5,9</label>
+            </div>
+            <div class="explanation" id="exp11"></div>
+        </div>
+
+        <div class="question-card" id="q12">
+            <div class="question-title">12) Округліть число 8,17 до одиниць:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q12" value="A"> А) 8</label>
+                <label class="option-label"><input type="radio" name="q12" value="B"> Б) 9</label>
+                <label class="option-label"><input type="radio" name="q12" value="C"> В) 8,2</label>
+            </div>
+            <div class="explanation" id="exp12"></div>
+        </div>
+
+        <!-- Секція 4 -->
+        <div class="section-title">4. Округліть числа до десятків</div>
+
+        <div class="question-card" id="q13">
+            <div class="question-title">13) Округліть число 145,145 до десятків:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q13" value="A"> А) 150</label>
+                <label class="option-label"><input type="radio" name="q13" value="B"> Б) 140</label>
+                <label class="option-label"><input type="radio" name="q13" value="C"> В) 145</label>
+            </div>
+            <div class="explanation" id="exp13"></div>
+        </div>
+
+        <div class="question-card" id="q14">
+            <div class="question-title">14) Округліть число 152,152 до десятків:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q14" value="A"> А) 160</label>
+                <label class="option-label"><input type="radio" name="q14" value="B"> Б) 150</label>
+                <label class="option-label"><input type="radio" name="q14" value="C"> В) 152</label>
+            </div>
+            <div class="explanation" id="exp14"></div>
+        </div>
+
+        <div class="question-card" id="q15">
+            <div class="question-title">15) Округліть число 45,14 до десятків:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q15" value="A"> А) 40</label>
+                <label class="option-label"><input type="radio" name="q15" value="B"> Б) 50</label>
+                <label class="option-label"><input type="radio" name="q15" value="C"> В) 45</label>
+            </div>
+            <div class="explanation" id="exp15"></div>
+        </div>
+
+        <div class="question-card" id="q16">
+            <div class="question-title">16) Округліть число 14,45 до десятків:</div>
+            <div class="options">
+                <label class="option-label"><input type="radio" name="q16" value="A"> А) 10</label>
+                <label class="option-label"><input type="radio" name="q16" value="B"> Б) 20</label>
+                <label class="option-label"><input type="radio" name="q16" value="C"> В) 14</label>
+            </div>
+            <div class="explanation" id="exp16"></div>
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn" onclick="checkQuiz()">Завершити тест</button>
+        </div>
+    </form>
+
+    <div id="result" class="result-box"></div>
+</div>
+
+<script>
+    const answers = {
+        q1: { correct: "A", exp: "Після сотих стоїть 3 (< 5), тому 4,43 ≈ 4,4" },
+        q2: { correct: "B", exp: "Після сотих стоїть 5 (≥ 5), тому 5,75 ≈ 5,8" },
+        q3: { correct: "B", exp: "Після сотих стоїть 2 (< 5), тому 9,02 ≈ 9,0" },
+        q4: { correct: "B", exp: "Після сотих стоїть 7 (≥ 5), тому 4,07 ≈ 4,1" },
+        q5: { correct: "B", exp: "Після тисячних стоїть 9 (≥ 5), тому 9,119 ≈ 9,12" },
+        q6: { correct: "B", exp: "Після тисячних стоїть 5 (≥ 5), тому 4,2951 ≈ 4,30" },
+        q7: { correct: "B", exp: "Після тисячних стоїть 5 (≥ 5), тому 2,115 ≈ 2,12" },
+        q8: { correct: "A", exp: "Після тисячних стоїть 1 (< 5), тому 18,911 ≈ 18,91" },
+        q9: { correct: "A", exp: "Після десятих стоїть 1 (< 5), тому 4,154 ≈ 4" },
+        q10: { correct: "B", exp: "Після десятих стоїть 5 (≥ 5), тому 4,514 ≈ 5" },
+        q11: { correct: "B", exp: "Після десятих стоїть 9 (≥ 5), тому 5,92 ≈ 6" },
+        q12: { correct: "A", exp: "Після десятих стоїть 1 (< 5), тому 8,17 ≈ 8" },
+        q13: { correct: "A", exp: "На місці одиниць стоїть 5 (≥ 5), тому 145,145 ≈ 150" },
+        q14: { correct: "B", exp: "На місці одиниць стоїть 2 (< 5), тому 152,152 ≈ 150" },
+        q15: { correct: "B", exp: "На місці одиниць стоїть 5 (≥ 5), тому 45,14 ≈ 50" },
+        q16: { correct: "A", exp: "На місці одиниць стоїть 4 (< 5), тому 14,45 ≈ 10" }
+    };
+
+    function checkQuiz() {
+        let score = 0;
+        const total = Object.keys(answers).length;
+
+        for (let key in answers) {
+            const questionCard = document.getElementById(key);
+            const selectedOption = document.querySelector(`input[name="${key}"]:checked`);
+            const expDiv = document.getElementById(`exp${key.replace('q', '')}`);
+
+            // Скинути попередні класи
+            questionCard.classList.remove('correct', 'wrong');
+            expDiv.style.display = 'block';
+
+            if (selectedOption) {
+                if (selectedOption.value === answers[key].correct) {
+                    score++;
+                    questionCard.classList.add('correct');
+                    expDiv.className = 'explanation correct';
+                    expDiv.innerHTML = `<strong>Правильно!</strong> ${answers[key].exp}`;
+                } else {
+                    questionCard.classList.add('wrong');
+                    expDiv.className = 'explanation wrong';
+                    expDiv.innerHTML = `<strong>Неправильно.</strong> ${answers[key].exp}`;
+                }
+            } else {
+                questionCard.classList.add('wrong');
+                expDiv.className = 'explanation wrong';
+                expDiv.innerHTML = `<strong>Відповідь не обрана.</strong> ${answers[key].exp}`;
+            }
+        }
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+        
+        const percentage = Math.round((score / total) * 100);
+        resultDiv.innerHTML = `Ваш результат: ${score} з ${total} (${percentage}%)`;
+        
+        if (percentage >= 80) {
+            resultDiv.style.backgroundColor = 'var(--correct-bg)';
+            resultDiv.style.color = 'var(--correct-color)';
+        } else {
+            resultDiv.style.backgroundColor = 'var(--wrong-bg)';
+            resultDiv.style.color = 'var(--wrong-color)';
+        }
+
+        // Прокрутка до результатів
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
