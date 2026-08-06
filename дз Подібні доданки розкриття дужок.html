@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математичний тренажер</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .task-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafafa;
+        }
+        .task-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #16a085;
+        }
+        .sub-task {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            width: 220px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .correct { color: #27ae60; }
+        .incorrect { color: #c0392b; }
+        
+        #canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        canvas {
+            border: 1px solid #333;
+            background-color: #fff;
+            cursor: crosshair;
+            border-radius: 4px;
+        }
+        .points-list {
+            background: #eef9f6;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Математичний тренажер</h1>
+
+    <!-- Завдання 1 (4 приклади) -->
+    <div class="task-card">
+        <div class="task-title">1. Зведіть подібні доданки:</div>
+        
+        <div class="sub-task">
+            <span>1) 6x - 4y + 2x + 10y = </span>
+            <input type="text" id="t1_1" placeholder="зразок: 2a+3b">
+            <button onclick="checkTask1_1()">Перевірити</button>
+            <span id="f1_1" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>2) -6,3 + 12x + 3,1 - 15x = </span>
+            <input type="text" id="t1_2" placeholder="зразок: -2x-1.5">
+            <button onclick="checkTask1_2()">Перевірити</button>
+            <span id="f1_2" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>3) -6a + 5 - 3b + 6a - 11b = </span>
+            <input type="text" id="t1_3" placeholder="зразок: -2b+5">
+            <button onclick="checkTask1_3()">Перевірити</button>
+            <span id="f1_3" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>4) 5a - 8b + 4a + 12b = </span>
+            <input type="text" id="t1_4" placeholder="зразок: 2a+3b">
+            <button onclick="checkTask1_4()">Перевірити</button>
+            <span id="f1_4" class="feedback"></span>
+        </div>
+    </div>
+
+    <!-- Завдання 2 (6 прикладів) -->
+    <div class="task-card">
+        <div class="task-title">2. Розкрийте дужки:</div>
+
+        <div class="sub-task">
+            <span>1) x + (a - b) = </span>
+            <input type="text" id="t2_1" placeholder="зразок: x+y-z">
+            <button onclick="checkTask2_1()">Перевірити</button>
+            <span id="f2_1" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>2) c - (m - n) = </span>
+            <input type="text" id="t2_2" placeholder="зразок: x-y+z">
+            <button onclick="checkTask2_2()">Перевірити</button>
+            <span id="f2_2" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>3) 3(2x - 5y) = </span>
+            <input type="text" id="t2_3" placeholder="зразок: 2a-3b">
+            <button onclick="checkTask2_3()">Перевірити</button>
+            <span id="f2_3" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>4) -4(-a + 3b) = </span>
+            <input type="text" id="t2_4" placeholder="зразок: 2a-3b">
+            <button onclick="checkTask2_4()">Перевірити</button>
+            <span id="f2_4" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>5) (-5,1 + x - y) · (-b) = </span>
+            <input type="text" id="t2_5" placeholder="зразок: 5.1b-bx+by">
+            <button onclick="checkTask2_5()">Перевірити</button>
+            <span id="f2_5" class="feedback"></span>
+        </div>
+
+        <div class="sub-task">
+            <span>6) -2(3x - 4y + 5) = </span>
+            <input type="text" id="t2_6" placeholder="зразок: 2x-3y-4">
+            <button onclick="checkTask2_6()">Перевірити</button>
+            <span id="f2_6" class="feedback"></span>
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-title">3. Побудова рисунка за координатами</div>
+        <p>Послідовно позначте на координатній площині точки за списком. Натисніть на сітку у відповідних місцях:</p>
+        
+        <div class="points-list">
+            <b>Поточне завдання:</b> 
+            <span id="target-point" style="color: #e67e22; font-weight: bold;"></span>
+        </div>
+
+        <div id="canvas-container" style="margin-top: 15px;">
+            <canvas id="grid" width="440" height="440"></canvas>
+            <div>
+                <button onclick="resetCanvas()" style="background-color: #e74c3c;">Скинути рисунок</button>
+                <span id="canvas-feedback" class="feedback"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clean(str) {
+        return str.replace(/\s+/g, '').replace(/,/g, '.').toLowerCase();
+    }
+
+    // --- Перевірка Завдання 1 ---
+    function checkTask1_1() {
+        const val = clean(document.getElementById('t1_1').value);
+        const fb = document.getElementById('f1_1');
+        if (val === "8x+6y" || val === "6y+8x") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно, спробуй ще"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask1_2() {
+        const val = clean(document.getElementById('t1_2').value);
+        const fb = document.getElementById('f1_2');
+        if (val === "-3x-3.2" || val === "-3.2-3x") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно, спробуй ще"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask1_3() {
+        const val = clean(document.getElementById('t1_3').value);
+        const fb = document.getElementById('f1_3');
+        if (val === "-14b+5" || val === "5-14b") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно, спробуй ще"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask1_4() {
+        const val = clean(document.getElementById('t1_4').value);
+        const fb = document.getElementById('f1_4');
+        if (val === "9a+4b" || val === "4b+9a") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно, спробуй ще"; fb.className = "feedback incorrect";
+        }
+    }
+
+    // --- Перевірка Завдання 2 ---
+    function checkTask2_1() {
+        const val = clean(document.getElementById('t2_1').value);
+        const fb = document.getElementById('f2_1');
+        if (val === "x+a-b") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask2_2() {
+        const val = clean(document.getElementById('t2_2').value);
+        const fb = document.getElementById('f2_2');
+        if (val === "c-m+n") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask2_3() {
+        const val = clean(document.getElementById('t2_3').value);
+        const fb = document.getElementById('f2_3');
+        if (val === "6x-15y") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask2_4() {
+        const val = clean(document.getElementById('t2_4').value);
+        const fb = document.getElementById('f2_4');
+        if (val === "4a-12b" || val === "-12b+4a") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask2_5() {
+        const val = clean(document.getElementById('t2_5').value);
+        const fb = document.getElementById('f2_5');
+        if (val === "5.1b-bx+by" || val === "5.1b-xb+yb" || val === "b(5.1-x+y)") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    function checkTask2_6() {
+        const val = clean(document.getElementById('t2_6').value);
+        const fb = document.getElementById('f2_6');
+        if (val === "-6x+8y-10" || val === "8y-6x-10") {
+            fb.textContent = "Правильно!"; fb.className = "feedback correct";
+        } else {
+            fb.textContent = "Невірно"; fb.className = "feedback incorrect";
+        }
+    }
+
+    // --- Завдання 3 (Координатна площина: "Кораблик") ---
+    const canvas = document.getElementById('grid');
+    const ctx = canvas.getContext('2d');
+    const scale = 20; 
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    const shipPoints = [
+        {x: -6, y: -2, name: "A(-6; -2)"},
+        {x: 6, y: -2, name: "B(6; -2)"},
+        {x: 4, y: -5, name: "C(4; -5)"},
+        {x: -4, y: -5, name: "D(-4; -5)"},
+        {x: -6, y: -2, name: "A(-6; -2)"},
+        {x: 0, y: -2, name: "E(0; -2)"},
+        {x: 0, y: 6, name: "F(0; 6)"},
+        {x: 5, y: 0, name: "G(5; 0)"},
+        {x: 0, y: -1, name: "H(0; -1)"}
+    ];
+
+    let currentPointIndex = 0;
+    let userPoints = [];
+
+    function updateTargetText() {
+        const targetSpan = document.getElementById('target-point');
+        if (currentPointIndex < shipPoints.length) {
+            targetSpan.textContent = `Знайдіть точку: ${shipPoints[currentPointIndex].name}`;
+        } else {
+            targetSpan.textContent = "Завдання виконано! Вийшов кораблик ⛵!";
+            document.getElementById('canvas-feedback').textContent = "Чудова робота!";
+            document.getElementById('canvas-feedback').className = "feedback correct";
+        }
+    }
+
+    function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Сітка
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= canvas.width; x += scale) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += scale) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        // Осі координат
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        // Ось X
+        ctx.beginPath(); ctx.moveTo(10, centerY); ctx.lineTo(canvas.width - 10, centerY); ctx.stroke();
+        // Ось Y
+        ctx.beginPath(); ctx.moveTo(centerX, canvas.height - 10); ctx.lineTo(centerX, 10); ctx.stroke();
+
+        // Стрілки на осях
+        // Стрілка X (вправо)
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 10, centerY);
+        ctx.lineTo(canvas.width - 20, centerY - 5);
+        ctx.lineTo(canvas.width - 20, centerY + 5);
+        ctx.closePath();
+        ctx.fillStyle = '#000';
+        ctx.fill();
+
+        // Стрілка Y (вгору)
+        ctx.beginPath();
+        ctx.moveTo(centerX, 10);
+        ctx.lineTo(centerX - 5, 20);
+        ctx.lineTo(centerX + 5, 20);
+        ctx.closePath();
+        ctx.fill();
+
+        // Назви осей
+        ctx.font = 'bold 13px Arial';
+        ctx.fillText('x', canvas.width - 15, centerY - 10);
+        ctx.fillText('y', centerX + 12, 18);
+        ctx.fillText('0', centerX - 12, centerY + 15);
+
+        // Розмітка (числа) на осях
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#444';
+        
+        // Насічки та числа по X
+        const maxUnitsX = Math.floor((centerX - 25) / scale);
+        for (let i = -maxUnitsX; i <= maxUnitsX; i++) {
+            if (i === 0) continue;
+            const px = centerX + i * scale;
+            ctx.beginPath();
+            ctx.moveTo(px, centerY - 3);
+            ctx.lineTo(px, centerY + 3);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.textAlign = 'center';
+            ctx.fillText(i.toString(), px, centerY + 16);
+        }
+
+        // Насічки та числа по Y
+        const maxUnitsY = Math.floor((centerY - 25) / scale);
+        for (let j = -maxUnitsY; j <= maxUnitsY; j++) {
+            if (j === 0) continue;
+            const py = centerY - j * scale;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 3, py);
+            ctx.lineTo(centerX + 3, py);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.textAlign = 'right';
+            ctx.fillText(j.toString(), centerX - 6, py + 4);
+        }
+
+        // Малювання з'єднань точок користувача
+        if (userPoints.length > 1) {
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX + userPoints[0].x * scale, centerY - userPoints[0].y * scale);
+            for (let i = 1; i < userPoints.length; i++) {
+                ctx.lineTo(centerX + userPoints[i].x * scale, centerY - userPoints[i].y * scale);
+            }
+            ctx.stroke();
+        }
+
+        // Малювання точок
+        userPoints.forEach(pt => {
+            ctx.fillStyle = '#2980b9';
+            ctx.beginPath();
+            ctx.arc(centerX + pt.x * scale, centerY - pt.y * scale, 4, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    canvas.addEventListener('click', function(e) {
+        if (currentPointIndex >= shipPoints.length) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const gridX = Math.round((mouseX - centerX) / scale);
+        const gridY = Math.round((centerY - mouseY) / scale);
+
+        const target = shipPoints[currentPointIndex];
+
+        if (gridX === target.x && gridY === target.y) {
+            userPoints.push({x: gridX, y: gridY});
+            currentPointIndex++;
+            document.getElementById('canvas-feedback').textContent = "Вірно!";
+            document.getElementById('canvas-feedback').className = "feedback correct";
+            updateTargetText();
+            drawGrid();
+        } else {
+            document.getElementById('canvas-feedback').textContent = `Невірно. Позначено (${gridX}; ${gridY})`;
+            document.getElementById('canvas-feedback').className = "feedback incorrect";
+        }
+    });
+
+    function resetCanvas() {
+        currentPointIndex = 0;
+        userPoints = [];
+        document.getElementById('canvas-feedback').textContent = "";
+        updateTargetText();
+        drawGrid();
+    }
+
+    drawGrid();
+    updateTargetText();
+</script>
+
+</body>
+</html>
