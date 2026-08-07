@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтерактивний тренажер з математики</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --correct-color: #2e7d32;
+            --incorrect-color: #c62828;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .task-card {
+            background-color: #f8fafc;
+            border-left: 5px solid var(--primary-color);
+            padding: 18px 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .task-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .example-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .math-expr {
+            font-size: 1.1rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+        }
+
+        .fraction > span {
+            display: block;
+            padding: 1px 0;
+        }
+
+        .fraction span.numerator {
+            border-bottom: 2px solid #333;
+        }
+
+        input[type="text"] {
+            width: 120px;
+            padding: 6px 10px;
+            font-size: 1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        input.correct {
+            border-color: var(--correct-color);
+            background-color: #e8f5e9;
+        }
+
+        input.incorrect {
+            border-color: var(--incorrect-color);
+            background-color: #ffebee;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #357abd;
+        }
+
+        .result-message {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Десяткові та звичайні дроби</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-title">1. Запиши десятковим дробом:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr">912<span class="fraction"><span class="numerator">371</span><span>1000</span></span> =</span>
+                <input type="text" data-answer='["912,371", "912.371"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr">67<span class="fraction"><span class="numerator">9</span><span>100</span></span> =</span>
+                <input type="text" data-answer='["67,09", "67.09"]' placeholder="наприклад: 5,4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-title">2. Запиши у вигляді правильного дробу або мішаного числа:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr">4,13 =</span>
+                <input type="text" data-answer='["4 13/100"]' placeholder="наприклад: 2 3/10">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr">8,07 =</span>
+                <input type="text" data-answer='["8 7/100"]' placeholder="наприклад: 2 3/10">
+            </div>
+            <div class="example-item">
+                <span>3)</span>
+                <span class="math-expr">0,004 =</span>
+                <input type="text" data-answer='["4/1000", "1/250"]' placeholder="наприклад: 3/10">
+            </div>
+            <div class="example-item">
+                <span>4)</span>
+                <span class="math-expr">0,052 =</span>
+                <input type="text" data-answer='["52/1000", "13/250"]' placeholder="наприклад: 3/10">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-title">3. Виділи цілу і дробову частини числа та запиши десятковим дробом:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr"><span class="fraction"><span class="numerator">311</span><span>10</span></span> =</span>
+                <input type="text" data-answer='["31,1", "31.1"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr"><span class="fraction"><span class="numerator">1798</span><span>100</span></span> =</span>
+                <input type="text" data-answer='["17,98", "17.98"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>3)</span>
+                <span class="math-expr"><span class="fraction"><span class="numerator">70513</span><span>10000</span></span> =</span>
+                <input type="text" data-answer='["7,0513", "7.0513"]' placeholder="наприклад: 5,4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-title">4. Виконай додавання:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr">15 + 7,2 =</span>
+                <input type="text" data-answer='["22,2", "22.2"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr">0,592 + 0,83 =</span>
+                <input type="text" data-answer='["1,422", "1.422"]' placeholder="наприклад: 5,4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-title">5. Виконай віднімання:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr">4 − 3,4 =</span>
+                <input type="text" data-answer='["0,6", "0.6"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr">9,378 − 8,45 =</span>
+                <input type="text" data-answer='["0,928", "0.928"]' placeholder="наприклад: 5,4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card">
+        <div class="task-title">6. Обчисли:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span>1)</span>
+                <span class="math-expr">5 · 0,7 =</span>
+                <input type="text" data-answer='["3,5", "3.5"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>2)</span>
+                <span class="math-expr">6 · 0,5 =</span>
+                <input type="text" data-answer='["3", "3,0", "3.0"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>3)</span>
+                <span class="math-expr">4 · 0,03 =</span>
+                <input type="text" data-answer='["0,12", "0.12"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>4)</span>
+                <span class="math-expr">8 · 0,04 =</span>
+                <input type="text" data-answer='["0,32", "0.32"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>5)</span>
+                <span class="math-expr">3 · 2,6 =</span>
+                <input type="text" data-answer='["7,8", "7.8"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>6)</span>
+                <span class="math-expr">9 · 1,2 =</span>
+                <input type="text" data-answer='["10,8", "10.8"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>7)</span>
+                <span class="math-expr">0,3 · 0,04 =</span>
+                <input type="text" data-answer='["0,012", "0.012"]' placeholder="наприклад: 5,4">
+            </div>
+            <div class="example-item">
+                <span>8)</span>
+                <span class="math-expr">0,7 · 0,09 =</span>
+                <input type="text" data-answer='["0,063", "0.063"]' placeholder="наприклад: 5,4">
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="checkAnswers()">Перевірити відповіді</button>
+        <div id="resultMessage" class="result-message"></div>
+    </div>
+</div>
+
+<script>
+    function normalizeString(str) {
+        return str.trim().replace(/\s+/g, ' ');
+    }
+
+    function checkAnswers() {
+        const inputs = document.querySelectorAll('input[type="text"]');
+        let correctCount = 0;
+        let totalCount = inputs.length;
+
+        inputs.forEach(input => {
+            const validAnswers = JSON.parse(input.getAttribute('data-answer'));
+            const userValue = normalizeString(input.value);
+
+            if (userValue !== '' && validAnswers.some(ans => normalizeString(ans) === userValue)) {
+                input.className = 'correct';
+                correctCount++;
+            } else {
+                input.className = 'incorrect';
+            }
+        });
+
+        const resultDiv = document.getElementById('resultMessage');
+        resultDiv.textContent = `Правильно виконано: ${correctCount} з ${totalCount}`;
+        
+        if (correctCount === totalCount) {
+            resultDiv.style.color = 'var(--correct-color)';
+        } else {
+            resultDiv.style.color = '#d32f2f';
+        }
+    }
+</script>
+
+</body>
+</html>
