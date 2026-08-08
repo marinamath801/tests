@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер з математики</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            font-size: 1.7rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        .task-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .sub-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        input.correct, select.correct {
+            border-color: var(--correct) !important;
+            background-color: #f0fdf4 !important;
+        }
+
+        input.incorrect, select.incorrect {
+            border-color: var(--incorrect) !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-btn:hover {
+            background-color: #f8fafc;
+        }
+
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .match-table th, .match-table td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .match-table th {
+            background-color: #f8fafc;
+        }
+
+        select {
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер з математики</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-title">1. Укажіть усі цілі числа, що належать проміжку:</div>
+        <div class="sub-questions">
+            <div class="sub-item">
+                <span>1) (-2; 3):</span>
+                <input type="text" data-answer='["-1; 0; 1; 2", "-1, 0, 1, 2", "-1 0 1 2"]' placeholder="список чисел">
+            </div>
+            <div class="sub-item">
+                <span>2) (-4; 1]:</span>
+                <input type="text" data-answer='["-3; -2; -1; 0; 1", "-3, -2, -1, 0, 1", "-3 -2 -1 0 1"]' placeholder="список чисел">
+            </div>
+            <div class="sub-item">
+                <span>3) [-1.8; 2.5]:</span>
+                <input type="text" data-answer='["-1; 0; 1; 2", "-1, 0, 1, 2", "-1 0 1 2"]' placeholder="список чисел">
+            </div>
+            <div class="sub-item">
+                <span>4) [-3.5; 0):</span>
+                <input type="text" data-answer='["-3; -2; -1", "-3, -2, -1", "-3 -2 -1"]' placeholder="список чисел">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-title">2. Укажіть найменше ціле число, що належить проміжку:</div>
+        <div class="sub-questions">
+            <div class="sub-item">
+                <span>1) (-3; +∞):</span>
+                <input type="text" data-answer='["-2"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>2) [2.4; +∞):</span>
+                <input type="text" data-answer='["3"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>3) [-5; +∞):</span>
+                <input type="text" data-answer='["-5"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>4) (-14.2; -11.8):</span>
+                <input type="text" data-answer='["-14"]' placeholder="число">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-title">3. Укажіть найбільше ціле число, що належить проміжку:</div>
+        <div class="sub-questions">
+            <div class="sub-item">
+                <span>1) (-∞; -4):</span>
+                <input type="text" data-answer='["-5"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>2) (-∞; -8.3]:</span>
+                <input type="text" data-answer='["-9"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>3) (-8.4; -6.1):</span>
+                <input type="text" data-answer='["-7"]' placeholder="число">
+            </div>
+            <div class="sub-item">
+                <span>4) [-3.1; 5]:</span>
+                <input type="text" data-answer='["5"]' placeholder="число">
+            </div>
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-title">4. Установіть відповідність між числом (1–4) та множиною, до якої воно належить (А–Д):</div>
+        <table class="match-table">
+            <tr>
+                <th>Число</th>
+                <th>Множина</th>
+                <th>Відповідність</th>
+            </tr>
+            <tr>
+                <td><strong>1)</strong> 4.2</td>
+                <td><strong>А)</strong> множина простих чисел</td>
+                <td>
+                    <select data-select-answer="Г">
+                        <option value="">--</option>
+                        <option value="А">А</option><option value="Б">Б</option><option value="В">В</option><option value="Г">Г</option><option value="Д">Д</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>2)</strong> √12</td>
+                <td><strong>Б)</strong> множина складених чисел</td>
+                <td>
+                    <select data-select-answer="Д">
+                        <option value="">--</option>
+                        <option value="А">А</option><option value="Б">Б</option><option value="В">В</option><option value="Г">Г</option><option value="Д">Д</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>3)</strong> 12/3</td>
+                <td><strong>В)</strong> множина цілих чисел, що не є натуральними</td>
+                <td>
+                    <select data-select-answer="Б">
+                        <option value="">--</option>
+                        <option value="А">А</option><option value="Б">Б</option><option value="В">В</option><option value="Г">Г</option><option value="Д">Д</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>4)</strong> -18</td>
+                <td><strong>Г)</strong> множина дробових чисел<br><strong>Д)</strong> множина ірраціональних чисел</td>
+                <td>
+                    <select data-select-answer="В">
+                        <option value="">--</option>
+                        <option value="А">А</option><option value="Б">Б</option><option value="В">В</option><option value="Г">Г</option><option value="Д">Д</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-title">5. Із поданих чисел оберіть число, яке ділиться і на 2, і на 3:</div>
+        <div class="options-grid" data-radio-group="q5" data-correct="В">
+            <label class="option-btn"><input type="radio" name="q5" value="А"> А) 1435</label>
+            <label class="option-btn"><input type="radio" name="q5" value="Б"> Б) 3104</label>
+            <label class="option-btn"><input type="radio" name="q5" value="В"> В) 1542</label>
+            <label class="option-btn"><input type="radio" name="q5" value="Г"> Г) 9005</label>
+            <label class="option-btn"><input type="radio" name="q5" value="Д"> Д) 8116</label>
+        </div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card">
+        <div class="task-title">6. Знайдіть НСД(36; 48):</div>
+        <div class="options-grid" data-radio-group="q6" data-correct="Б">
+            <label class="option-btn"><input type="radio" name="q6" value="А"> А) 6</label>
+            <label class="option-btn"><input type="radio" name="q6" value="Б"> Б) 12</label>
+            <label class="option-btn"><input type="radio" name="q6" value="В"> В) 24</label>
+            <label class="option-btn"><input type="radio" name="q6" value="Г"> Г) 4</label>
+            <label class="option-btn"><input type="radio" name="q6" value="Д"> Д) 144</label>
+        </div>
+    </div>
+
+    <!-- Завдання 7 -->
+    <div class="task-card">
+        <div class="task-title">7. Не виконуючи ділення, встановити остачу від ділення 5555555523 на 9:</div>
+        <div class="options-grid" data-radio-group="q7" data-correct="А">
+            <label class="option-btn"><input type="radio" name="q7" value="А"> А) 0</label>
+            <label class="option-btn"><input type="radio" name="q7" value="Б"> Б) 2</label>
+            <label class="option-btn"><input type="radio" name="q7" value="В"> В) 5</label>
+            <label class="option-btn"><input type="radio" name="q7" value="Г"> Г) 1</label>
+            <label class="option-btn"><input type="radio" name="q7" value="Д"> Д) 4</label>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="checkAnswers()">Перевірити відповіді</button>
+        <div id="resultMessage" class="result"></div>
+    </div>
+</div>
+
+<script>
+    function normalize(str) {
+        return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/,/g, ';');
+    }
+
+    function checkAnswers() {
+        let correct = 0;
+        let total = 0;
+
+        // 1. Текстові поля
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            total++;
+            const answers = JSON.parse(input.getAttribute('data-answer'));
+            const userVal = normalize(input.value);
+
+            if (userVal !== '' && answers.some(ans => normalize(ans) === userVal)) {
+                input.className = 'correct';
+                correct++;
+            } else {
+                input.className = 'incorrect';
+            }
+        });
+
+        // 2. Випадаючі списки (відповідність)
+        document.querySelectorAll('select[data-select-answer]').forEach(select => {
+            total++;
+            const target = select.getAttribute('data-select-answer');
+            if (select.value === target) {
+                select.className = 'correct';
+                correct++;
+            } else {
+                select.className = 'incorrect';
+            }
+        });
+
+        // 3. Радіокнопки
+        document.querySelectorAll('[data-radio-group]').forEach(group => {
+            total++;
+            const name = group.getAttribute('data-radio-group');
+            const target = group.getAttribute('data-correct');
+            const selected = group.querySelector(`input[name="${name}"]:checked`);
+
+            const labels = group.querySelectorAll('.option-btn');
+            labels.forEach(l => l.style.color = 'inherit');
+
+            if (selected && selected.value === target) {
+                selected.parentElement.style.color = 'var(--correct)';
+                selected.parentElement.style.fontWeight = 'bold';
+                correct++;
+            } else if (selected) {
+                selected.parentElement.style.color = 'var(--incorrect)';
+            }
+        });
+
+        // Вивід підсумку
+        const resDiv = document.getElementById('resultMessage');
+        resDiv.textContent = `Результат: ${correct} з ${total} балів`;
+        resDiv.style.color = (correct === total) ? 'var(--correct)' : 'var(--incorrect)';
+    }
+</script>
+
+</body>
+</html>
