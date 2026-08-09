@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Дільники і кратні числа. Прості і складені числа</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .section-title {
+            background-color: #e0e7ff;
+            color: #1e3a8a;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .task-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            min-width: 200px;
+            flex-grow: 1;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #f0fdf4;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #fef2f2;
+            color: var(--incorrect);
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .task-status {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .status-correct {
+            color: var(--correct);
+        }
+
+        .status-incorrect {
+            color: var(--incorrect);
+        }
+
+        .explanation {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Дільники і кратні числа. Прості і складені числа</h1>
+
+    <div class="section-title">Частина 1. Дільники і кратні натурального числа</div>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">Якщо число <i>a</i> ділиться без остачі на число 5, то 5 називають...</div>
+        <div class="input-group">
+            <input type="text" id="t1" placeholder="Введіть відповідь">
+            <button class="check-btn" onclick="check1()">Перевірити</button>
+            <span class="task-status" id="status-1"></span>
+        </div>
+        <div class="explanation" id="exp-1">
+            <strong>Пояснення:</strong> Якщо число <i>a</i> ділиться на 5 без остачі, то 5 є <b>дільником</b> числа <i>a</i>.
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">Якщо число 7 є дільником числа <i>c</i>, то число <i>c</i> називають...</div>
+        <div class="input-group">
+            <input type="text" id="t2" placeholder="Введіть відповідь">
+            <button class="check-btn" onclick="check2()">Перевірити</button>
+            <span class="task-status" id="status-2"></span>
+        </div>
+        <div class="explanation" id="exp-2">
+            <strong>Пояснення:</strong> Якщо 7 ділить <i>c</i>, то число <i>c</i> ділиться на 7, а отже є <b>кратним</b> числу 7 (кратним 7).
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">Найменше число, кратне 34, — це...</div>
+        <div class="input-group">
+            <input type="text" id="t3" placeholder="Введіть число">
+            <button class="check-btn" onclick="check3()">Перевірити</button>
+            <span class="task-status" id="status-3"></span>
+        </div>
+        <div class="explanation" id="exp-3">
+            <strong>Пояснення:</strong> Найменшим натуральним числом, що ділиться на дане число, є саме це число. Тобто <b>34</b> (бо 34 · 1 = 34).
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 4</div>
+        <div class="task-text">Найбільший дільник числа 45 — це число...</div>
+        <div class="input-group">
+            <input type="text" id="t4" placeholder="Введіть число">
+            <button class="check-btn" onclick="check4()">Перевірити</button>
+            <span class="task-status" id="status-4"></span>
+        </div>
+        <div class="explanation" id="exp-4">
+            <strong>Пояснення:</strong> Найбільшим дільником будь-якого натурального числа є саме це число. Тобто <b>45</b>.
+        </div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 5</div>
+        <div class="task-text">Найбільший дільник числа 24 — це число...</div>
+        <div class="input-group">
+            <input type="text" id="t5" placeholder="Введіть число">
+            <button class="check-btn" onclick="check5()">Перевірити</button>
+            <span class="task-status" id="status-5"></span>
+        </div>
+        <div class="explanation" id="exp-5">
+            <strong>Пояснення:</strong> Найбільшим дільником будь-якого натурального числа є саме це число. Тобто <b>24</b>.
+        </div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 6</div>
+        <div class="task-text">Найменшим дільником числа 48, відмінним від одиниці, є число...</div>
+        <div class="input-group">
+            <input type="text" id="t6" placeholder="Введіть число">
+            <button class="check-btn" onclick="check6()">Перевірити</button>
+            <span class="task-status" id="status-6"></span>
+        </div>
+        <div class="explanation" id="exp-6">
+            <strong>Пояснення:</strong> Найменший дільник більший за 1 для будь-якого парного числа — це число <b>2</b>.
+        </div>
+    </div>
+
+    <div class="section-title">Частина 2. Прості і складені числа</div>
+
+    <!-- Завдання 7 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 7</div>
+        <div class="task-text">Число 16 складене, оскільки воно має такі дільники...</div>
+        <div class="input-group">
+            <input type="text" id="t7" placeholder="Перелічіть всі дільники через кому">
+            <button class="check-btn" onclick="check7()">Перевірити</button>
+            <span class="task-status" id="status-7"></span>
+        </div>
+        <div class="explanation" id="exp-7">
+            <strong>Пояснення:</strong> Дільниками числа 16 є числа: <b>1, 2, 4, 8, 16</b>. Оскільки дільників більше двох, число 16 є складеним.
+        </div>
+    </div>
+
+    <!-- Завдання 8 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 8</div>
+        <div class="task-text">Число 19 просте, оскільки воно має такі дільники...</div>
+        <div class="input-group">
+            <input type="text" id="t8" placeholder="Перелічіть дільники через кому">
+            <button class="check-btn" onclick="check8()">Перевірити</button>
+            <span class="task-status" id="status-8"></span>
+        </div>
+        <div class="explanation" id="exp-8">
+            <strong>Пояснення:</strong> Просте число ділиться лише на 1 і на само себе. Дільники числа 19: <b>1, 19</b> (або 1 і 19).
+        </div>
+    </div>
+
+    <!-- Завдання 9 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 9</div>
+        <div class="task-text">Запишіть складені числа третього десятка.</div>
+        <div class="input-group">
+            <input type="text" id="t9" placeholder="Перелічіть числа через кому">
+            <button class="check-btn" onclick="check9()">Перевірити</button>
+            <span class="task-status" id="status-9"></span>
+        </div>
+        <div class="explanation" id="exp-9">
+            <strong>Пояснення:</strong> Третій десяток — це числа від 21 до 30. Складені числа серед них: <b>21, 22, 24, 25, 26, 27, 28, 30</b> (числа 23 і 29 є простими).
+        </div>
+    </div>
+
+    <!-- Завдання 10 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 10</div>
+        <div class="task-text">Запишіть усі складені числа, менші за 15.</div>
+        <div class="input-group">
+            <input type="text" id="t10" placeholder="Перелічіть числа через кому">
+            <button class="check-btn" onclick="check10()">Перевірити</button>
+            <span class="task-status" id="status-10"></span>
+        </div>
+        <div class="explanation" id="exp-10">
+            <strong>Пояснення:</strong> Число 1 не є ні простим, ні складеним. Складені числа, менші за 15: <b>4, 6, 8, 9, 10, 12, 14</b>.
+        </div>
+    </div>
+
+    <!-- Завдання 11 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 11</div>
+        <div class="task-text">Серед чисел другого десятка простими є...</div>
+        <div class="input-group">
+            <input type="text" id="t11" placeholder="Перелічіть числа через кому">
+            <button class="check-btn" onclick="check11()">Перевірити</button>
+            <span class="task-status" id="status-11"></span>
+        </div>
+        <div class="explanation" id="exp-11">
+            <strong>Пояснення:</strong> Другий десяток — це числа від 11 до 20. Простими серед них є: <b>11, 13, 17, 19</b>.
+        </div>
+    </div>
+
+    <!-- Завдання 12 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 12</div>
+        <div class="task-text">Чи може сума простих чисел бути простим числом?</div>
+        <div class="input-group">
+            <input type="text" id="t12" placeholder="Так чи ні? Наведіть приклад за бажанням">
+            <button class="check-btn" onclick="check12()">Перевірити</button>
+            <span class="task-status" id="status-12"></span>
+        </div>
+        <div class="explanation" id="exp-12">
+            <strong>Пояснення:</strong> <b>Так, може.</b> Наприклад: 2 + 3 = 5 (числа 2, 3 і 5 є простими).
+        </div>
+    </div>
+
+</div>
+
+<script>
+function norm(str) {
+    if (!str) return '';
+    return str.toString().toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
+function parseSetOfNumbers(str) {
+    return str.split(/[,;\s]+/).map(x => x.trim()).filter(x => x.length > 0).sort((a, b) => a - b);
+}
+
+function setsEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
+function updateUI(num, isCorrect) {
+    const inp = document.getElementById(`t${num}`);
+    const st = document.getElementById(`status-${num}`);
+    const exp = document.getElementById(`exp-${num}`);
+
+    inp.classList.remove('correct', 'incorrect');
+    if (isCorrect) {
+        inp.classList.add('correct');
+        st.innerText = "Правильно!";
+        st.className = "task-status status-correct";
+        exp.style.display = 'none';
+    } else {
+        inp.classList.add('incorrect');
+        st.innerText = "Неправильно";
+        st.className = "task-status status-incorrect";
+        exp.style.display = 'block';
+    }
+}
+
+function check1() {
+    const v = norm(document.getElementById('t1').value);
+    const ok = v.includes('дільник') || v.includes('дильник');
+    updateUI(1, ok);
+}
+
+function check2() {
+    const v = norm(document.getElementById('t2').value);
+    const ok = v.includes('кратн') || v.includes('кратне');
+    updateUI(2, ok);
+}
+
+function check3() {
+    const v = norm(document.getElementById('t3').value);
+    updateUI(3, v === '34');
+}
+
+function check4() {
+    const v = norm(document.getElementById('t4').value);
+    updateUI(4, v === '45');
+}
+
+function check5() {
+    const v = norm(document.getElementById('t5').value);
+    updateUI(5, v === '24');
+}
+
+function check6() {
+    const v = norm(document.getElementById('t6').value);
+    updateUI(6, v === '2');
+}
+
+function check7() {
+    const userNums = parseSetOfNumbers(document.getElementById('t7').value);
+    const expected = ['1', '2', '4', '8', '16'];
+    updateUI(7, setsEqual(userNums, expected));
+}
+
+function check8() {
+    const userNums = parseSetOfNumbers(document.getElementById('t8').value);
+    const expected = ['1', '19'];
+    updateUI(8, setsEqual(userNums, expected));
+}
+
+function check9() {
+    const userNums = parseSetOfNumbers(document.getElementById('t9').value);
+    const expected = ['21', '22', '24', '25', '26', '27', '28', '30'];
+    updateUI(9, setsEqual(userNums, expected));
+}
+
+function check10() {
+    const userNums = parseSetOfNumbers(document.getElementById('t10').value);
+    const expected = ['4', '6', '8', '9', '10', '12', '14'];
+    updateUI(10, setsEqual(userNums, expected));
+}
+
+function check11() {
+    const userNums = parseSetOfNumbers(document.getElementById('t11').value);
+    const expected = ['11', '13', '17', '19'];
+    updateUI(11, setsEqual(userNums, expected));
+}
+
+function check12() {
+    const v = norm(document.getElementById('t12').value);
+    const ok = v.includes('так') || v.includes('може');
+    updateUI(12, ok);
+}
+</script>
+
+</body>
+</html>
