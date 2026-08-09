@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Подільність чисел</title>
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-hover: #1565c0;
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --correct: #2e7d32;
+            --incorrect: #c62828;
+            --border: #cfd8dc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 26px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .sub-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sub-item label {
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            width: 280px;
+            outline: none;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #e8f5e9;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffebee;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #e3f2fd;
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background-color: #bbdefb;
+            font-weight: bold;
+        }
+
+        .option-btn.correct {
+            border-color: var(--correct);
+            background-color: #c8e6c9;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffcdd2;
+            color: var(--incorrect);
+            font-weight: bold;
+        }
+
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .match-table td {
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        .match-select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            outline: none;
+            width: 100%;
+        }
+
+        .match-select.correct {
+            border-color: var(--correct);
+            background-color: #e8f5e9;
+        }
+
+        .match-select.incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffebee;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .task-status {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-correct {
+            color: var(--correct);
+        }
+
+        .status-incorrect {
+            color: var(--incorrect);
+        }
+
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 15px;
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Подільність чисел</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">
+            Серед чисел <strong>2; 13; 28; 51; 37; 63; 39</strong> назвіть:
+        </div>
+        <div class="sub-item">
+            <label>1) прості числа:</label>
+            <input type="text" id="t1-1" placeholder="Запишіть через кому">
+        </div>
+        <div class="sub-item">
+            <label>2) складені числа:</label>
+            <input type="text" id="t1-2" placeholder="Запишіть через кому">
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити завдання 1</button>
+        <span class="task-status" id="status-1"></span>
+        <div class="explanation" id="exp-1">
+            <strong>Пояснення:</strong><br>
+            • <strong>Прості числа</strong> мають лише 2 дільники (1 і саме число): <strong>2, 13, 37</strong>.<br>
+            • <strong>Складені числа</strong> мають більше ніж 2 дільники:<br>
+            - 28 (ділиться на 2, 4, 7...);<br>
+            - 51 (сума цифр 5+1=6, ділиться на 3: 51=3×17);<br>
+            - 63 (ділиться на 3, 7, 9);<br>
+            - 39 (сума цифр 3+9=12, ділиться на 3: 39=3×13).<br>
+            Отже, складені: <strong>28, 51, 63, 39</strong>.
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">
+            Серед чисел <strong>6477; 7245; 45 783; 3260; 68 220</strong> укажіть такі, що діляться націло:
+        </div>
+        <div class="sub-item"><label>1) на 3:</label> <input type="text" id="t2-1"></div>
+        <div class="sub-item"><label>2) на 5:</label> <input type="text" id="t2-2"></div>
+        <div class="sub-item"><label>3) на 9:</label> <input type="text" id="t2-3"></div>
+        <div class="sub-item"><label>4) на 2:</label> <input type="text" id="t2-4"></div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити завдання 2</button>
+        <span class="task-status" id="status-2"></span>
+        <div class="explanation" id="exp-2">
+            <strong>Пояснення:</strong><br>
+            • <strong>На 3</strong> (сума цифр ділиться на 3):<br>
+              - 6477 (6+4+7+7=24) — так;<br>
+              - 7245 (7+2+4+5=18) — так;<br>
+              - 45783 (4+5+7+8+3=27) — так;<br>
+              - 3260 (3+2+6+0=11) — ні;<br>
+              - 68220 (6+8+2+2+0=18) — так.<br>
+            • <strong>На 5</strong> (закінчується на 0 або 5): <strong>7245, 3260, 68220</strong>.<br>
+            • <strong>На 9</strong> (сума цифр ділиться на 9): <strong>7245, 45783, 68220</strong>.<br>
+            • <strong>На 2</strong> (парні, закінчуються на 0, 2, 4, 6, 8): <strong>3260, 68220</strong>.
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">
+            Яку цифру можна поставити замість зірочки в записі <strong>67114*</strong>, щоб одержане число ділилося і на 3, і на 5?
+        </div>
+        <div class="sub-item">
+            <label>Цифра замість * :</label>
+            <input type="text" id="t3-1" placeholder="Введіть цифру">
+        </div>
+        <button class="check-btn" onclick="checkTask3()">Перевірити завдання 3</button>
+        <span class="task-status" id="status-3"></span>
+        <div class="explanation" id="exp-3">
+            <strong>Пояснення:</strong><br>
+            1. Щоб число ділилося на 5, воно має закінчуватися на <strong>0</strong> або <strong>5</strong>.<br>
+            2. Сума відомих цифр: 6 + 7 + 1 + 1 + 4 = 19.<br>
+            • Якщо * = 0, сума цифр 19 + 0 = 19 (не ділиться на 3).<br>
+            • Якщо * = 5, сума цифр 19 + 5 = 24 (ділиться на 3, бо 24 : 3 = 8).<br>
+            Отже, єдине правильне значення — це цифра <strong>5</strong>.
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="task-4">
+        <div class="task-num">Завдання 4 (№13)</div>
+        <div class="task-text">Скільки дільників має число 32?</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(4, 'А')">А) 4</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(4, 'Б')">Б) 5</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(4, 'В')">В) 6</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(4, 'Г')">Г) 7</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(4, 'Д')">Д) 8</div>
+        </div>
+        <button class="check-btn" onclick="checkTask4()">Перевірити завдання 4</button>
+        <span class="task-status" id="status-4"></span>
+        <div class="explanation" id="exp-4">
+            <strong>Пояснення:</strong><br>
+            Випишемо всі дільники числа 32:<br>
+            1, 2, 4, 8, 16, 32.<br>
+            Всього 6 дільників.<br>
+            <em>Правильний варіант: В</em>
+        </div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card" id="task-5">
+        <div class="task-num">Завдання 5 (№15)</div>
+        <div class="task-text">Які числа у наведених парах є взаємно простими?</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(5, 'А')">А) 15 і 12</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(5, 'Б')">Б) 62 і 22</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(5, 'В')">В) 18 і 54</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(5, 'Г')">Г) 25 і 105</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(5, 'Д')">Д) 37 і 35</div>
+        </div>
+        <button class="check-btn" onclick="checkTask5()">Перевірити завдання 5</button>
+        <span class="task-status" id="status-5"></span>
+        <div class="explanation" id="exp-5">
+            <strong>Пояснення:</strong><br>
+            Взаємно прості числа — це числа, НСД яких дорівнює 1.<br>
+            • А) 15 і 12 мають спільний дільник 3.<br>
+            • Б) 62 і 22 — парні, мають спільний дільник 2.<br>
+            • В) 18 і 54 діляться на 2, 3, 9, 18.<br>
+            • Г) 25 і 105 закінчуються на 5, мають спільний дільник 5.<br>
+            • Д) 37 і 35 мають єдиний спільний дільник 1 (37 — просте число).<br>
+            <em>Правильний варіант: Д</em>
+        </div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card" id="task-6">
+        <div class="task-num">Завдання 6 (№4)</div>
+        <div class="task-text">Яку цифру із зазначених нижче треба поставити замість * у числі 5*62, щоб одержане число ділилося на 9?</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(6, 'А')">А) 0</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(6, 'Б')">Б) 2</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(6, 'В')">В) 9</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(6, 'Г')">Г) 3</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(6, 'Д')">Д) 5</div>
+        </div>
+        <button class="check-btn" onclick="checkTask6()">Перевірити завдання 6</button>
+        <span class="task-status" id="status-6"></span>
+        <div class="explanation" id="exp-6">
+            <strong>Пояснення:</strong><br>
+            Ознака подільності на 9: сума цифр має ділитися на 9.<br>
+            Сума відомих цифр: 5 + 6 + 2 = 13.<br>
+            Найближче число, більше за 13, яке ділиться на 9 — це 18.<br>
+            18 - 13 = 5.<br>
+            Замість * треба поставити цифру 5.<br>
+            <em>Правильний варіант: Д</em>
+        </div>
+    </div>
+
+    <!-- Завдання 7 -->
+    <div class="task-card" id="task-7">
+        <div class="task-num">Завдання 7 (№5)</div>
+        <div class="task-text">Із поданих чисел оберіть число, яке ділиться і на 2, і на 3.</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(7, 'А')">А) 2894</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(7, 'Б')">Б) 406</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(7, 'В')">В) 2802</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(7, 'Г')">Г) 785</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(7, 'Д')">Д) 604</div>
+        </div>
+        <button class="check-btn" onclick="checkTask7()">Перевірити завдання 7</button>
+        <span class="task-status" id="status-7"></span>
+        <div class="explanation" id="exp-7">
+            <strong>Пояснення:</strong><br>
+            Щоб число ділилося і на 2, і на 3, воно має бути парним (закінчуватись на парну цифру) та сума його цифр має ділитися на 3.<br>
+            • 785 — непарне (закінчується на 5).<br>
+            • Перевіримо суму цифр решти парних чисел:<br>
+              - 2894: 2+8+9+4 = 23 (не ділиться на 3);<br>
+              - 406: 4+0+6 = 10 (не ділиться на 3);<br>
+              - 604: 6+0+4 = 10 (не ділиться на 3);<br>
+              - 2802: 2+8+0+2 = 12 (ділиться на 3).<br>
+            <em>Правильний варіант: В</em>
+        </div>
+    </div>
+
+    <!-- Завдання 8 -->
+    <div class="task-card" id="task-8">
+        <div class="task-num">Завдання 8 (№1.12)</div>
+        <div class="task-text">Не виконуючи ділення, встановити остачу від ділення <strong>33333333341</strong> на 9.</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(8, 'А')">А) 1</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(8, 'Б')">Б) 5</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(8, 'В')">В) 14</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(8, 'Г')">Г) 4</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(8, 'Д')">Д) 41</div>
+        </div>
+        <button class="check-btn" onclick="checkTask8()">Перевірити завдання 8</button>
+        <span class="task-status" id="status-8"></span>
+        <div class="explanation" id="exp-8">
+            <strong>Пояснення:</strong><br>
+            Остача від ділення числа на 9 дорівнює остачі від ділення суми його цифр на 9.<br>
+            Число 33333333341 містить 9 трійок, одну четвірку та одну одиницю.<br>
+            Сума цифр = 9 × 3 + 4 + 1 = 27 + 5 = 32.<br>
+            Знайдемо остачу від ділення 32 на 9:<br>
+            32 = 9 × 3 + 5, тобто остача дорівнює <strong>5</strong>.<br>
+            <em>Правильний варіант: Б</em>
+        </div>
+    </div>
+
+    <!-- Завдання 9 -->
+    <div class="task-card" id="task-9">
+        <div class="task-num">Завдання 9 (№17)</div>
+        <div class="task-text">Знайдіть НСД(45; 63).</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(9, 'А')">А) 6</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(9, 'Б')">Б) 9</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(9, 'В')">В) 3</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(9, 'Г')">Г) 5</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(9, 'Д')">Д) 7</div>
+        </div>
+        <button class="check-btn" onclick="checkTask9()">Перевірити завдання 9</button>
+        <span class="task-status" id="status-9"></span>
+        <div class="explanation" id="exp-9">
+            <strong>Пояснення:</strong><br>
+            Розкладемо числа на прості множники:<br>
+            45 = 3 × 3 × 5 = 3² × 5<br>
+            63 = 3 × 3 × 7 = 3² × 7<br>
+            НСД(45; 63) = 3² = 9.<br>
+            <em>Правильний варіант: Б</em>
+        </div>
+    </div>
+
+    <!-- Завдання 10 -->
+    <div class="task-card" id="task-10">
+        <div class="task-num">Завдання 10 (№18)</div>
+        <div class="task-text">Обчисліть НСК(30; 36).</div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(10, 'А')">А) 120</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(10, 'Б')">Б) 140</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(10, 'В')">В) 160</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(10, 'Г')">Г) 180</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(10, 'Д')">Д) інша відповідь</div>
+        </div>
+        <button class="check-btn" onclick="checkTask10()">Перевірити завдання 10</button>
+        <span class="task-status" id="status-10"></span>
+        <div class="explanation" id="exp-10">
+            <strong>Пояснення:</strong><br>
+            Розкладемо числа на прості множники:<br>
+            30 = 2 × 3 × 5<br>
+            36 = 2² × 3²<br>
+            НСК(30; 36) = 2² × 3² × 5 = 4 × 9 × 5 = 180.<br>
+            <em>Правильний варіант: Г</em>
+        </div>
+    </div>
+
+    <!-- Завдання 11 -->
+    <div class="task-card" id="task-11">
+        <div class="task-num">Завдання 11 (№19)</div>
+        <div class="task-text">
+            Яку найбільшу кількість однакових пакунків із горіхів і цукерок можна зробити, якщо є 18 горіхів і 24 цукерки? Використайте усі горіхи й цукерки.
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(11, 'А')">А) 9</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(11, 'Б')">Б) 6</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(11, 'В')">В) 8</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(11, 'Г')">Г) 4</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(11, 'Д')">Д) 3</div>
+        </div>
+        <button class="check-btn" onclick="checkTask11()">Перевірити завдання 11</button>
+        <span class="task-status" id="status-11"></span>
+        <div class="explanation" id="exp-11">
+            <strong>Пояснення:</strong><br>
+            Найбільша кількість однакових пакунків дорівнює Найбільшому Спільному Дільнику чисел 18 і 24.<br>
+            Дільники 18: 1, 2, 3, 6, 9, 18.<br>
+            Дільники 24: 1, 2, 3, 4, 6, 8, 12, 24.<br>
+            НСД(18; 24) = 6.<br>
+            <em>Правильний варіант: Б</em>
+        </div>
+    </div>
+
+    <!-- Завдання 12 -->
+    <div class="task-card" id="task-12">
+        <div class="task-num">Завдання 12 (№20)</div>
+        <div class="task-text">
+            В ящику лежать груші і яблука. Яблук у чотири рази більше, ніж груш. Якою із запропонованих кількостей може бути кількість фруктів у ящику?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(12, 'А')">А) 56</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(12, 'Б')">Б) 55</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(12, 'В')">В) 57</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(12, 'Г')">Г) 63</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(12, 'Д')">Д) 64</div>
+        </div>
+        <button class="check-btn" onclick="checkTask12()">Перевірити завдання 12</button>
+        <span class="task-status" id="status-12"></span>
+        <div class="explanation" id="exp-12">
+            <strong>Пояснення:</strong><br>
+            Нехай кількість груш = x, тоді яблук = 4x.<br>
+            Загальна кількість фруктів: x + 4x = 5x.<br>
+            Отже, загальна кількість фруктів обов'язково має ділитися на 5.<br>
+            Серед запропонованих чисел тільки 55 ділиться на 5.<br>
+            <em>Правильний варіант: Б</em>
+        </div>
+    </div>
+
+    <!-- Завдання 13 -->
+    <div class="task-card" id="task-13">
+        <div class="task-num">Завдання 13 (№21, Пробне ЗНО 2009)</div>
+        <div class="task-text">
+            У коробці міститься не більше 50 цукерок. Цукерки можна порівну розподілити між двома або трьома дітьми, але неможливо між чотирма. Яка найбільша можлива кількість цукерок може бути в коробці?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(13, 'А')">А) 42</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(13, 'Б')">Б) 44</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(13, 'В')">В) 46</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(13, 'Г')">Г) 48</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(13, 'Д')">Д) 50</div>
+        </div>
+        <button class="check-btn" onclick="checkTask13()">Перевірити завдання 13</button>
+        <span class="task-status" id="status-13"></span>
+        <div class="explanation" id="exp-13">
+            <strong>Пояснення:</strong><br>
+            1. Число цукерок має ділитися і на 2, і на 3, тобто ділитися на 6.<br>
+            2. Серед варіантів числа, що діляться на 6: 42 та 48.<br>
+            3. Перевіримо умова "неможливо розподілити між 4":<br>
+               - 48 ділиться на 4 (48 : 4 = 12) — не підходить;<br>
+               - 42 не ділиться на 4 націло (42 : 4 = 10,5) — підходить!<br>
+            Отже, найбільша можлива кількість — 42.<br>
+            <em>Правильний варіант: А</em>
+        </div>
+    </div>
+
+    <!-- Завдання 14 -->
+    <div class="task-card" id="task-14">
+        <div class="task-num">Завдання 14 (№1.14)</div>
+        <div class="task-text">
+            Із 68 жовтих і 85 червоних троянд склали букети, розділивши жовті та червоні троянди в усі букети порівну. Скільки найбільше букетів можна одержати?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(14, 'А')">А) 9</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(14, 'Б')">Б) 20</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(14, 'В')">В) 34</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(14, 'Г')">Г) 17</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(14, 'Д')">Д) 8</div>
+        </div>
+        <button class="check-btn" onclick="checkTask14()">Перевірити завдання 14</button>
+        <span class="task-status" id="status-14"></span>
+        <div class="explanation" id="exp-14">
+            <strong>Пояснення:</strong><br>
+            Шукаємо Найбільший Спільний Дільник НСД(68; 85).<br>
+            68 = 17 × 4<br>
+            85 = 17 × 5<br>
+            НСД(68; 85) = 17.<br>
+            Отже, можна скласти найбільше 17 букетів (у кожному по 4 жовтих та 5 червоних троянд).<br>
+            <em>Правильний варіант: Г</em>
+        </div>
+    </div>
+
+    <!-- Завдання 15 -->
+    <div class="task-card" id="task-15">
+        <div class="task-num">Завдання 15 (№1.15)</div>
+        <div class="task-text">
+            Яка найменша кількість метрів тканини може бути в рулоні, щоб його можна було продати без залишку по 6 м, по 8 м або по 10 м?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(15, 'А')">А) 480</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(15, 'Б')">Б) 60</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(15, 'В')">В) 120</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(15, 'Г')">Г) 240</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(15, 'Д')">Д) 4800</div>
+        </div>
+        <button class="check-btn" onclick="checkTask15()">Перевірити завдання 15</button>
+        <span class="task-status" id="status-15"></span>
+        <div class="explanation" id="exp-15">
+            <strong>Пояснення:</strong><br>
+            Найменша кількість метрів дорівнює Найменшому Спільному Кратному чисел 6, 8 та 10.<br>
+            6 = 2 × 3<br>
+            8 = 2³<br>
+            10 = 2 × 5<br>
+            НСК(6; 8; 10) = 2³ × 3 × 5 = 8 × 3 × 5 = 120 м.<br>
+            <em>Правильний варіант: В</em>
+        </div>
+    </div>
+
+    <!-- Завдання 16 -->
+    <div class="task-card" id="task-16">
+        <div class="task-num">Завдання 16 (№21, Пробне ЗНО 2008)</div>
+        <div class="task-text">
+            Знайдіть натуральне одноцифрове число <strong>a</strong>, коли відомо, що сума <strong>510 + a</strong> ділиться без остачі на 9.
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(16, 'А')">А) 1</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(16, 'Б')">Б) 3</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(16, 'В')">В) 5</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(16, 'Г')">Г) 6</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(16, 'Д')">Д) 9</div>
+        </div>
+        <button class="check-btn" onclick="checkTask16()">Перевірити завдання 16</button>
+        <span class="task-status" id="status-16"></span>
+        <div class="explanation" id="exp-16">
+            <strong>Пояснення:</strong><br>
+            Сума цифр числа 510 дорівнює 5 + 1 + 0 = 6.<br>
+            Щоб число (510 + a) ділилося на 9, сума його цифр (6 + a) має ділитися на 9.<br>
+            Найближче число, що ділиться на 9 — це 9.<br>
+            6 + a = 9  ⇒  a = 3.<br>
+            <em>Правильний варіант: Б</em>
+        </div>
+    </div>
+
+    <!-- Завдання 17 -->
+    <div class="task-card" id="task-17">
+        <div class="task-num">Завдання 17 (№1.23)</div>
+        <div class="task-text">
+            Установити відповідність між числами (1–4) та їх остачами від ділення на 9 (А–Д).
+        </div>
+        <table class="match-table">
+            <tr>
+                <td width="30%"><strong>1)</strong> 53229465</td>
+                <td>
+                    <select class="match-select" id="t17-1">
+                        <option value="">-- Оберіть остачу --</option>
+                        <option value="А">А) 2</option>
+                        <option value="Б">Б) 3</option>
+                        <option value="В">В) 4</option>
+                        <option value="Г">Г) 5</option>
+                        <option value="Д">Д) 0</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>2)</strong> 81720245</td>
+                <td>
+                    <select class="match-select" id="t17-2">
+                        <option value="">-- Оберіть остачу --</option>
+                        <option value="А">А) 2</option>
+                        <option value="Б">Б) 3</option>
+                        <option value="В">В) 4</option>
+                        <option value="Г">Г) 5</option>
+                        <option value="Д">Д) 0</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>3)</strong> 33333332</td>
+                <td>
+                    <select class="match-select" id="t17-3">
+                        <option value="">-- Оберіть остачу --</option>
+                        <option value="А">А) 2</option>
+                        <option value="Б">Б) 3</option>
+                        <option value="В">В) 4</option>
+                        <option value="Г">Г) 5</option>
+                        <option value="Д">Д) 0</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>4)</strong> 33333016</td>
+                <td>
+                    <select class="match-select" id="t17-4">
+                        <option value="">-- Оберіть остачу --</option>
+                        <option value="А">А) 2</option>
+                        <option value="Б">Б) 3</option>
+                        <option value="В">В) 4</option>
+                        <option value="Г">Г) 5</option>
+                        <option value="Д">Д) 0</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button class="check-btn" onclick="checkTask17()">Перевірити завдання 17</button>
+        <span class="task-status" id="status-17"></span>
+        <div class="explanation" id="exp-17">
+            <strong>Пояснення:</strong><br>
+            Остача від ділення на 9 дорівнює остачі від ділення суми цифр числа на 9:<br>
+            1) 5+3+2+2+9+4+6+5 = 36; 36:9 = 4 (остача 0) &rarr; <strong>Д</strong><br>
+            2) 8+1+7+2+0+2+4+5 = 29; 29 = 9×3 + 2 (остача 2) &rarr; <strong>А</strong><br>
+            3) 7×3 + 2 = 23; 23 = 9×2 + 5 (остача 5) &rarr; <strong>Г</strong><br>
+            4) 5×3 + 0 + 1 + 6 = 22; 22 = 9×2 + 4 (остача 4) &rarr; <strong>В</strong>
+        </div>
+    </div>
+
+    <!-- Завдання 18 -->
+    <div class="task-card" id="task-18">
+        <div class="task-num">Завдання 18</div>
+        <div class="task-text">
+            Установіть відповідність між запитанням (1–4) та правильною відповіддю на нього (А–Д).
+        </div>
+        <table class="match-table">
+            <tr>
+                <td width="45%"><strong>1)</strong> Яке число є квадратом натурального числа?</td>
+                <td>
+                    <select class="match-select" id="t18-1">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="А">А) 8</option>
+                        <option value="Б">Б) 16</option>
+                        <option value="В">В) 17</option>
+                        <option value="Г">Г) 27</option>
+                        <option value="Д">Д) 56</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>2)</strong> Яке число є простим?</td>
+                <td>
+                    <select class="match-select" id="t18-2">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="А">А) 8</option>
+                        <option value="Б">Б) 16</option>
+                        <option value="В">В) 17</option>
+                        <option value="Г">Г) 27</option>
+                        <option value="Д">Д) 56</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>3)</strong> Яке число є дільником 8?</td>
+                <td>
+                    <select class="match-select" id="t18-3">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="А">А) 8</option>
+                        <option value="Б">Б) 16</option>
+                        <option value="В">В) 17</option>
+                        <option value="Г">Г) 27</option>
+                        <option value="Д">Д) 56</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>4)</strong> Яке число кратне 7?</td>
+                <td>
+                    <select class="match-select" id="t18-4">
+                        <option value="">-- Оберіть відповідь --</option>
+                        <option value="А">А) 8</option>
+                        <option value="Б">Б) 16</option>
+                        <option value="В">В) 17</option>
+                        <option value="Г">Г) 27</option>
+                        <option value="Д">Д) 56</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button class="check-btn" onclick="checkTask18()">Перевірити завдання 18</button>
+        <span class="task-status" id="status-18"></span>
+        <div class="explanation" id="exp-18">
+            <strong>Пояснення:</strong><br>
+            1) Квадрат натурального числа: 16 (бо 4² = 16) &rarr; <strong>Б</strong><br>
+            2) Просте число: 17 (ділиться тільки на 1 і на 17) &rarr; <strong>В</strong><br>
+            3) Дільник числа 8: 8 (бо 8 : 8 = 1) &rarr; <strong>А</strong><br>
+            4) Число, кратне 7: 56 (бо 56 : 7 = 8) &rarr; <strong>Д</strong>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function parseSet(str) {
+    if (!str) return [];
+    return str.replace(/\s+/g, '')
+              .replace(/;/g, ',')
+              .split(',')
+              .filter(x => x !== '');
+}
+
+function setsEqual(a, b) {
+    if (a.length !== b.length) return false;
+    let setA = [...a].sort();
+    let setB = [...b].sort();
+    return setA.every((val, index) => val === setB[index]);
+}
+
+function updateInputStatus(inputId, isCorrect) {
+    const el = document.getElementById(inputId);
+    el.classList.remove('correct', 'incorrect');
+    if (isCorrect) {
+        el.classList.add('correct');
+    } else {
+        el.classList.add('incorrect');
+    }
+}
+
+function toggleExplanation(taskNum, show) {
+    const exp = document.getElementById(`exp-${taskNum}`);
+    if (exp) {
+        exp.style.display = show ? 'block' : 'none';
+    }
+}
+
+// Завдання 1
+function checkTask1() {
+    const ans1 = parseSet(document.getElementById('t1-1').value);
+    const ans2 = parseSet(document.getElementById('t1-2').value);
+
+    const target1 = ['2', '13', '37'];
+    const target2 = ['28', '51', '63', '39'];
+
+    const c1 = setsEqual(ans1, target1);
+    const c2 = setsEqual(ans2, target2);
+
+    updateInputStatus('t1-1', c1);
+    updateInputStatus('t1-2', c2);
+
+    const status = document.getElementById('status-1');
+    if (c1 && c2) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(1, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(1, true);
+    }
+}
+
+// Завдання 2
+function checkTask2() {
+    const answers = {
+        't2-1': ['6477', '7245', '45783', '68220'],
+        't2-2': ['7245', '3260', '68220'],
+        't2-3': ['7245', '45783', '68220'],
+        't2-4': ['3260', '68220']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+        const userVals = parseSet(document.getElementById(id).value);
+        const isOk = setsEqual(userVals, answers[id]);
+        updateInputStatus(id, isOk);
+        if (!isOk) allCorrect = false;
+    }
+
+    const status = document.getElementById('status-2');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(2, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(2, true);
+    }
+}
+
+// Завдання 3
+function checkTask3() {
+    const val = document.getElementById('t3-1').value.trim();
+    const isOk = (val === '5');
+    updateInputStatus('t3-1', isOk);
+
+    const status = document.getElementById('status-3');
+    if (isOk) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(3, false);
+    } else {
+        status.innerText = "Неправильно";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(3, true);
+    }
+}
+
+let selectedOptions = {};
+
+function selectOption(taskNum, option) {
+    selectedOptions[taskNum] = option;
+    const taskCard = document.getElementById(`task-${taskNum}`);
+    const btns = taskCard.querySelectorAll('.option-btn');
+    
+    btns.forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'incorrect');
+        if (btn.getAttribute('data-opt') === option) {
+            btn.classList.add('selected');
+        }
+    });
+}
+
+function checkSingleChoiceTask(taskNum, correctOpt) {
+    const userOpt = selectedOptions[taskNum];
+    const taskCard = document.getElementById(`task-${taskNum}`);
+    const btns = taskCard.querySelectorAll('.option-btn');
+    const status = document.getElementById(`status-${taskNum}`);
+
+    btns.forEach(btn => {
+        btn.classList.remove('correct', 'incorrect');
+        const opt = btn.getAttribute('data-opt');
+        if (opt === userOpt) {
+            if (userOpt === correctOpt) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+            }
+        }
+    });
+
+    if (userOpt === correctOpt) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(taskNum, false);
+    } else {
+        status.innerText = userOpt ? "Неправильно" : "Оберіть варіант";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(taskNum, true);
+    }
+}
+
+function checkTask4() { checkSingleChoiceTask(4, 'В'); }
+function checkTask5() { checkSingleChoiceTask(5, 'Д'); }
+function checkTask6() { checkSingleChoiceTask(6, 'Д'); }
+function checkTask7() { checkSingleChoiceTask(7, 'В'); }
+function checkTask8() { checkSingleChoiceTask(8, 'Б'); } // Оновлено перевірку на правильний варіант 'Б'
+function checkTask9() { checkSingleChoiceTask(9, 'Б'); }
+function checkTask10() { checkSingleChoiceTask(10, 'Г'); }
+function checkTask11() { checkSingleChoiceTask(11, 'Б'); }
+function checkTask12() { checkSingleChoiceTask(12, 'Б'); }
+function checkTask13() { checkSingleChoiceTask(13, 'А'); }
+function checkTask14() { checkSingleChoiceTask(14, 'Г'); }
+function checkTask15() { checkSingleChoiceTask(15, 'В'); }
+function checkTask16() { checkSingleChoiceTask(16, 'Б'); }
+
+// Завдання 17
+function checkTask17() {
+    const answers = {
+        't17-1': 'Д',
+        't17-2': 'А',
+        't17-3': 'Г',
+        't17-4': 'В'
+    };
+
+    let allCorrect = true;
+    for (let i = 1; i <= 4; i++) {
+        const select = document.getElementById(`t17-${i}`);
+        select.classList.remove('correct', 'incorrect');
+        if (select.value === answers[`t17-${i}`]) {
+            select.classList.add('correct');
+        } else {
+            select.classList.add('incorrect');
+            allCorrect = false;
+        }
+    }
+
+    const status = document.getElementById('status-17');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(17, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(17, true);
+    }
+}
+
+// Завдання 18
+function checkTask18() {
+    const answers = {
+        't18-1': 'Б',
+        't18-2': 'В',
+        't18-3': 'А',
+        't18-4': 'Д'
+    };
+
+    let allCorrect = true;
+    for (let i = 1; i <= 4; i++) {
+        const select = document.getElementById(`t18-${i}`);
+        select.classList.remove('correct', 'incorrect');
+        if (select.value === answers[`t18-${i}`]) {
+            select.classList.add('correct');
+        } else {
+            select.classList.add('incorrect');
+            allCorrect = false;
+        }
+    }
+
+    const status = document.getElementById('status-18');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(18, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(18, true);
+    }
+}
+</script>
+
+</body>
+</html>
