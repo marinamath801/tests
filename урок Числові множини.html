@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Числові множини</title>
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-hover: #1565c0;
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --correct: #2e7d32;
+            --incorrect: #c62828;
+            --border: #cfd8dc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 26px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .sub-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sub-item label {
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+            outline: none;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #e8f5e9;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffebee;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #e3f2fd;
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background-color: #bbdefb;
+            font-weight: bold;
+        }
+
+        .option-btn.correct {
+            border-color: var(--correct);
+            background-color: #c8e6c9;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffcdd2;
+            color: var(--incorrect);
+            font-weight: bold;
+        }
+
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .match-table td {
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        .match-select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            outline: none;
+            width: 100%;
+        }
+
+        .match-select.correct {
+            border-color: var(--correct);
+            background-color: #e8f5e9;
+        }
+
+        .match-select.incorrect {
+            border-color: var(--incorrect);
+            background-color: #ffebee;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .task-status {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-correct {
+            color: var(--correct);
+        }
+
+        .status-incorrect {
+            color: var(--incorrect);
+        }
+
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 15px;
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Числові множини</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">
+            Серед чисел <strong>-5; 0; -4,1; 3/7; 35/5; 81; 92&frac13;; -64/4</strong> назвіть:
+        </div>
+        <div class="sub-item">
+            <label>1) натуральні:</label>
+            <input type="text" id="t1-1" placeholder="Запишіть через кому або крапку з комою">
+        </div>
+        <div class="sub-item">
+            <label>2) цілі числа, що не є натуральними:</label>
+            <input type="text" id="t1-2" placeholder="Запишіть через кому або крапку з комою">
+        </div>
+        <div class="sub-item">
+            <label>3) раціональні числа, що не є цілими:</label>
+            <input type="text" id="t1-3" placeholder="Запишіть через кому або крапку з комою">
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити завдання 1</button>
+        <span class="task-status" id="status-1"></span>
+        <div class="explanation" id="exp-1">
+            <strong>Пояснення:</strong><br>
+            Спочатку спростимо дроби: 35/5 = 7; -64/4 = -16.<br>
+            • <strong>Натуральні числа:</strong> 35/5 (бо це 7) та 81.<br>
+            • <strong>Цілі не натуральні числа:</strong> -5; 0; -64/4 (бо це -16).<br>
+            • <strong>Раціональні дробові (не цілі):</strong> -4,1; 3/7; 92 1/3.
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">Укажіть усі натуральні числа, що належать проміжку:</div>
+        <div class="sub-item"><label>1) [4; 8]:</label> <input type="text" id="t2-1"></div>
+        <div class="sub-item"><label>2) [-1; 3]:</label> <input type="text" id="t2-2"></div>
+        <div class="sub-item"><label>3) [12,3; 15):</label> <input type="text" id="t2-3"></div>
+        <div class="sub-item"><label>4) (23; 27):</label> <input type="text" id="t2-4"></div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити завдання 2</button>
+        <span class="task-status" id="status-2"></span>
+        <div class="explanation" id="exp-2">
+            <strong>Пояснення:</strong><br>
+            Натуральні числа — це цілі додатні числа (1, 2, 3, ...).<br>
+            1) [4; 8] включає межі: <strong>4, 5, 6, 7, 8</strong><br>
+            2) [-1; 3]: від'ємні та 0 не є натуральними, отже: <strong>1, 2, 3</strong><br>
+            3) [12,3; 15): перше натуральне число після 12,3 — це 13, а 15 не включається (дужка кругла): <strong>13, 14</strong><br>
+            4) (23; 27): круглі дужки не включають межі: <strong>24, 25, 26</strong>
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">Укажіть усі цілі числа, що належать проміжку:</div>
+        <div class="sub-item"><label>1) (-1; 2):</label> <input type="text" id="t3-1"></div>
+        <div class="sub-item"><label>2) (-3; 2]:</label> <input type="text" id="t3-2"></div>
+        <div class="sub-item"><label>3) [-2,1; 3,2]:</label> <input type="text" id="t3-3"></div>
+        <div class="sub-item"><label>4) [-4,2; 0):</label> <input type="text" id="t3-4"></div>
+        <button class="check-btn" onclick="checkTask3()">Перевірити завдання 3</button>
+        <span class="task-status" id="status-3"></span>
+        <div class="explanation" id="exp-3">
+            <strong>Пояснення:</strong><br>
+            Цілі числа: ..., -3, -2, -1, 0, 1, 2, 3, ...<br>
+            1) (-1; 2): -1 та 2 не входять: <strong>0, 1</strong><br>
+            2) (-3; 2]: -3 не входить, 2 входить: <strong>-2, -1, 0, 1, 2</strong><br>
+            3) [-2,1; 3,2]: цілі числа між -2,1 та 3,2 це: <strong>-2, -1, 0, 1, 2, 3</strong><br>
+            4) [-4,2; 0): 0 не входить через круглу дужку: <strong>-4, -3, -2, -1</strong>
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="task-4">
+        <div class="task-num">Завдання 4</div>
+        <div class="task-text">Укажіть найменше ціле число, що належить проміжку:</div>
+        <div class="sub-item"><label>1) (-2; +&infin;):</label> <input type="text" id="t4-1"></div>
+        <div class="sub-item"><label>2) [1,2; +&infin;):</label> <input type="text" id="t4-2"></div>
+        <div class="sub-item"><label>3) [-3; +&infin;):</label> <input type="text" id="t4-3"></div>
+        <div class="sub-item"><label>4) (-11,7; -9,3):</label> <input type="text" id="t4-4"></div>
+        <button class="check-btn" onclick="checkTask4()">Перевірити завдання 4</button>
+        <span class="task-status" id="status-4"></span>
+        <div class="explanation" id="exp-4">
+            <strong>Пояснення:</strong><br>
+            1) (-2; +&infin;): -2 не входить, тому найменше наступне ціле: <strong>-1</strong><br>
+            2) [1,2; +&infin;): перше ціле число, більше за 1,2: <strong>2</strong><br>
+            3) [-3; +&infin;): квадратна дужка включає межу: <strong>-3</strong><br>
+            4) (-11,7; -9,3): найбільше за модулем ціле число в проміжку (найменше): <strong>-11</strong>
+        </div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card" id="task-5">
+        <div class="task-num">Завдання 5</div>
+        <div class="task-text">Укажіть найбільше ціле число, що належить проміжку:</div>
+        <div class="sub-item"><label>1) (-&infin;; -2):</label> <input type="text" id="t5-1"></div>
+        <div class="sub-item"><label>2) (-&infin;; -6,6]:</label> <input type="text" id="t5-2"></div>
+        <div class="sub-item"><label>3) (-11,7; -9,3):</label> <input type="text" id="t5-3"></div>
+        <div class="sub-item"><label>4) [-5,2; 4]:</label> <input type="text" id="t5-4"></div>
+        <button class="check-btn" onclick="checkTask5()">Перевірити завдання 5</button>
+        <span class="task-status" id="status-5"></span>
+        <div class="explanation" id="exp-5">
+            <strong>Пояснення:</strong><br>
+            1) (-&infin;; -2): -2 не входить, тому найбільше ціле ліворуч: <strong>-3</strong><br>
+            2) (-&infin;; -6,6]: найбільше ціле число, яке не перевищує -6,6: <strong>-7</strong><br>
+            3) (-11,7; -9,3): найбільше ціле число перед -9,3 це: <strong>-10</strong><br>
+            4) [-5,2; 4]: межа 4 входить завдяки квадратній дужці: <strong>4</strong>
+        </div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card" id="task-6">
+        <div class="task-num">Завдання 6</div>
+        <div class="task-text">
+            Установіть відповідність між числом (1–4) та множиною, до якої воно належить (А–Д).
+        </div>
+        <table class="match-table">
+            <tr>
+                <td width="25%"><strong>1)</strong> 3,4</td>
+                <td>
+                    <select class="match-select" id="t6-1">
+                        <option value="">-- Оберіть --</option>
+                        <option value="А">А) множина натуральних чисел</option>
+                        <option value="Б">Б) множина складених чисел</option>
+                        <option value="В">В) множина цілих чисел, що не є натуральними</option>
+                        <option value="Г">Г) множина дробових чисел</option>
+                        <option value="Д">Д) множина ірраціональних чисел</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>2)</strong> &radic;8</td>
+                <td>
+                    <select class="match-select" id="t6-2">
+                        <option value="">-- Оберіть --</option>
+                        <option value="А">А) множина натуральних чисел</option>
+                        <option value="Б">Б) множина складених чисел</option>
+                        <option value="В">В) множина цілих чисел, що не є натуральними</option>
+                        <option value="Г">Г) множина дробових чисел</option>
+                        <option value="Д">Д) множина ірраціональних чисел</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>3)</strong> 10/2</td>
+                <td>
+                    <select class="match-select" id="t6-3">
+                        <option value="">-- Оберіть --</option>
+                        <option value="А">А) множина натуральних чисел</option>
+                        <option value="Б">Б) множина складених чисел</option>
+                        <option value="В">В) множина цілих чисел, що не є натуральними</option>
+                        <option value="Г">Г) множина дробових чисел</option>
+                        <option value="Д">Д) множина ірраціональних чисел</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>4)</strong> -13</td>
+                <td>
+                    <select class="match-select" id="t6-4">
+                        <option value="">-- Оберіть --</option>
+                        <option value="А">А) множина натуральних чисел</option>
+                        <option value="Б">Б) множина складених чисел</option>
+                        <option value="В">В) множина цілих чисел, що не є натуральними</option>
+                        <option value="Г">Г) множина дробових чисел</option>
+                        <option value="Д">Д) множина ірраціональних чисел</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button class="check-btn" onclick="checkTask6()">Перевірити завдання 6</button>
+        <span class="task-status" id="status-6"></span>
+        <div class="explanation" id="exp-6">
+            <strong>Пояснення:</strong><br>
+            1) 3,4 &rarr; <strong>Г</strong> (десятковий дріб, отже дробове число)<br>
+            2) &radic;8 &rarr; <strong>Д</strong> (корінь не добувається націло, ірраціональне)<br>
+            3) 10/2 = 5 &rarr; <strong>А</strong> (натуральне число)<br>
+            4) -13 &rarr; <strong>В</strong> (ціле від'ємне число, тому не натуральне)
+        </div>
+    </div>
+
+    <!-- Завдання 7 -->
+    <div class="task-card" id="task-7">
+        <div class="task-num">Завдання 7</div>
+        <div class="task-text">
+            Скільки цілих чисел є розв'язками нерівності <strong>-3,5 &lt; x &le; 5,5</strong>?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(7, 'А')">А) 7</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(7, 'Б')">Б) 8</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(7, 'В')">В) 9</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(7, 'Г')">Г) 10</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(7, 'Д')">Д) 11</div>
+        </div>
+        <button class="check-btn" onclick="checkTask7()">Перевірити завдання 7</button>
+        <span class="task-status" id="status-7"></span>
+        <div class="explanation" id="exp-7">
+            <strong>Пояснення:</strong><br>
+            Випишемо всі цілі числа, що задовольняють нерівність:<br>
+            -3, -2, -1, 0, 1, 2, 3, 4, 5.<br>
+            Порахуємо їх кількість: всього <strong>9</strong> чисел.<br>
+            <em>Правильний варіант: В</em>
+        </div>
+    </div>
+
+    <!-- Завдання 8 -->
+    <div class="task-card" id="task-8">
+        <div class="task-num">Завдання 8</div>
+        <div class="task-text">
+            Яка відстань між точками <strong>A(-2,5)</strong> і <strong>B(3,5)</strong> на числовій осі?
+        </div>
+        <div class="options-grid">
+            <div class="option-btn" data-opt="А" onclick="selectOption(8, 'А')">А) 3,5</div>
+            <div class="option-btn" data-opt="Б" onclick="selectOption(8, 'Б')">Б) -2,5</div>
+            <div class="option-btn" data-opt="В" onclick="selectOption(8, 'В')">В) 5</div>
+            <div class="option-btn" data-opt="Г" onclick="selectOption(8, 'Г')">Г) 6</div>
+            <div class="option-btn" data-opt="Д" onclick="selectOption(8, 'Д')">Д) інша відповідь</div>
+        </div>
+        <button class="check-btn" onclick="checkTask8()">Перевірити завдання 8</button>
+        <span class="task-status" id="status-8"></span>
+        <div class="explanation" id="exp-8">
+            <strong>Пояснення:</strong><br>
+            Відстань між двома точками дорівнює модулю їхньої різниці:<br>
+            d = |3,5 - (-2,5)| = |3,5 + 2,5| = <strong>6</strong>.<br>
+            <em>Правильний варіант: Г</em>
+        </div>
+    </div>
+</div>
+
+<script>
+function parseSet(str) {
+    if (!str) return [];
+    return str.replace(/\s+/g, '')
+              .replace(/;/g, ',')
+              .split(',')
+              .filter(x => x !== '');
+}
+
+function setsEqual(a, b) {
+    if (a.length !== b.length) return false;
+    let setA = [...a].sort();
+    let setB = [...b].sort();
+    return setA.every((val, index) => val === setB[index]);
+}
+
+function updateInputStatus(inputId, isCorrect) {
+    const el = document.getElementById(inputId);
+    el.classList.remove('correct', 'incorrect');
+    if (isCorrect) {
+        el.classList.add('correct');
+    } else {
+        el.classList.add('incorrect');
+    }
+}
+
+function toggleExplanation(taskNum, show) {
+    const exp = document.getElementById(`exp-${taskNum}`);
+    if (exp) {
+        exp.style.display = show ? 'block' : 'none';
+    }
+}
+
+// Завдання 1
+function checkTask1() {
+    const ans1 = parseSet(document.getElementById('t1-1').value);
+    const ans2 = parseSet(document.getElementById('t1-2').value);
+    const ans3 = parseSet(document.getElementById('t1-3').value);
+
+    const c1 = ans1.every(x => ['35/5', '7', '81'].includes(x)) && ans1.length === 2;
+    const c2 = ans2.every(x => ['-5', '0', '-64/4', '-16'].includes(x)) && ans2.length === 3;
+    const c3 = ans3.every(x => ['-4,1', '3/7', '92 1/3', '92_1/3', '92,3', '277/3'].includes(x)) && ans3.length === 3;
+
+    updateInputStatus('t1-1', c1);
+    updateInputStatus('t1-2', c2);
+    updateInputStatus('t1-3', c3);
+
+    const status = document.getElementById('status-1');
+    if (c1 && c2 && c3) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(1, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(1, true);
+    }
+}
+
+// Завдання 2
+function checkTask2() {
+    const answers = {
+        't2-1': ['4', '5', '6', '7', '8'],
+        't2-2': ['1', '2', '3'],
+        't2-3': ['13', '14'],
+        't2-4': ['24', '25', '26']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+        const userVals = parseSet(document.getElementById(id).value);
+        const isOk = setsEqual(userVals, answers[id]);
+        updateInputStatus(id, isOk);
+        if (!isOk) allCorrect = false;
+    }
+
+    const status = document.getElementById('status-2');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(2, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(2, true);
+    }
+}
+
+// Завдання 3
+function checkTask3() {
+    const answers = {
+        't3-1': ['0', '1'],
+        't3-2': ['-2', '-1', '0', '1', '2'],
+        't3-3': ['-2', '-1', '0', '1', '2', '3'],
+        't3-4': ['-4', '-3', '-2', '-1']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+        const userVals = parseSet(document.getElementById(id).value);
+        const isOk = setsEqual(userVals, answers[id]);
+        updateInputStatus(id, isOk);
+        if (!isOk) allCorrect = false;
+    }
+
+    const status = document.getElementById('status-3');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(3, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(3, true);
+    }
+}
+
+// Завдання 4
+function checkTask4() {
+    const answers = {
+        't4-1': ['-1'],
+        't4-2': ['2'],
+        't4-3': ['-3'],
+        't4-4': ['-11']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+        const userVals = parseSet(document.getElementById(id).value);
+        const isOk = setsEqual(userVals, answers[id]);
+        updateInputStatus(id, isOk);
+        if (!isOk) allCorrect = false;
+    }
+
+    const status = document.getElementById('status-4');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(4, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(4, true);
+    }
+}
+
+// Завдання 5
+function checkTask5() {
+    const answers = {
+        't5-1': ['-3'],
+        't5-2': ['-7'],
+        't5-3': ['-10'],
+        't5-4': ['4']
+    };
+
+    let allCorrect = true;
+    for (let id in answers) {
+        const userVals = parseSet(document.getElementById(id).value);
+        const isOk = setsEqual(userVals, answers[id]);
+        updateInputStatus(id, isOk);
+        if (!isOk) allCorrect = false;
+    }
+
+    const status = document.getElementById('status-5');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(5, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(5, true);
+    }
+}
+
+// Завдання 6
+function checkTask6() {
+    const answers = {
+        't6-1': 'Г',
+        't6-2': 'Д',
+        't6-3': 'А',
+        't6-4': 'В'
+    };
+
+    let allCorrect = true;
+    for (let i = 1; i <= 4; i++) {
+        const select = document.getElementById(`t6-${i}`);
+        select.classList.remove('correct', 'incorrect');
+        if (select.value === answers[`t6-${i}`]) {
+            select.classList.add('correct');
+        } else {
+            select.classList.add('incorrect');
+            allCorrect = false;
+        }
+    }
+
+    const status = document.getElementById('status-6');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(6, false);
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(6, true);
+    }
+}
+
+let selectedOptions = {};
+
+function selectOption(taskNum, option) {
+    selectedOptions[taskNum] = option;
+    const taskCard = document.getElementById(`task-${taskNum}`);
+    const btns = taskCard.querySelectorAll('.option-btn');
+    
+    btns.forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'incorrect');
+        if (btn.getAttribute('data-opt') === option) {
+            btn.classList.add('selected');
+        }
+    });
+}
+
+// Завдання 7
+function checkTask7() {
+    const correctOpt = 'В';
+    const userOpt = selectedOptions[7];
+    const taskCard = document.getElementById('task-7');
+    const btns = taskCard.querySelectorAll('.option-btn');
+    const status = document.getElementById('status-7');
+
+    btns.forEach(btn => {
+        btn.classList.remove('correct', 'incorrect');
+        const opt = btn.getAttribute('data-opt');
+        if (opt === userOpt) {
+            if (userOpt === correctOpt) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+            }
+        }
+    });
+
+    if (userOpt === correctOpt) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(7, false);
+    } else {
+        status.innerText = userOpt ? "Неправильно" : "Оберіть варіант";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(7, true);
+    }
+}
+
+// Завдання 8
+function checkTask8() {
+    const correctOpt = 'Г';
+    const userOpt = selectedOptions[8];
+    const taskCard = document.getElementById('task-8');
+    const btns = taskCard.querySelectorAll('.option-btn');
+    const status = document.getElementById('status-8');
+
+    btns.forEach(btn => {
+        btn.classList.remove('correct', 'incorrect');
+        const opt = btn.getAttribute('data-opt');
+        if (opt === userOpt) {
+            if (userOpt === correctOpt) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+            }
+        }
+    });
+
+    if (userOpt === correctOpt) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+        toggleExplanation(8, false);
+    } else {
+        status.innerText = userOpt ? "Неправильно" : "Оберіть варіант";
+        status.className = "task-status status-incorrect";
+        toggleExplanation(8, true);
+    }
+}
+</script>
+
+</body>
+</html>
