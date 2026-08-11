@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Степені та одночлени</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-item label {
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        input[type="text"], select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+            background-color: #fff;
+            transition: all 0.2s;
+        }
+
+        input[type="text"].correct, select.correct {
+            border-color: var(--correct);
+            background-color: #f0fdf4;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect, select.incorrect {
+            border-color: var(--incorrect);
+            background-color: #fef2f2;
+            color: var(--incorrect);
+        }
+
+        .options-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .option-btn.selected {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct) !important;
+            color: #fff !important;
+            border-color: var(--correct) !important;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--incorrect) !important;
+            color: #fff !important;
+            border-color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .task-status {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .status-correct {
+            color: var(--correct);
+        }
+
+        .status-incorrect {
+            color: var(--incorrect);
+        }
+
+        table.mcq-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0 15px 0;
+            background: #fff;
+        }
+
+        table.mcq-table th, table.mcq-table td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        table.mcq-table th {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Степені з цілим показником та одночлени</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">Обчисліть:</div>
+        <div class="grid-inputs">
+            <div class="sub-item"><label>1) 6<sup>2</sup> =</label> <input type="text" id="t1-1"></div>
+            <div class="sub-item"><label>2) 8<sup>2</sup> =</label> <input type="text" id="t1-2"></div>
+            <div class="sub-item"><label>3) (−3)<sup>3</sup> =</label> <input type="text" id="t1-3"></div>
+            <div class="sub-item"><label>4) (−1)<sup>10</sup> =</label> <input type="text" id="t1-4"></div>
+            <div class="sub-item"><label>5) (−0,2)<sup>3</sup> =</label> <input type="text" id="t1-5"></div>
+            <div class="sub-item"><label>6) (2/3)<sup>4</sup> =</label> <input type="text" id="t1-6"></div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(1, ['36', '64', '-27', '1', '-0,008', '16/81'])">Перевірити завдання 1</button>
+        <span class="task-status" id="status-1"></span>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">Обчисліть:</div>
+        <div class="grid-inputs">
+            <div class="sub-item"><label>1) 2<sup>−2</sup> =</label> <input type="text" id="t2-1"></div>
+            <div class="sub-item"><label>2) (−3)<sup>−3</sup> =</label> <input type="text" id="t2-2"></div>
+            <div class="sub-item"><label>3) (−1)<sup>−11</sup> =</label> <input type="text" id="t2-3"></div>
+            <div class="sub-item"><label>4) (2/5)<sup>−2</sup> =</label> <input type="text" id="t2-4"></div>
+            <div class="sub-item"><label>5) (−1/2)<sup>−4</sup> =</label> <input type="text" id="t2-5"></div>
+            <div class="sub-item"><label>6) (−0,1)<sup>−1</sup> =</label> <input type="text" id="t2-6"></div>
+            <div class="sub-item"><label>7) (0,5)<sup>−3</sup> =</label> <input type="text" id="t2-7"></div>
+            <div class="sub-item"><label>8) (−1,5)<sup>−2</sup> =</label> <input type="text" id="t2-8"></div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(2, ['1/4', '-1/27', '-1', '6 1/4', '16', '-10', '8', '4/9'])">Перевірити завдання 2</button>
+        <span class="task-status" id="status-2"></span>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">Знайдіть значення виразу:</div>
+        <div class="grid-inputs">
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>1) 16x<sup>2</sup> − 1, якщо x = 1/8:</label> 
+                <input type="text" id="t3-1">
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>2) −3/4 x<sup>−3</sup>, якщо x = −1/2:</label> 
+                <input type="text" id="t3-2">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(3, ['-3/4', '6'])">Перевірити завдання 3</button>
+        <span class="task-status" id="status-3"></span>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="task-4">
+        <div class="task-num">Завдання 4</div>
+        <div class="task-text">Серед наведених виразів (−12,3)<sup>4</sup>, (−3/5)<sup>5</sup>, (2/3)<sup>−2</sup>, 3<sup>−1</sup> − 2<sup>−1</sup> укажіть додатні.</div>
+        <div class="grid-inputs">
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>Перелічіть номери додатних виразів (наприклад: 1, 3):</label> 
+                <input type="text" id="t4-1">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(4, ['1, 3'])">Перевірити завдання 4</button>
+        <span class="task-status" id="status-4"></span>
+    </div>
+
+    <!-- Завдання 5 (Випадний список) -->
+    <div class="task-card" id="task-5">
+        <div class="task-num">Завдання 5</div>
+        <div class="task-text">Подайте у вигляді степеня добуток:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) x<sup>11</sup> · x<sup>3</sup> =</label>
+                <select id="t5-1">
+                    <option value="">Оберіть...</option>
+                    <option value="x^8">x⁸</option>
+                    <option value="x^14">x¹⁴</option>
+                    <option value="x^33">x³³</option>
+                    <option value="x^113">x¹¹³</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>2) x · x<sup>23</sup> =</label>
+                <select id="t5-2">
+                    <option value="">Оберіть...</option>
+                    <option value="x^23">x²³</option>
+                    <option value="x^22">x²²</option>
+                    <option value="x^24">x²⁴</option>
+                    <option value="x^230">x²³⁰</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>3) a<sup>−2</sup> · a<sup>6</sup> =</label>
+                <select id="t5-3">
+                    <option value="">Оберіть...</option>
+                    <option value="a^-8">a⁻⁸</option>
+                    <option value="a^-12">a⁻¹²</option>
+                    <option value="a^4">a⁴</option>
+                    <option value="a^-4">a⁻⁴</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>4) p<sup>−5</sup> · p<sup>−1</sup> =</label>
+                <select id="t5-4">
+                    <option value="">Оберіть...</option>
+                    <option value="p^-6">p⁻⁶</option>
+                    <option value="p^-4">p⁻⁴</option>
+                    <option value="p^5">p⁵</option>
+                    <option value="p^-5">p⁻⁵</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(5, ['x^14', 'x^24', 'a^4', 'p^-6'])">Перевірити завдання 5</button>
+        <span class="task-status" id="status-5"></span>
+    </div>
+
+    <!-- Завдання 6 (Випадний список) -->
+    <div class="task-card" id="task-6">
+        <div class="task-num">Завдання 6</div>
+        <div class="task-text">Подайте у вигляді степеня частку:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) x<sup>24</sup> : x<sup>4</sup> =</label>
+                <select id="t6-1">
+                    <option value="">Оберіть...</option>
+                    <option value="x^6">x⁶</option>
+                    <option value="x^28">x²⁸</option>
+                    <option value="x^20">x²⁰</option>
+                    <option value="x^96">x⁹⁶</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>2) k<sup>32</sup> : k<sup>2</sup> =</label>
+                <select id="t6-2">
+                    <option value="">Оберіть...</option>
+                    <option value="k^16">k¹⁶</option>
+                    <option value="k^30">k³⁰</option>
+                    <option value="k^34">k³⁴</option>
+                    <option value="k^64">k⁶⁴</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>3) a<sup>4</sup> : a<sup>8</sup> =</label>
+                <select id="t6-3">
+                    <option value="">Оберіть...</option>
+                    <option value="a^4">a⁴</option>
+                    <option value="a^-4">a⁻⁴</option>
+                    <option value="a^12">a¹²</option>
+                    <option value="a^-2">a⁻²</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>4) b<sup>−12</sup> : b<sup>−6</sup> =</label>
+                <select id="t6-4">
+                    <option value="">Оберіть...</option>
+                    <option value="b^-18">b⁻¹⁸</option>
+                    <option value="b^2">b²</option>
+                    <option value="b^-6">b⁻⁶</option>
+                    <option value="b^6">b⁶</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>5) x<sup>3</sup> : x<sup>−6</sup> =</label>
+                <select id="t6-5">
+                    <option value="">Оберіть...</option>
+                    <option value="x^-3">x⁻³</option>
+                    <option value="x^9">x⁹</option>
+                    <option value="x^-18">x⁻¹⁸</option>
+                    <option value="x^-9">x⁻⁹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>6) m<sup>−3</sup> : m<sup>2</sup> =</label>
+                <select id="t6-6">
+                    <option value="">Оберіть...</option>
+                    <option value="m^-1">m⁻¹</option>
+                    <option value="m^-5">m⁻⁵</option>
+                    <option value="m^5">m⁵</option>
+                    <option value="m^-6">m⁻⁶</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>7) x<sup>−9</sup> : x<sup>7</sup> =</label>
+                <select id="t6-7">
+                    <option value="">Оберіть...</option>
+                    <option value="x^-2">x⁻²</option>
+                    <option value="x^-16">x⁻¹⁶</option>
+                    <option value="x^16">x¹⁶</option>
+                    <option value="x^-63">x⁻⁶³</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>8) a<sup>−11</sup> : a<sup>−10</sup> =</label>
+                <select id="t6-8">
+                    <option value="">Оберіть...</option>
+                    <option value="a^-1">a⁻¹</option>
+                    <option value="a^-21">a⁻²¹</option>
+                    <option value="a^1">a¹</option>
+                    <option value="a^-110">a⁻¹¹⁰</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(6, ['x^20', 'k^30', 'a^-4', 'b^-6', 'x^9', 'm^-5', 'x^-16', 'a^-1'])">Перевірити завдання 6</button>
+        <span class="task-status" id="status-6"></span>
+    </div>
+
+    <!-- Завдання 7 (Випадний список) -->
+    <div class="task-card" id="task-7">
+        <div class="task-num">Завдання 7</div>
+        <div class="task-text">Подайте у вигляді степеня з основою x вираз:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) (x<sup>2</sup>)<sup>3</sup> =</label>
+                <select id="t7-1">
+                    <option value="">Оберіть...</option>
+                    <option value="x^5">x⁵</option>
+                    <option value="x^6">x⁶</option>
+                    <option value="x^8">x⁸</option>
+                    <option value="x^9">x⁹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>2) (x<sup>−4</sup>)<sup>2</sup> =</label>
+                <select id="t7-2">
+                    <option value="">Оберіть...</option>
+                    <option value="x^-2">x⁻²</option>
+                    <option value="x^-16">x⁻¹⁶</option>
+                    <option value="x^-8">x⁻⁸</option>
+                    <option value="x^8">x⁸</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>3) (x<sup>5</sup>)<sup>−3</sup> =</label>
+                <select id="t7-3">
+                    <option value="">Оберіть...</option>
+                    <option value="x^2">x²</option>
+                    <option value="x^-15">x⁻¹⁵</option>
+                    <option value="x^-125">x⁻¹²⁵</option>
+                    <option value="x^15">x¹⁵</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>4) (x<sup>−6</sup>)<sup>−2</sup> =</label>
+                <select id="t7-4">
+                    <option value="">Оберіть...</option>
+                    <option value="x^-8">x⁻⁸</option>
+                    <option value="x^-12">x⁻¹²</option>
+                    <option value="x^12">x¹²</option>
+                    <option value="x^36">x³⁶</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(7, ['x^6', 'x^-8', 'x^-15', 'x^12'])">Перевірити завдання 7</button>
+        <span class="task-status" id="status-7"></span>
+    </div>
+
+    <!-- Завдання 8 (Випадний список) -->
+    <div class="task-card" id="task-8">
+        <div class="task-num">Завдання 8</div>
+        <div class="task-text">Спростіть вираз:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) a<sup>10</sup> · a<sup>−9</sup> : a<sup>−2</sup> =</label>
+                <select id="t8-1">
+                    <option value="">Оберіть...</option>
+                    <option value="a^-1">a⁻¹</option>
+                    <option value="a^3">a³</option>
+                    <option value="a^-3">a⁻³</option>
+                    <option value="a^1">a¹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>2) c<sup>12</sup> : (c<sup>6</sup>)<sup>−2</sup> =</label>
+                <select id="t8-2">
+                    <option value="">Оберіть...</option>
+                    <option value="c^0">c⁰</option>
+                    <option value="c^24">c²⁴</option>
+                    <option value="c^-24">c⁻²⁴</option>
+                    <option value="c^1">c¹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>3) (m<sup>3</sup>)<sup>4</sup> : (m<sup>2</sup>)<sup>3</sup> =</label>
+                <select id="t8-3">
+                    <option value="">Оберіть...</option>
+                    <option value="m^2">m²</option>
+                    <option value="m^6">m⁶</option>
+                    <option value="m^12">m¹²</option>
+                    <option value="m^1">m¹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>4) (y<sup>3</sup> · y<sup>5</sup>) / y<sup>2</sup> =</label>
+                <select id="t8-4">
+                    <option value="">Оберіть...</option>
+                    <option value="y^6">y⁶</option>
+                    <option value="y^5.5">y⁵.⁵</option>
+                    <option value="y^13">y¹³</option>
+                    <option value="y^4">y⁴</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(8, ['a^3', 'c^24', 'm^6', 'y^6'])">Перевірити завдання 8</button>
+        <span class="task-status" id="status-8"></span>
+    </div>
+
+    <!-- Завдання 9 -->
+    <div class="task-card" id="task-9">
+        <div class="task-num">Завдання 9</div>
+        <div class="task-text">Обчисліть:</div>
+        <div class="grid-inputs">
+            <div class="sub-item"><label>1) (4/7)<sup>3</sup> · (7/4)<sup>3</sup> =</label> <input type="text" id="t9-1"></div>
+            <div class="sub-item"><label>2) (−10)<sup>5</sup> · (1/5)<sup>5</sup> =</label> <input type="text" id="t9-2"></div>
+            <div class="sub-item"><label>3) (−1,5)<sup>9</sup> · (−2/3)<sup>9</sup> =</label> <input type="text" id="t9-3"></div>
+            <div class="sub-item"><label>4) (3<sup>5</sup> · 5<sup>5</sup>) / 15<sup>4</sup> =</label> <input type="text" id="t9-4"></div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(9, ['1', '-32', '1', '15'])">Перевірити завдання 9</button>
+        <span class="task-status" id="status-9"></span>
+    </div>
+
+    <!-- Завдання 10 (Випадний список) -->
+    <div class="task-card" id="task-10">
+        <div class="task-num">Завдання 10</div>
+        <div class="task-text">Спростіть вираз:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) x<sup>3</sup> · 3x<sup>−2</sup> =</label>
+                <select id="t10-1">
+                    <option value="">Оберіть...</option>
+                    <option value="3x^5">3x⁵</option>
+                    <option value="3x">3x</option>
+                    <option value="3x^-6">3x⁻⁶</option>
+                    <option value="x">x</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>2) 1/3 a<sup>−3</sup> · 0,9a =</label>
+                <select id="t10-2">
+                    <option value="">Оберіть...</option>
+                    <option value="0,3a^-2">0,3a⁻²</option>
+                    <option value="0,3a^-4">0,3a⁻⁴</option>
+                    <option value="2,7a^-2">2,7a⁻²</option>
+                    <option value="0,3a^-3">0,3a⁻³</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>3) 0,24p<sup>6</sup> : 1/2 p<sup>−3</sup> =</label>
+                <select id="t10-3">
+                    <option value="">Оберіть...</option>
+                    <option value="0,12p^3">0,12p³</option>
+                    <option value="0,48p^9">0,48p⁹</option>
+                    <option value="0,48p^3">0,48p³</option>
+                    <option value="0,12p^9">0,12p⁹</option>
+                </select>
+            </div>
+            <div class="sub-item">
+                <label>4) 0,7y<sup>8</sup> : 7y<sup>4</sup> =</label>
+                <select id="t10-4">
+                    <option value="">Оберіть...</option>
+                    <option value="0,1y^2">0,1y²</option>
+                    <option value="0,1y^4">0,1y⁴</option>
+                    <option value="4,9y^4">4,9y⁴</option>
+                    <option value="0,1y^12">0,1y¹²</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(10, ['3x', '0,3a^-2', '0,48p^9', '0,1y^4'])">Перевірити завдання 10</button>
+        <span class="task-status" id="status-10"></span>
+    </div>
+
+    <!-- Завдання 11 -->
+    <div class="task-card" id="task-11">
+        <div class="task-num">Завдання 11</div>
+        <div class="task-text">Обчисліть: (2<sup>6</sup> · 5<sup>6</sup>) / 10<sup>4</sup></div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr><td>10</td><td>10<sup>2</sup></td><td>10<sup>8</sup></td><td>10<sup>9</sup></td><td>10<sup>10</sup></td></tr>
+        </table>
+        <div class="options-group" id="opts-11">
+            <button class="option-btn" onclick="selectSingleOption(11, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(11, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(11, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(11, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(11, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(11, 'Б')">Перевірити завдання 11</button>
+        <span class="task-status" id="status-11"></span>
+    </div>
+
+    <!-- Завдання 12 -->
+    <div class="task-card" id="task-12">
+        <div class="task-num">Завдання 12</div>
+        <div class="task-text">Запишіть числа 2<sup>15</sup>, 4<sup>10</sup>, 10<sup>5</sup> у порядку зростання.</div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr>
+                <td>2<sup>15</sup>, 4<sup>10</sup>, 10<sup>5</sup></td>
+                <td>2<sup>15</sup>, 10<sup>5</sup>, 4<sup>10</sup></td>
+                <td>10<sup>5</sup>, 2<sup>15</sup>, 4<sup>10</sup></td>
+                <td>10<sup>5</sup>, 4<sup>10</sup>, 2<sup>15</sup></td>
+                <td>4<sup>10</sup>, 2<sup>15</sup>, 10<sup>5</sup></td>
+            </tr>
+        </table>
+        <div class="options-group" id="opts-12">
+            <button class="option-btn" onclick="selectSingleOption(12, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(12, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(12, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(12, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(12, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(12, 'В')">Перевірити завдання 12</button>
+        <span class="task-status" id="status-12"></span>
+    </div>
+
+    <!-- Завдання 13 -->
+    <div class="task-card" id="task-13">
+        <div class="task-num">Завдання 13</div>
+        <div class="task-text">Подайте одночлен у стандартному вигляді: (−4m<sup>2</sup>n<sup>5</sup>)<sup>3</sup> · (−2mn<sup>3</sup>)<sup>2</sup></div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr>
+                <td>−256m<sup>8</sup>n<sup>21</sup></td>
+                <td>−16m<sup>7</sup>n<sup>14</sup></td>
+                <td>−256m<sup>7</sup>n<sup>14</sup></td>
+                <td>−256m<sup>8</sup>n<sup>16</sup></td>
+                <td>інша відповідь</td>
+            </tr>
+        </table>
+        <div class="options-group" id="opts-13">
+            <button class="option-btn" onclick="selectSingleOption(13, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(13, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(13, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(13, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(13, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(13, 'А')">Перевірити завдання 13</button>
+        <span class="task-status" id="status-13"></span>
+    </div>
+
+    <!-- Завдання 14 -->
+    <div class="task-card" id="task-14">
+        <div class="task-num">Завдання 14</div>
+        <div class="task-text">Спростіть вираз: (1/3 mn<sup>2</sup>)<sup>4</sup> · (3m<sup>3</sup>)<sup>2</sup> · (−4,5)</div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr>
+                <td>−0,5m<sup>9</sup>n<sup>6</sup></td>
+                <td>−1/6 m<sup>10</sup>n<sup>8</sup></td>
+                <td>0,5m<sup>10</sup>n<sup>8</sup></td>
+                <td>−0,5m<sup>10</sup>n<sup>8</sup></td>
+                <td>інша відповідь</td>
+            </tr>
+        </table>
+        <div class="options-group" id="opts-14">
+            <button class="option-btn" onclick="selectSingleOption(14, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(14, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(14, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(14, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(14, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(14, 'Г')">Перевірити завдання 14</button>
+        <span class="task-status" id="status-14"></span>
+    </div>
+
+    <!-- Завдання 15 -->
+    <div class="task-card" id="task-15">
+        <div class="task-num">Завдання 15</div>
+        <div class="task-text">Обчислити: (9<sup>5</sup> · 4<sup>3</sup>) / (27<sup>4</sup> · 2<sup>5</sup>)</div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr><td>2/9</td><td>1</td><td>2</td><td>2/27</td><td>4/9</td></tr>
+        </table>
+        <div class="options-group" id="opts-15">
+            <button class="option-btn" onclick="selectSingleOption(15, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(15, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(15, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(15, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(15, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(15, 'В')">Перевірити завдання 15</button>
+        <span class="task-status" id="status-15"></span>
+    </div>
+
+    <!-- Завдання 16 -->
+    <div class="task-card" id="task-16">
+        <div class="task-num">Завдання 16</div>
+        <div class="task-text">Якщо 2<sup>a</sup> = 1/5, то 2<sup>6−a</sup> = ...</div>
+        <table class="mcq-table">
+            <tr><th>А</th><th>Б</th><th>В</th><th>Г</th><th>Д</th></tr>
+            <tr><td>12,8</td><td>59</td><td>69</td><td>240</td><td>320</td></tr>
+        </table>
+        <div class="options-group" id="opts-16">
+            <button class="option-btn" onclick="selectSingleOption(16, 'А')">А</button>
+            <button class="option-btn" onclick="selectSingleOption(16, 'Б')">Б</button>
+            <button class="option-btn" onclick="selectSingleOption(16, 'В')">В</button>
+            <button class="option-btn" onclick="selectSingleOption(16, 'Г')">Г</button>
+            <button class="option-btn" onclick="selectSingleOption(16, 'Д')">Д</button>
+        </div>
+        <button class="check-btn" onclick="checkSingleMCQ(16, 'Д')">Перевірити завдання 16</button>
+        <span class="task-status" id="status-16"></span>
+    </div>
+
+    <!-- Завдання 17 (Випадний список) -->
+    <div class="task-card" id="task-17">
+        <div class="task-num">Завдання 17</div>
+        <div class="task-text">Виконайте дії та зведіть отриманий вираз до вигляду, який не містить степеня з від'ємним показником:</div>
+        <div class="grid-inputs">
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>1) −2,4a<sup>−4</sup>b<sup>3</sup> · (−2a<sup>−3</sup>c<sup>−5</sup>)<sup>−3</sup> =</label> 
+                <select id="t17-1">
+                    <option value="">Оберіть...</option>
+                    <option value="0,3a^5b^3c^15">0,3a⁵b³c¹⁵</option>
+                    <option value="-0,3a^-5b^3c^-15">-0,3a⁻⁵b³c⁻¹⁵</option>
+                    <option value="19,2a^5b^3c^15">19,2a⁵b³c¹⁵</option>
+                    <option value="0,3a^12b^3c^15">0,3a¹²b³c¹⁵</option>
+                </select>
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>2) (−10x<sup>−2</sup>yz<sup>−8</sup>)<sup>−2</sup> · (0,1yz<sup>−4</sup>)<sup>−2</sup> =</label> 
+                <select id="t17-2">
+                    <option value="">Оберіть...</option>
+                    <option value="x^4/(y^4z^24)">x⁴ / (y⁴z²⁴)</option>
+                    <option value="100x^4/(y^4z^24)">100x⁴ / (y⁴z²⁴)</option>
+                    <option value="x^4y^4z^24">x⁴y⁴z²⁴</option>
+                    <option value="x^-4/(y^4z^16)">x⁻⁴ / (y⁴z¹⁶)</option>
+                </select>
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>3) 1 <sup>7</sup>/<sub>9</sub> m<sup>−6</sup>n · (1 <sup>1</sup>/<sub>3</sub> m<sup>−1</sup>n<sup>−4</sup>)<sup>−3</sup> =</label> 
+                <select id="t17-3">
+                    <option value="">Оберіть...</option>
+                    <option value="3/4 m^-3n^13">¾ m⁻³n¹³</option>
+                    <option value="16/9 m^-3n^13">¹⁶/₉ m⁻³n¹³</option>
+                    <option value="3/4 m^-9n^-11">¾ m⁻⁹n⁻¹¹</option>
+                    <option value="4/3 m^-3n^13">⁴/₃ m⁻³n¹³</option>
+                </select>
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>4) (−1/6 a<sup>−3</sup>b<sup>−6</sup>)<sup>−3</sup> · (−6a<sup>2</sup>b<sup>9</sup>)<sup>−2</sup> =</label> 
+                <select id="t17-4">
+                    <option value="">Оберіть...</option>
+                    <option value="-6a^5">-6a⁵</option>
+                    <option value="6a^5b">6a⁵b</option>
+                    <option value="-216a^5">-216a⁵</option>
+                    <option value="-6a^-5">-6a⁻⁵</option>
+                </select>
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>5) (7p<sup>−3</sup> / (5k<sup>−1</sup>))<sup>−2</sup> · 49m<sup>−6</sup>n<sup>4</sup> =</label> 
+                <select id="t17-5">
+                    <option value="">Оберіть...</option>
+                    <option value="25p^6/(k^2m^6n^4)">25p⁶ / (k²m⁶n⁴)</option>
+                    <option value="25p^6n^4/(k^2m^6)">25p⁶n⁴ / (k²m⁶)</option>
+                    <option value="p^6/(25k^2m^6n^4)">p⁶ / (25k²m⁶n⁴)</option>
+                    <option value="25k^2p^6/(m^6n^4)">25k²p⁶ / (m⁶n⁴)</option>
+                </select>
+            </div>
+            <div class="sub-item" style="grid-column: 1 / -1;">
+                <label>6) (4x<sup>−5</sup> / (3y<sup>−2</sup>))<sup>−3</sup> · (16x<sup>−6</sup>y<sup>4</sup>)<sup>2</sup> =</label> 
+                <select id="t17-6">
+                    <option value="">Оберіть...</option>
+                    <option value="36x^3y^2">36x³y²</option>
+                    <option value="108x^3y^2">108x³y²</option>
+                    <option value="36x^-3y^2">36x⁻³y²</option>
+                    <option value="27x^3y^2">27x³y²</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTaskInputs(17, ['0,3a^5b^3c^15', 'x^4/(y^4z^24)', '3/4 m^-3n^13', '-6a^5', '25p^6/(k^2m^6n^4)', '36x^3y^2'])">Перевірити завдання 17</button>
+        <span class="task-status" id="status-17"></span>
+    </div>
+
+</div>
+
+<script>
+const userSelections = {};
+
+function normalize(str) {
+    if (!str) return '';
+    return str.toString().trim().toLowerCase().replace(/\s+/g, '').replace(/\./g, ',');
+}
+
+/* Перевірка відповідей (текстових та випадних списків) */
+function checkTaskInputs(taskNum, correctAnswers) {
+    let allCorrect = true;
+
+    correctAnswers.forEach((ans, index) => {
+        const elementId = `t${taskNum}-${index + 1}`;
+        const inputEl = document.getElementById(elementId);
+        if (!inputEl) return;
+
+        const userVal = normalize(inputEl.value);
+        const expectedVal = normalize(ans);
+        let isOk = false;
+
+        if (userVal === expectedVal) {
+            isOk = true;
+        } 
+        else if (ans === '1/4' && userVal === '0,25') isOk = true;
+        else if (ans === '6 1/4' && (userVal === '6,25' || userVal === '25/4')) isOk = true;
+        else if (ans === '-3/4' && userVal === '-0,75') isOk = true;
+        else if (ans === '1, 3' && (userVal === '1,3' || userVal === '1;3' || userVal === '3,1' || userVal === '3;1')) isOk = true;
+
+        inputEl.classList.remove('correct', 'incorrect');
+        if (isOk && userVal !== '') {
+            inputEl.classList.add('correct');
+        } else {
+            inputEl.classList.add('incorrect');
+            allCorrect = false;
+        }
+    });
+
+    const statusEl = document.getElementById(`status-${taskNum}`);
+    if (allCorrect) {
+        statusEl.innerText = "Правильно!";
+        statusEl.className = "task-status status-correct";
+    } else {
+        statusEl.innerText = "Є помилки";
+        statusEl.className = "task-status status-incorrect";
+    }
+}
+
+/* Вибір літери для MCQ */
+function selectSingleOption(taskNum, letter) {
+    userSelections[taskNum] = letter;
+    const buttons = document.querySelectorAll(`#opts-${taskNum} .option-btn`);
+    buttons.forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'incorrect');
+        if (btn.innerText === letter) {
+            btn.classList.add('selected');
+        }
+    });
+}
+
+/* Перевірка MCQ */
+function checkSingleMCQ(taskNum, correctLetter) {
+    const selected = userSelections[taskNum];
+    const statusEl = document.getElementById(`status-${taskNum}`);
+    const buttons = document.querySelectorAll(`#opts-${taskNum} .option-btn`);
+
+    if (!selected) {
+        statusEl.innerText = "Оберіть варіант!";
+        statusEl.className = "task-status status-incorrect";
+        return;
+    }
+
+    buttons.forEach(btn => {
+        btn.classList.remove('correct', 'incorrect');
+        if (btn.innerText === selected) {
+            if (selected === correctLetter) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('incorrect');
+            }
+        }
+    });
+
+    if (selected === correctLetter) {
+        statusEl.innerText = "Правильно!";
+        statusEl.className = "task-status status-correct";
+    } else {
+        statusEl.innerText = "Неправильно!";
+        statusEl.className = "task-status status-incorrect";
+    }
+}
+</script>
+
+</body>
+</html>
