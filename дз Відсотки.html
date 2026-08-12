@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер з математики: Відсотки</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+            --rule-bg: #eff6ff;
+            --rule-border: #93c5fd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .rule-box {
+            background-color: var(--rule-bg);
+            border: 1px solid var(--rule-border);
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1e3a8a;
+        }
+
+        .rule-box strong {
+            color: #1d4ed8;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            background: #fff;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .sub-item label {
+            font-size: 15px;
+            font-weight: 600;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .input-short {
+            width: 80px !important;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            background-color: #fff;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #f0fdf4;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #fef2f2;
+            color: var(--incorrect);
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .task-status {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .status-correct {
+            color: var(--correct);
+        }
+
+        .status-incorrect {
+            color: var(--incorrect);
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.9em;
+            margin: 0 2px;
+        }
+
+        .fraction > span:first-child {
+            border-bottom: 1px solid var(--text);
+            padding: 0 2px;
+        }
+
+        .fraction > span:last-child {
+            padding: 0 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Відсотки</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">№ 1 (30°). Виразіть у відсотках число:</div>
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) 0,8 =</label>
+                <input type="text" id="t1-1" class="input-short" placeholder="%">
+            </div>
+            <div class="sub-item">
+                <label>2) 1,35 =</label>
+                <input type="text" id="t1-2" class="input-short" placeholder="%">
+            </div>
+            <div class="sub-item">
+                <label>3) 7,2 =</label>
+                <input type="text" id="t1-3" class="input-short" placeholder="%">
+            </div>
+            <div class="sub-item">
+                <label>4) 0,006 =</label>
+                <input type="text" id="t1-4" class="input-short" placeholder="%">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити № 1</button>
+        <span class="task-status" id="status-1"></span>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">№ 2 (31°). Знайдіть відсоток від числа</div>
+        
+        <!-- Оновлений блок з правилом -->
+        <div class="rule-box">
+            📌 <strong>Правило:</strong> Щоб знайти відсотки від числа, ділимо число на 100 і множимо на кількість відсотків (якщо треба, то записуємо дії у вигляді дробів).
+        </div>
+
+        <div class="grid-inputs">
+            <div class="sub-item">
+                <label>1) 15 % від числа 200 =</label>
+                <input type="text" id="t2-1" class="input-short">
+            </div>
+            <div class="sub-item">
+                <label>2) 14 % від числа 60 =</label>
+                <input type="text" id="t2-2" class="input-short">
+            </div>
+            <div class="sub-item">
+                <label>3) 15,4 % від числа 40 =</label>
+                <input type="text" id="t2-3" class="input-short">
+            </div>
+            <div class="sub-item">
+                <label>4) 16 % від числа 3<div class="fraction"><span>1</span><span>8</span></div> =</label>
+                <input type="text" id="t2-4" class="input-short">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити № 2</button>
+        <span class="task-status" id="status-2"></span>
+    </div>
+
+</div>
+
+<script>
+function normalize(str) {
+    if (!str) return '';
+    return str.toString().trim().toLowerCase().replace(/\s+/g, '').replace(/%/g, '').replace(/\./g, ',');
+}
+
+function checkTask1() {
+    const answers = ['80', '135', '720', '0,6'];
+    let allCorrect = true;
+
+    answers.forEach((ans, idx) => {
+        const input = document.getElementById(`t1-${idx + 1}`);
+        const userVal = normalize(input.value);
+        const expected = normalize(ans);
+
+        if (userVal === expected && userVal !== '') {
+            input.className = 'input-short correct';
+        } else {
+            input.className = 'input-short incorrect';
+            allCorrect = false;
+        }
+    });
+
+    const status = document.getElementById('status-1');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+    }
+}
+
+function checkTask2() {
+    const answers = ['30', '8,4', '6,16', '0,5'];
+    let allCorrect = true;
+
+    answers.forEach((ans, idx) => {
+        const input = document.getElementById(`t2-${idx + 1}`);
+        const userVal = normalize(input.value);
+        const expected = normalize(ans);
+
+        if (userVal === expected && userVal !== '') {
+            input.className = 'input-short correct';
+        } else {
+            input.className = 'input-short incorrect';
+            allCorrect = false;
+        }
+    });
+
+    const status = document.getElementById('status-2');
+    if (allCorrect) {
+        status.innerText = "Правильно!";
+        status.className = "task-status status-correct";
+    } else {
+        status.innerText = "Є помилки";
+        status.className = "task-status status-incorrect";
+    }
+}
+</script>
+
+</body>
+</html>
