@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер з математики: Ділення десяткових дробів</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            background-color: #eef2f5;
+            color: #2c3e50;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 30px;
+            font-size: 28px;
+            border-bottom: 3px solid #3182ce;
+            padding-bottom: 10px;
+        }
+        .section-box {
+            background: #f8fafc;
+            border: 2px solid #cbd5e0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 35px;
+        }
+        .section-header {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2b6cb0;
+            margin-bottom: 20px;
+        }
+        .task-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .task-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+        .question-block {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .q1-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
+        .inline-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow-x: auto;
+            padding: 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        input[type="text"], select {
+            padding: 8px 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #fff;
+            font-weight: normal;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.2);
+        }
+        .inp-example {
+            width: 140px;
+        }
+        .inp-ans {
+            width: 100px;
+        }
+        .check-btn {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 15px;
+        }
+        .check-btn:hover {
+            background-color: #2b6cb0;
+        }
+        .result-box {
+            margin-top: 15px;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            display: none;
+        }
+        .result-box.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        .result-box.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+        .is-valid {
+            border-color: #38a169 !important;
+            background-color: #f0fff4 !important;
+        }
+        .is-invalid {
+            border-color: #e53e3e !important;
+            background-color: #fff5f5 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер з математики: Ділення десяткових дробів</h1>
+
+    <!-- НОМЕР 1 -->
+    <div class="section-box" id="section1">
+        <div class="section-header">1. Обчисли (№ 1599)</div>
+
+        <!-- 1) -->
+        <div class="task-card" data-key="1_1">
+            <div class="task-title">1) 19,2 : 0,1</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>19,2 : 0,1 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2) -->
+        <div class="task-card" data-key="1_2">
+            <div class="task-title">2) 0,7 : 0,1</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>0,7 : 0,1 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3) -->
+        <div class="task-card" data-key="1_3">
+            <div class="task-title">3) 0,07 : 0,1</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>0,07 : 0,1 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4) -->
+        <div class="task-card" data-key="1_4">
+            <div class="task-title">4) 9,7 : 0,01</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>9,7 : 0,01 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 5) -->
+        <div class="task-card" data-key="1_5">
+            <div class="task-title">5) 0,92 : 0,01</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>0,92 : 0,01 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 6) -->
+        <div class="task-card" data-key="1_6">
+            <div class="task-title">6) 230 : 0,01</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>230 : 0,01 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 7) -->
+        <div class="task-card" data-key="1_7">
+            <div class="task-title">7) 0,152 : 0,001</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>0,152 : 0,001 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 8) -->
+        <div class="task-card" data-key="1_8">
+            <div class="task-title">8) 5,7 : 0,001</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>5,7 : 0,001 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 9) -->
+        <div class="task-card" data-key="1_9">
+            <div class="task-title">9) 219 : 0,0001</div>
+            <div class="question-block">
+                <div class="q1-row">
+                    <span>1) На скільки цифр треба переносити кому в обох числах?</span>
+                    <select class="q1-val">
+                        <option value="">-- Оберіть --</option>
+                        <option value="1">на 1 цифру</option>
+                        <option value="2">на 2 цифри</option>
+                        <option value="3">на 3 цифри</option>
+                        <option value="4">на 4 цифри</option>
+                    </select>
+                </div>
+                <div class="inline-row">
+                    <span>2) Запис розв'язання:</span>
+                    <span>219 : 0,0001 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <button class="check-btn" onclick="checkNum1()">Перевірити номер 1</button>
+        <div class="result-box" id="res1"></div>
+    </div>
+
+
+    <!-- НОМЕР 2 -->
+    <div class="section-box" id="section2">
+        <div class="section-header">2. Виконай ділення</div>
+
+        <!-- 2.1 -->
+        <div class="task-card" data-key="2_1">
+            <div class="task-title">1) 495,6 : 0,7</div>
+            <div class="question-block">
+                <div class="inline-row">
+                    <span>Запис розв'язання:</span>
+                    <span>495,6 : 0,7 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2.2 -->
+        <div class="task-card" data-key="2_2">
+            <div class="task-title">2) 18 : 1,25</div>
+            <div class="question-block">
+                <div class="inline-row">
+                    <span>Запис розв'язання:</span>
+                    <span>18 : 1,25 =</span>
+                    <input type="text" class="q2-val inp-example" placeholder="приклад">
+                    <span>=</span>
+                    <input type="text" class="q3-val inp-ans" placeholder="відповідь">
+                </div>
+            </div>
+        </div>
+
+        <button class="check-btn" onclick="checkNum2()">Перевірити номер 2</button>
+        <div class="result-box" id="res2"></div>
+    </div>
+
+</div>
+
+<script>
+    const db1 = {
+        '1_1': { q1: '1', q2: ['192:1', '192 : 1', '192/1'], q3: ['192'] },
+        '1_2': { q1: '1', q2: ['7:1', '7 : 1', '7/1', '07:1'], q3: ['7'] },
+        '1_3': { q1: '1', q2: ['0,7:1', '0,7 : 1', '0,7/1', '0.7:1', '0.7 : 1'], q3: ['0,7', '0.7'] },
+        '1_4': { q1: '2', q2: ['970:1', '970 : 1', '970/1'], q3: ['970'] },
+        '1_5': { q1: '2', q2: ['92:1', '92 : 1', '92/1'], q3: ['92'] },
+        '1_6': { q1: '2', q2: ['23000:1', '23000 : 1', '23000/1', '23 000:1'], q3: ['23000', '23 000'] },
+        '1_7': { q1: '3', q2: ['152:1', '152 : 1', '152/1'], q3: ['152'] },
+        '1_8': { q1: '3', q2: ['5700:1', '5700 : 1', '5700/1', '5 700:1'], q3: ['5700', '5 700'] },
+        '1_9': { q1: '4', q2: ['2190000:1', '2190000 : 1', '2190000/1', '2 190 000:1'], q3: ['2190000', '2 190 000'] }
+    };
+
+    const db2 = {
+        '2_1': { q2: ['4956:7', '4956 : 7', '4956/7'], q3: ['708'] },
+        '2_2': { q2: ['1800:125', '1800 : 125', '1800/125'], q3: ['14,4', '14.4'] }
+    };
+
+    function clean(str) {
+        return str.trim().toLowerCase().replace(/\s+/g, '');
+    }
+
+    function checkNum1() {
+        let total = 0;
+        let score = 0;
+        let res = document.getElementById('res1');
+
+        for (let key in db1) {
+            let card = document.querySelector(`[data-key="${key}"]`);
+            let sel = card.querySelector('.q1-val');
+            let q2In = card.querySelector('.q2-val');
+            let q3In = card.querySelector('.q3-val');
+
+            let item = db1[key];
+
+            // Check 1
+            total++;
+            if (sel.value === item.q1) {
+                score++;
+                sel.className = 'q1-val is-valid';
+            } else {
+                sel.className = 'q1-val is-invalid';
+            }
+
+            // Check 2
+            total++;
+            let u2 = clean(q2In.value);
+            let ok2 = item.q2.some(x => clean(x) === u2);
+            if (u2 !== '' && ok2) {
+                score++;
+                q2In.className = 'q2-val inp-example is-valid';
+            } else {
+                q2In.className = 'q2-val inp-example is-invalid';
+            }
+
+            // Check 3
+            total++;
+            let u3 = clean(q3In.value);
+            let ok3 = item.q3.some(x => clean(x) === u3);
+            if (u3 !== '' && ok3) {
+                score++;
+                q3In.className = 'q3-val inp-ans is-valid';
+            } else {
+                q3In.className = 'q3-val inp-ans is-invalid';
+            }
+        }
+
+        res.style.display = 'block';
+        if (score === total) {
+            res.className = 'result-box success';
+            res.innerHTML = `Чудово! Номер 1 виконано ідеально (${score}/${total})! 🎉`;
+        } else {
+            res.className = 'result-box error';
+            res.innerHTML = `Результат Номера 1: ${score} з ${total}. Помилки виділено червоним коліром.`;
+        }
+    }
+
+    function checkNum2() {
+        let total = 0;
+        let score = 0;
+        let res = document.getElementById('res2');
+
+        for (let key in db2) {
+            let card = document.querySelector(`[data-key="${key}"]`);
+            let q2In = card.querySelector('.q2-val');
+            let q3In = card.querySelector('.q3-val');
+
+            let item = db2[key];
+
+            // Check 2
+            total++;
+            let u2 = clean(q2In.value);
+            let ok2 = item.q2.some(x => clean(x) === u2);
+            if (u2 !== '' && ok2) {
+                score++;
+                q2In.className = 'q2-val inp-example is-valid';
+            } else {
+                q2In.className = 'q2-val inp-example is-invalid';
+            }
+
+            // Check 3
+            total++;
+            let u3 = clean(q3In.value);
+            let ok3 = item.q3.some(x => clean(x) === u3);
+            if (u3 !== '' && ok3) {
+                score++;
+                q3In.className = 'q3-val inp-ans is-valid';
+            } else {
+                q3In.className = 'q3-val inp-ans is-invalid';
+            }
+        }
+
+        res.style.display = 'block';
+        if (score === total) {
+            res.className = 'result-box success';
+            res.innerHTML = `Чудово! Номер 2 виконано ідеально (${score}/${total})! 👏`;
+        } else {
+            res.className = 'result-box error';
+            res.innerHTML = `Результат Номера 2: ${score} з ${total}. Помилки виділено червоним коліром.`;
+        }
+    }
+</script>
+
+</body>
+</html>
