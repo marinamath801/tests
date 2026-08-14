@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: дз Сума кутів трикутника</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .explanation { display: none; }
+        
+        /* Стилі для підсвічування правильності/неправильності полів */
+        .correct-field {
+            background-color: #ccfbf1 !important; /* teal-100 */
+            border-color: #0d9488 !important;     /* teal-600 */
+            color: #0f766e !important;            /* teal-700 */
+            font-weight: 700 !important;
+        }
+        .incorrect-field {
+            background-color: #ffe4e6 !important; /* rose-100 */
+            border-color: #e11d48 !important;     /* rose-600 */
+            color: #be123c !important;            /* rose-700 */
+            font-weight: 700 !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-slate-200">
+    <header class="bg-teal-700 p-8 text-white text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">дз Сума кутів трикутника</h1>
+        <p class="mt-2 text-teal-100 opacity-90 text-lg">Інтерактивний тренажер з автоматичною перевіркою</p>
+    </header>
+
+    <main class="p-6 md:p-10 space-y-12">
+        
+        <!-- Завдання 1 (Колишня Частина 1 завдання 1) -->
+        <section class="task-container" id="task-1">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                <h2 class="text-xl font-bold text-slate-700">Знайдіть кути рівнобедреного прямокутного трикутника:</h2>
+            </div>
+            
+            <div class="space-y-6 mb-6">
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="selectTask1('А')" id="t1-А" class="t1-btn p-3 border-2 border-slate-200 rounded-xl hover:bg-white transition-all text-center font-medium">
+                            А) 90°, 60°, 30°
+                        </button>
+                        <button onclick="selectTask1('Б')" id="t1-Б" class="t1-btn p-3 border-2 border-slate-200 rounded-xl hover:bg-white transition-all text-center font-medium">
+                            Б) 90°, 45°, 45°
+                        </button>
+                        <button onclick="selectTask1('В')" id="t1-В" class="t1-btn p-3 border-2 border-slate-200 rounded-xl hover:bg-white transition-all text-center font-medium">
+                            В) 60°, 60°, 60°
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="checkTask(1)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 1
+            </button>
+            <div id="exp-1" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+        <!-- Завдання 2 (Колишня Частина 2 завдання 1) -->
+        <section class="task-container" id="task-2">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                <h2 class="text-xl font-bold text-slate-700">У &Delta;ABC сторона AB &gt; AC. Порівняйте кути B і C цього трикутника:</h2>
+            </div>
+
+            <div class="space-y-6 mb-6">
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-3">
+                    <span class="font-bold text-lg">&ang;B</span>
+                    <select id="t2-select" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-bold text-lg transition-all">
+                        <option value="">-- знак --</option>
+                        <option value="<">&lt;</option>
+                        <option value=">">&gt;</option>
+                        <option value="=">=</option>
+                    </select>
+                    <span class="font-bold text-lg">&ang;C</span>
+                </div>
+            </div>
+
+            <button onclick="checkTask(2)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 2
+            </button>
+            <div id="exp-2" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+        <!-- Завдання 3 (Колишнє завдання 2) -->
+        <section class="task-container" id="task-3">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                <h2 class="text-xl font-bold text-slate-700">У трикутнику два кути дорівнюють 60&deg; і 50&deg;. Знайдіть кут між прямими, що містять бісектриси цих кутів.</h2>
+            </div>
+
+            <!-- Рисунок -->
+            <div class="my-6 flex justify-center">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-md w-full">
+                    <svg viewBox="0 0 340 220" class="w-full h-auto">
+                        <!-- Triangle ABC -->
+                        <polygon points="120,20 30,180 270,180" fill="none" stroke="#334155" stroke-width="2.5"/>
+                        
+                        <!-- Bisector lines -->
+                        <line x1="30" y1="180" x2="195" y2="100" stroke="#334155" stroke-width="2"/>
+                        <line x1="270" y1="180" x2="75" y2="100" stroke="#334155" stroke-width="2"/>
+
+                        <!-- Exact Angle Sector & Arc at D for angle CDM -->
+                        <path d="M 140 126.67 L 165.19 114.45 A 28 28 0 0 1 165.90 137.30 Z" fill="#fca5a5" opacity="0.65"/>
+                        <path d="M 165.19 114.45 A 28 28 0 0 1 165.90 137.30" fill="none" stroke="#dc2626" stroke-width="2.2"/>
+
+                        <!-- Red Point D precisely at intersection (140, 126.67) -->
+                        <circle cx="140" cy="126.67" r="4" fill="#dc2626"/>
+
+                        <!-- Arc at A -->
+                        <path d="M 55 167.8 A 30 30 0 0 0 57 180" fill="none" stroke="#7c3aed" stroke-width="2"/>
+
+                        <!-- Arcs at C -->
+                        <path d="M 245 180 A 25 25 0 0 0 242.8 166.7" fill="none" stroke="#16a34a" stroke-width="2"/>
+                        <path d="M 235 180 A 35 35 0 0 0 231.9 161.4" fill="none" stroke="#16a34a" stroke-width="2"/>
+
+                        <!-- Labels -->
+                        <text x="115" y="15" font-weight="bold" fill="#1e293b" font-size="16">B</text>
+                        <text x="15" y="195" font-weight="bold" fill="#2563eb" font-size="16">A</text>
+                        <text x="275" y="195" font-weight="bold" fill="#2563eb" font-size="16">C</text>
+                        <text x="58" y="102" font-weight="bold" fill="#1e293b" font-size="14">E</text>
+                        <text x="202" y="102" font-weight="bold" fill="#1e293b" font-size="14">M</text>
+                        <text x="122" y="122" font-weight="bold" fill="#dc2626" font-size="15">D</text>
+                        
+                        <!-- Question mark -->
+                        <text x="205" y="133" font-weight="bold" fill="#dc2626" font-size="18">?</text>
+
+                        <!-- Given values -->
+                        <text x="215" y="45" font-style="italic" fill="#1e293b" font-size="15">&ang;A = 60&deg;</text>
+                        <text x="215" y="70" font-style="italic" fill="#1e293b" font-size="15">&ang;C = 50&deg;</text>
+                        <text x="215" y="95" font-style="italic" fill="#dc2626" font-size="15">&ang;(AM; CE) = ?</text>
+                    </svg>
+                </div>
+            </div>
+
+            <p class="font-medium text-slate-700 mb-4">Заповніть проміжні значення та знайдіть шуканий кут:</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="font-bold">&ang;CAD =</span>
+                    <input type="number" id="t3-cad" placeholder="значення" class="p-2 border-2 border-slate-200 rounded-lg w-28 text-center focus:border-teal-500 outline-none font-semibold transition-all">
+                    <span class="font-bold">&deg;</span>
+                </div>
+                <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="font-bold">&ang;ACD =</span>
+                    <input type="number" id="t3-acd" placeholder="значення" class="p-2 border-2 border-slate-200 rounded-lg w-28 text-center focus:border-teal-500 outline-none font-semibold transition-all">
+                    <span class="font-bold">&deg;</span>
+                </div>
+                <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="font-bold">&ang;ADC =</span>
+                    <input type="number" id="t3-adc" placeholder="значення" class="p-2 border-2 border-slate-200 rounded-lg w-28 text-center focus:border-teal-500 outline-none font-semibold transition-all">
+                    <span class="font-bold">&deg;</span>
+                </div>
+                <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="font-bold">&ang;CDM =</span>
+                    <input type="number" id="t3-cdm" placeholder="значення" class="p-2 border-2 border-slate-200 rounded-lg w-28 text-center focus:border-teal-500 outline-none font-semibold transition-all">
+                    <span class="font-bold">&deg;</span>
+                </div>
+            </div>
+
+            <button onclick="checkTask(3)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 3
+            </button>
+            <div id="exp-3" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+        <!-- Завдання 4 (Колишнє завдання 3) -->
+        <section class="task-container" id="task-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">4</span>
+                <h2 class="text-xl font-bold text-slate-700">Два кути трикутника дорівнюють 35&deg; і 55&deg;. Вкажіть вид трикутника:</h2>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">1) за кутами цей трикутник —</span>
+                    <select id="t4-angles" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть вид --</option>
+                        <option value="гострокутний">гострокутний</option>
+                        <option value="прямокутний">прямокутний</option>
+                        <option value="тупокутний">тупокутний</option>
+                    </select>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">2) за сторонами цей трикутник —</span>
+                    <select id="t4-sides" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть вид --</option>
+                        <option value="рівносторонній">рівносторонній</option>
+                        <option value="рівнобедрений">рівнобедрений</option>
+                        <option value="різносторонній">різносторонній</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="checkTask(4)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 4
+            </button>
+            <div id="exp-4" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+        <!-- Завдання 5 (Колишнє завдання 4) -->
+        <section class="task-container" id="task-5">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">5</span>
+                <h2 class="text-xl font-bold text-slate-700">Два кути трикутника дорівнюють 42&deg; і 96&deg;. Вкажіть вид трикутника:</h2>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">1) за кутами цей трикутник —</span>
+                    <select id="t5-angles" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть вид --</option>
+                        <option value="гострокутний">гострокутний</option>
+                        <option value="прямокутний">прямокутний</option>
+                        <option value="тупокутний">тупокутний</option>
+                    </select>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">2) за сторонами цей трикутник —</span>
+                    <select id="t5-sides" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть вид --</option>
+                        <option value="рівносторонній">рівносторонній</option>
+                        <option value="рівнобедрений">рівнобедрений</option>
+                        <option value="різносторонній">різносторонній</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="checkTask(5)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 5
+            </button>
+            <div id="exp-5" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+        <!-- Завдання 6 (Колишнє завдання 5) -->
+        <section class="task-container" id="task-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">6</span>
+                <h2 class="text-xl font-bold text-slate-700">Два кути трикутника дорівнюють 51&deg; і 68&deg;. Вкажіть відповіді відповідно до рисунку:</h2>
+            </div>
+
+            <!-- Рисунок для завдання 6 -->
+            <div class="my-6 flex justify-center">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 max-w-md w-full">
+                    <svg viewBox="0 0 300 200" class="w-full h-auto">
+                        <!-- Triangle MOT -->
+                        <polygon points="100,30 30,170 260,170" fill="none" stroke="#334155" stroke-width="2.5"/>
+
+                        <!-- Angle arc at M (orange) -->
+                        <path d="M 50 170 A 25 25 0 0 0 43 145" fill="none" stroke="#ea580c" stroke-width="2.5"/>
+                        <path d="M 30 170 L 50 170 A 25 25 0 0 0 43 145 Z" fill="#ffedd5" opacity="0.6"/>
+
+                        <!-- Double angle arc at T (green) -->
+                        <path d="M 235 170 A 25 25 0 0 1 240 153" fill="none" stroke="#16a34a" stroke-width="2"/>
+                        <path d="M 225 170 A 35 35 0 0 1 232 146" fill="none" stroke="#16a34a" stroke-width="2"/>
+
+                        <!-- Labels -->
+                        <text x="95" y="20" font-weight="bold" fill="#1e293b" font-size="18">O</text>
+                        <text x="10" y="180" font-weight="bold" fill="#1e293b" font-size="18">M</text>
+                        <text x="270" y="180" font-weight="bold" fill="#1e293b" font-size="18">T</text>
+
+                        <!-- Angle values -->
+                        <text x="50" y="162" font-bold fill="#ea580c" font-size="15">68&deg;</text>
+                        <text x="210" y="162" font-bold fill="#16a34a" font-size="15">51&deg;</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold text-lg">1) &ang;O =</span>
+                    <input type="number" id="t6-angle" placeholder="значення" class="p-2 border-2 border-slate-200 rounded-xl w-28 text-center focus:border-teal-500 outline-none font-semibold text-lg transition-all">
+                    <span class="font-semibold text-lg">&deg;</span>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">2) найбільша сторона трикутника —</span>
+                    <select id="t6-max-side" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть сторону --</option>
+                        <option value="MO">MO</option>
+                        <option value="MT">MT</option>
+                        <option value="OT">OT</option>
+                    </select>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <span class="font-semibold">3) найменша сторона трикутника —</span>
+                    <select id="t6-min-side" class="p-3 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold w-full md:w-1/2 transition-all">
+                        <option value="">-- Оберіть сторону --</option>
+                        <option value="MO">MO</option>
+                        <option value="MT">MT</option>
+                        <option value="OT">OT</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="checkTask(6)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 6
+            </button>
+            <div id="exp-6" class="explanation mt-4 p-4 rounded-xl text-sm italic border"></div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-50 p-8 border-t border-slate-100 text-center">
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button onclick="window.location.reload()" class="bg-slate-400 hover:bg-slate-500 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all active:scale-95">
+                Скинути все
+            </button>
+        </div>
+        <p class="mt-6 text-slate-400 text-sm">Інтерактивний тренажер: дз Сума кутів трикутника</p>
+    </footer>
+</div>
+
+<script>
+    let task1Selected = '';
+
+    function selectTask1(option) {
+        task1Selected = option;
+        document.querySelectorAll('.t1-btn').forEach(btn => {
+            btn.classList.remove('ring-4', 'ring-teal-500', 'bg-teal-100', 'border-teal-600', 'font-bold', 'correct-field', 'incorrect-field');
+        });
+        const selectedBtn = document.getElementById(`t1-${option}`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('ring-4', 'ring-teal-500', 'bg-teal-100', 'border-teal-600', 'font-bold');
+        }
+    }
+
+    function checkTask(taskNum) {
+        const exp = document.getElementById(`exp-${taskNum}`);
+        exp.style.display = 'block';
+
+        // Перевірка завдання 1
+        if (taskNum === 1) {
+            const btnA = document.getElementById('t1-А');
+            const btnB = document.getElementById('t1-Б');
+            const btnC = document.getElementById('t1-В');
+
+            // Скидаємо підсвічування
+            [btnA, btnB, btnC].forEach(b => b.classList.remove('correct-field', 'incorrect-field', 'ring-4', 'ring-teal-500'));
+
+            if (!task1Selected) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, оберіть один із варіантів відповідей.';
+                return;
+            }
+
+            // Правильна відповідь - Б
+            btnB.classList.add('correct-field');
+
+            if (task1Selected === 'Б') {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Правильно! 🎉</strong><br>У рівнобедреному прямокутному трикутнику один кут 90°, а два інші рівні: (180° - 90°) / 2 = 45°. Відповідь: Б.';
+            } else {
+                const wrongBtn = document.getElementById(`t1-${task1Selected}`);
+                if (wrongBtn) wrongBtn.classList.add('incorrect-field');
+                
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Є помилка.</strong><br>Правильна відповідь: <strong>Б (90°, 45°, 45°)</strong>.';
+            }
+        }
+
+        // Перевірка завдання 2
+        if (taskNum === 2) {
+            const selectEl = document.getElementById('t2-select');
+            selectEl.classList.remove('correct-field', 'incorrect-field');
+
+            if (!selectEl.value) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, оберіть знак для порівняння кутів.';
+                return;
+            }
+
+            if (selectEl.value === '<') {
+                selectEl.classList.add('correct-field');
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Правильно! 🎉</strong><br>Напроти більшої сторони AB лежить більший кут C, а напроти меншої AC — менший кут B. Отже, ∠B < ∠C.';
+            } else {
+                selectEl.classList.add('incorrect-field');
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Неправильно.</strong><br>Правильний знак: <strong>&ang;B &lt; &ang;C</strong> (проти більшої сторони AB лежить більший кут C).';
+            }
+        }
+
+        // Перевірка завдання 3
+        if (taskNum === 3) {
+            const cad = document.getElementById('t3-cad');
+            const acd = document.getElementById('t3-acd');
+            const adc = document.getElementById('t3-adc');
+            const cdm = document.getElementById('t3-cdm');
+
+            const inputs = [cad, acd, adc, cdm];
+            inputs.forEach(i => i.classList.remove('correct-field', 'incorrect-field'));
+
+            if (!cad.value.trim() || !acd.value.trim() || !adc.value.trim() || !cdm.value.trim()) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, заповніть всі чотири значення.';
+                return;
+            }
+
+            const c1 = parseInt(cad.value.trim()) === 30;
+            const c2 = parseInt(acd.value.trim()) === 25;
+            const c3 = parseInt(adc.value.trim()) === 125;
+            const c4 = parseInt(cdm.value.trim()) === 55;
+
+            cad.classList.add(c1 ? 'correct-field' : 'incorrect-field');
+            acd.classList.add(c2 ? 'correct-field' : 'incorrect-field');
+            adc.classList.add(c3 ? 'correct-field' : 'incorrect-field');
+            cdm.classList.add(c4 ? 'correct-field' : 'incorrect-field');
+
+            if (c1 && c2 && c3 && c4) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Відмінно! Все правильно! 🎉</strong><br>&ang;CAD = 60° / 2 = 30°; &ang;ACD = 50° / 2 = 25°; &ang;ADC = 180° - (30° + 25°) = 125°; кут між бісектрисами &ang;CDM = 180° - 125° = 55°.';
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Є помилки у обчисленнях.</strong><br>Правильний хід розв’язання:<br>&bull; &ang;CAD = 60° / 2 = <strong>30°</strong><br>&bull; &ang;ACD = 50° / 2 = <strong>25°</strong><br>&bull; &ang;ADC = 180° - (30° + 25°) = <strong>125°</strong><br>&bull; &ang;CDM = 180° - 125° = <strong>55°</strong>.';
+            }
+        }
+
+        // Перевірка завдання 4
+        if (taskNum === 4) {
+            const angles = document.getElementById('t4-angles');
+            const sides = document.getElementById('t4-sides');
+
+            [angles, sides].forEach(s => s.classList.remove('correct-field', 'incorrect-field'));
+
+            if (!angles.value || !sides.value) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, оберіть варіанти для обох пунктів.';
+                return;
+            }
+
+            const c1 = angles.value === 'прямокутний';
+            const c2 = sides.value === 'різносторонній';
+
+            angles.classList.add(c1 ? 'correct-field' : 'incorrect-field');
+            sides.classList.add(c2 ? 'correct-field' : 'incorrect-field');
+
+            if (c1 && c2) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Правильно! 🎉</strong><br>Третій кут = 180° - (35° + 55°) = 90°. Оскільки є прямий кут, трикутник <strong>прямокутний</strong>. Усі кути різні (35°, 55°, 90°), тому й усі сторони різні — <strong>різносторонній</strong>.';
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Неправильно.</strong><br>Третій кут = 180° - (35° + 55°) = 90°. Отже, за кутами — <strong>прямокутний</strong>, а за сторонами — <strong>різносторонній</strong>.';
+            }
+        }
+
+        // Перевірка завдання 5
+        if (taskNum === 5) {
+            const angles = document.getElementById('t5-angles');
+            const sides = document.getElementById('t5-sides');
+
+            [angles, sides].forEach(s => s.classList.remove('correct-field', 'incorrect-field'));
+
+            if (!angles.value || !sides.value) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, оберіть варіанти для обох пунктів.';
+                return;
+            }
+
+            const c1 = angles.value === 'тупокутний';
+            const c2 = sides.value === 'рівнобедрений';
+
+            angles.classList.add(c1 ? 'correct-field' : 'incorrect-field');
+            sides.classList.add(c2 ? 'correct-field' : 'incorrect-field');
+
+            if (c1 && c2) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Чудово! Всі відповіді правильні! 🎉</strong><br>Третій кут = 180° - (42° + 96°) = 42°. Оскільки кут 96° &gt; 90°, трикутник <strong>тупокутний</strong>. Оскільки два кути рівні (42° і 42°), трикутник <strong>рівнобедрений</strong>.';
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Неправильно.</strong><br>Третій кут = 180° - (42° + 96°) = 42°. За кутами він <strong>тупокутний</strong> (кут 96°), а за сторонами — <strong>рівнобедрений</strong> (кути при основі рівні по 42°).';
+            }
+        }
+
+        // Перевірка завдання 6
+        if (taskNum === 6) {
+            const angleVal = document.getElementById('t6-angle');
+            const maxSide = document.getElementById('t6-max-side');
+            const minSide = document.getElementById('t6-min-side');
+
+            [angleVal, maxSide, minSide].forEach(el => el.classList.remove('correct-field', 'incorrect-field'));
+
+            if (!angleVal.value.trim() || !maxSide.value || !minSide.value) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = 'Будь ласка, дайте відповіді на всі три пункти.';
+                return;
+            }
+
+            const c1 = parseInt(angleVal.value.trim()) === 61;
+            const c2 = maxSide.value === 'OT';
+            const c3 = minSide.value === 'MO';
+
+            angleVal.classList.add(c1 ? 'correct-field' : 'incorrect-field');
+            maxSide.classList.add(c2 ? 'correct-field' : 'incorrect-field');
+            minSide.classList.add(c3 ? 'correct-field' : 'incorrect-field');
+
+            if (c1 && c2 && c3) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = '<strong>Блискуче! Все правильно! 🎉</strong><br>1) &ang;O = 180° - (68° + 51°) = 61°.<br>2) Найбільший кут &ang;M = 68°, проти нього лежить найбільша сторона <strong>OT</strong>.<br>3) Найменший кут &ang;T = 51°, проти нього лежить найменша сторона <strong>MO</strong>.';
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm italic border bg-red-50 text-red-900 border-red-200';
+                exp.innerHTML = '<strong>Є помилки.</strong><br>Правильні відповіді:<br>1) &ang;O = 180° - (68° + 51°) = <strong>61°</strong>;<br>2) найбільша сторона — <strong>OT</strong> (напроти більшого кута 68°);<br>3) найменша сторона — <strong>MO</strong> (напроти меншого кута 51°).';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
