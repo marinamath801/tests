@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Сумісні дії зі звичайними і десятковими дробами</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .explanation { display: none; }
+        
+        /* Стилі для підсвічування полів */
+        .correct-field {
+            background-color: #ccfbf1 !important; /* bg-teal-100 */
+            border-color: #0d9488 !important;     /* border-teal-600 */
+            color: #0f766e !important;          /* text-teal-700 */
+            font-weight: 700 !important;
+        }
+        .incorrect-field {
+            background-color: #ffe4e6 !important; /* bg-rose-100 */
+            border-color: #e11d48 !important;     /* border-rose-600 */
+            color: #be123c !important;          /* text-rose-700 */
+            font-weight: 700 !important;
+        }
+
+        /* Трюк для стилізації кастомних чекбоксів-літер у завданні 1 */
+        .letter-checkbox:checked + label {
+            background-color: #0d9488;
+            color: white;
+            border-color: #0f766e;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden border border-slate-200">
+    
+    <!-- Шапка з банком монет -->
+    <header class="bg-teal-700 p-6 md:p-8 text-white relative">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Дз Сумісні дії зі звичайними і десятковими дробами</h1>
+                <p class="mt-1 text-teal-100 opacity-90 text-sm md:text-base">Інтерактивний тренажер: зароби ігрові монети за правильні відповіді!</p>
+            </div>
+            
+            <!-- Скарбничка / Банка -->
+            <div class="bg-teal-800/80 border border-teal-500/50 rounded-2xl p-4 flex items-center gap-4 shadow-inner min-w-[200px]">
+                <div class="text-3xl animate-bounce">🪙</div>
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-teal-200 font-bold">Скарбничка</div>
+                    <div class="text-2xl font-black text-amber-300"><span id="coin-count">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-6 md:p-10 space-y-12">
+        
+        <!-- Завдання 1 -->
+        <section class="task-container" id="task-1">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">1</span>
+                <h2 class="text-xl font-bold text-slate-700">Аналіз кінчених десяткових дробів та секретне слово</h2>
+            </div>
+
+            <p class="text-sm text-slate-600 mb-6 bg-slate-100 p-4 rounded-xl border border-slate-200">
+                Знайди дроби, які <b>можна подати у вигляді скінченного десяткового дробу</b> (знаменник містить лише множники 2 та/або 5). 
+                Познач ці дроби прапорцями, а з відповідних літер склади назву популярного тренду / гри!
+            </p>
+
+            <!-- Сітка дробів та літер -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 mb-6">
+                <!-- Дріб 1: 5/2 (A) - ТАК -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>5</sup>/<sub>2</sub></div>
+                    <input type="checkbox" id="t1-frac-0" class="hidden letter-checkbox">
+                    <label for="t1-frac-0" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">А</label>
+                </div>
+                <!-- Дріб 2: 7/6 (Б) - НІ -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>7</sup>/<sub>6</sub></div>
+                    <input type="checkbox" id="t1-frac-1" class="hidden letter-checkbox">
+                    <label for="t1-frac-1" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">Б</label>
+                </div>
+                <!-- Дріб 3: 3/4 (Н) - ТАК -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>3</sup>/<sub>4</sub></div>
+                    <input type="checkbox" id="t1-frac-2" class="hidden letter-checkbox">
+                    <label for="t1-frac-2" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">Н</label>
+                </div>
+                <!-- Дріб 4: 9/20 (І) - ТАК -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>9</sup>/<sub>20</sub></div>
+                    <input type="checkbox" id="t1-frac-3" class="hidden letter-checkbox">
+                    <label for="t1-frac-3" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">І</label>
+                </div>
+                <!-- Дріб 5: 4/11 (В) - НІ -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>4</sup>/<sub>11</sub></div>
+                    <input type="checkbox" id="t1-frac-4" class="hidden letter-checkbox">
+                    <label for="t1-frac-4" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">В</label>
+                </div>
+                <!-- Дріб 6: 12/25 (M) - ТАК -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>12</sup>/<sub>25</sub></div>
+                    <input type="checkbox" id="t1-frac-5" class="hidden letter-checkbox">
+                    <label for="t1-frac-5" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">М</label>
+                </div>
+                <!-- Дріб 7: 33/8 (Е) - ТАК -->
+                <div class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-center space-y-2">
+                    <div class="text-lg font-bold"><sup>33</sup>/<sub>8</sub></div>
+                    <input type="checkbox" id="t1-frac-6" class="hidden letter-checkbox">
+                    <label for="t1-frac-6" class="block cursor-pointer py-1 border-2 border-teal-600 rounded-lg text-teal-700 font-bold transition-all">Е</label>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 mb-6">
+                <span class="font-semibold text-slate-800">Запиши розгадане слово (з вибраних літер):</span>
+                <input type="text" id="t1-word" placeholder="Введіть слово..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+            </div>
+
+            <button onclick="checkTask(1)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 1 (до +8 грн)
+            </button>
+            <div id="exp-1" class="explanation mt-4 p-4 rounded-xl text-sm border"></div>
+        </section>
+
+        <!-- Завдання 2 -->
+        <section class="task-container" id="task-2">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">2</span>
+                <h2 class="text-xl font-bold text-slate-700">Виконай дії, переходячи до десяткових дробів:</h2>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <!-- а -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">а) 6,7 &minus; <sup>2</sup>/<sub>5</sub> =</span>
+                    <input type="text" id="t2-a-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-36 md:w-48 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t2-a-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+                <!-- б -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">б) <sup>3</sup>/<sub>4</sub> : 0,01 =</span>
+                    <input type="text" id="t2-b-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-36 md:w-48 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t2-b-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+                <!-- в -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">в) 4,8 &middot; <sup>1</sup>/<sub>50</sub> =</span>
+                    <input type="text" id="t2-c-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-36 md:w-48 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t2-c-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+            </div>
+
+            <button onclick="checkTask(2)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 2 (до +6 грн)
+            </button>
+            <div id="exp-2" class="explanation mt-4 p-4 rounded-xl text-sm border"></div>
+        </section>
+
+        <!-- Завдання 3 -->
+        <section class="task-container" id="task-3">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">3</span>
+                <h2 class="text-xl font-bold text-slate-700">Виконай дії, переходячи до звичайних дробів:</h2>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <!-- а -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">а) 1 <sup>2</sup>/<sub>9</sub> &minus; 0,2 =</span>
+                    <input type="text" id="t3-a-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-44 md:w-56 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t3-a-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+                <!-- б -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">б) 0,7 &middot; <sup>5</sup>/<sub>14</sub> =</span>
+                    <input type="text" id="t3-b-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-44 md:w-56 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t3-b-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+                <!-- в -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-slate-800">в) <sup>9</sup>/<sub>13</sub> : 0,6 =</span>
+                    <input type="text" id="t3-c-step" placeholder="Проміжний крок..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-44 md:w-56 transition-all">
+                    <span class="font-semibold text-slate-800">=</span>
+                    <input type="text" id="t3-c-ans" placeholder="Відповідь..." class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm w-28 md:w-36 transition-all">
+                </div>
+            </div>
+
+            <button onclick="checkTask(3)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 3 (до +6 грн)
+            </button>
+            <div id="exp-3" class="explanation mt-4 p-4 rounded-xl text-sm border"></div>
+        </section>
+
+        <!-- Завдання 4 -->
+        <section class="task-container" id="task-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-teal-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0">4</span>
+                <h2 class="text-xl font-bold text-slate-700">До яких дробів будемо переходити у прикладах?</h2>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <!-- a -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">а) 3 <sup>4</sup>/<sub>5</sub> &minus; 1,8</span>
+                    <select id="t4-a" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- б -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">б) 0,84 &middot; <sup>3</sup>/<sub>7</sub></span>
+                    <select id="t4-b" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- в -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">в) 2,2 : <sup>11</sup>/<sub>15</sub></span>
+                    <select id="t4-c" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- г -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">г) 3 <sup>9</sup>/<sub>10</sub> + 1,68</span>
+                    <select id="t4-d" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- д -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">д) 4,2 : 3 <sup>1</sup>/<sub>2</sub></span>
+                    <select id="t4-e" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- е -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">е) <sup>1</sup>/<sub>5</sub> &middot; 20,08</span>
+                    <select id="t4-f" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- ж -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">ж) 5,384 &minus; 4 <sup>3</sup>/<sub>20</sub></span>
+                    <select id="t4-g" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+                <!-- з -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <span class="font-semibold text-slate-800">з) 1 <sup>2</sup>/<sub>3</sub> + 2,5</span>
+                    <select id="t4-h" class="p-2.5 border-2 border-slate-200 rounded-xl bg-white focus:border-teal-500 outline-none font-semibold text-sm md:w-1/2 transition-all">
+                        <option value="">-- Оберіть тип --</option>
+                        <option value="десятка">до десяткових</option>
+                        <option value="звичайний">до звичайних</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="checkTask(4)" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-6 rounded-xl transition-all">
+                Перевірити завдання 4 (до +8 грн)
+            </button>
+            <div id="exp-4" class="explanation mt-4 p-4 rounded-xl text-sm border"></div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-50 p-8 border-t border-slate-100 text-center">
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button onclick="window.location.reload()" class="bg-slate-400 hover:bg-slate-500 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all active:scale-95">
+                Скинути все
+            </button>
+        </div>
+        <p class="mt-6 text-slate-400 text-sm">Інтерактивний тренажер: Сумісні дії зі звичайними і десятковими дробами</p>
+    </footer>
+</div>
+
+<script>
+    // Змінна для зберігання зароблених монет по кожному завданню
+    let taskCoins = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0
+    };
+
+    // Функція оновлення загальної суми монет в шапці
+    function updateTotalCoins() {
+        const total = taskCoins[1] + taskCoins[2] + taskCoins[3] + taskCoins[4];
+        document.getElementById('coin-count').innerText = total;
+    }
+
+    // Парсер одного числа або звичайного/мішаного дробу
+    function parseFraction(str) {
+        if (!str) return NaN;
+        let s = str.trim().replace(',', '.');
+
+        // Сценарій 1: Мішаний дріб з пробілом ("1 2/9")
+        let mixedMatch = s.match(/^(\d+)\s+([0-9]+)\/([0-9]+)$/);
+        if (mixedMatch) {
+            let whole = parseFloat(mixedMatch[1]);
+            let num = parseFloat(mixedMatch[2]);
+            let den = parseFloat(mixedMatch[3]);
+            return den !== 0 ? whole + (num / den) : NaN;
+        }
+
+        // Сценарій 2: Простий дріб ("2/9", "6/10")
+        let clean = s.replace(/\s+/g, '');
+        let fracMatch = clean.match(/^([0-9]+)\/([0-9]+)$/);
+        if (fracMatch) {
+            let num = parseFloat(fracMatch[1]);
+            let den = parseFloat(fracMatch[2]);
+            return den !== 0 ? num / den : NaN;
+        }
+
+        // Сценарій 3: Звичайне десяткове або ціле число
+        return parseFloat(clean);
+    }
+
+    // Виправлений парсер виразів: коректно розпізнає дії (+, -, *, / або :) між будь-якими форматами дробів
+    function evaluateExpression(str) {
+        if (!str) return NaN;
+        let s = str.trim().replace(',', '.').replace('·', '*').replace(':', '/');
+
+        // Витягуємо операнди (мішані дроби, звичайні дроби, десяткові числа) та знаки операцій
+        // Оператором вважаємо +, -, * або / лише тоді, коли перед ним та після нього знаходяться чисельні значення
+        let regex = /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)/;
+        let match = s.match(regex);
+
+        if (!match) {
+            return parseFraction(s);
+        }
+
+        let left = parseFraction(match[1]);
+        let op = match[2];
+        let right = parseFraction(match[3]);
+
+        if (isNaN(left) || isNaN(right)) return NaN;
+
+        if (op === '+') return left + right;
+        if (op === '-') return left - right;
+        if (op === '*') return left * right;
+        if (op === '/') return right !== 0 ? left / right : NaN;
+
+        return NaN;
+    }
+
+    // Допоміжна функція для очищення рядка
+    function cleanString(str) {
+        if (!str) return '';
+        return str.replace(/\s+/g, '').replace(',', '.').replace('·', '*').replace(':', '/');
+    }
+
+    // ГОЛОВНА ФУНКЦІЯ ПЕРЕВІРКИ
+    function checkTask(taskNum) {
+        const exp = document.getElementById(`exp-${taskNum}`);
+        exp.style.display = 'block';
+
+        // Завдання 1
+        if (taskNum === 1) {
+            const correctIndexes = [0, 2, 3, 5, 6];
+            let checkedCorrectlyCount = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const cb = document.getElementById(`t1-frac-${i}`);
+                const isShouldBeChecked = correctIndexes.includes(i);
+                if (cb.checked === isShouldBeChecked) {
+                    checkedCorrectlyCount++;
+                }
+            }
+
+            const wordInput = document.getElementById('t1-word');
+            wordInput.classList.remove('correct-field', 'incorrect-field');
+            const userWord = wordInput.value.trim().toUpperCase();
+            const isWordCorrect = (userWord === 'ANIME' || userWord === 'АНІМЕ');
+
+            wordInput.classList.add(isWordCorrect ? 'correct-field' : 'incorrect-field');
+
+            let earnedCoins = checkedCorrectlyCount + (isWordCorrect ? 1 : 0);
+            taskCoins[1] = earnedCoins;
+
+            let errors = [];
+            if (checkedCorrectlyCount !== 7) {
+                errors.push(`<b>Помилка у виборі дробів:</b> Вірно визначено ${checkedCorrectlyCount} з 7 дробів. Перевір знаменники.`);
+            }
+            if (!isWordCorrect) {
+                errors.push('<b>Помилка у слові:</b> Подивись уважно на обрані літери та спробуй переставити їх.');
+            }
+
+            if (errors.length === 0) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = `<strong>Вітаємо! Усе розгадано вірно! +${earnedCoins} грн додано! 🎉</strong>`;
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = `<div class="space-y-2"><p class="font-bold">Нараховано: +${earnedCoins} грн з 8. Підказки:</p>` + errors.map(e => `<p>${e}</p>`).join('') + '</div>';
+            }
+            updateTotalCoins();
+        }
+
+        // Завдання 2
+        if (taskNum === 2) {
+            let fieldsData = [
+                { stepId: 't2-a-step', stepCorrect: '6.7-0.4', ansId: 't2-a-ans', ansCorrect: 6.3 },
+                { stepId: 't2-b-step', stepCorrect: '0.75:0.01', ansId: 't2-b-ans', ansCorrect: 75 },
+                { stepId: 't2-c-step', stepCorrect: '4.8*0.02', ansId: 't2-c-ans', ansCorrect: 0.096 }
+            ];
+
+            let earnedCoins = 0;
+            let totalFields = fieldsData.length * 2;
+
+            fieldsData.forEach(item => {
+                const stepEl = document.getElementById(item.stepId);
+                const ansEl = document.getElementById(item.ansId);
+
+                stepEl.classList.remove('correct-field', 'incorrect-field');
+                ansEl.classList.remove('correct-field', 'incorrect-field');
+
+                const userStepClean = cleanString(stepEl.value);
+                const correctStepClean = cleanString(item.stepCorrect);
+                const userStepVal = parseFraction(stepEl.value);
+
+                if (userStepClean && (userStepClean === correctStepClean || (!isNaN(userStepVal) && Math.abs(userStepVal - parseFraction(item.stepCorrect)) < 0.0001))) {
+                    stepEl.classList.add('correct-field');
+                    earnedCoins += 1;
+                } else if (stepEl.value.trim()) {
+                    stepEl.classList.add('incorrect-field');
+                }
+
+                const userAnsVal = parseFraction(ansEl.value);
+                if (!isNaN(userAnsVal) && Math.abs(userAnsVal - item.ansCorrect) < 0.0001) {
+                    ansEl.classList.add('correct-field');
+                    earnedCoins += 1;
+                } else if (ansEl.value.trim()) {
+                    ansEl.classList.add('incorrect-field');
+                }
+            });
+
+            taskCoins[2] = earnedCoins;
+
+            if (earnedCoins === totalFields) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = `<strong>Блискуче! Усі кроки та відповіді правильно записані! +${earnedCoins} грн додано! 🎉</strong>`;
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = `<div class="space-y-2"><p class="font-bold">Зароблено: +${earnedCoins} грн з ${totalFields}. Підказки:</p><p>Перевір, чи правильно ти перевів звичайний дріб у десятковий та виконав дію.</p></div>`;
+            }
+            updateTotalCoins();
+        }
+
+        // Завдання 3
+        if (taskNum === 3) {
+            let fieldsData = [
+                { stepId: 't3-a-step', targetVal: 46 / 45, ansId: 't3-a-ans', ansCorrect: 46 / 45 },
+                { stepId: 't3-b-step', targetVal: 0.25, ansId: 't3-b-ans', ansCorrect: 0.25 },
+                { stepId: 't3-c-step', targetVal: 15 / 13, ansId: 't3-c-ans', ansCorrect: 15 / 13 }
+            ];
+
+            let earnedCoins = 0;
+            let totalFields = fieldsData.length * 2;
+
+            fieldsData.forEach(item => {
+                const stepEl = document.getElementById(item.stepId);
+                const ansEl = document.getElementById(item.ansId);
+
+                stepEl.classList.remove('correct-field', 'incorrect-field');
+                ansEl.classList.remove('correct-field', 'incorrect-field');
+
+                // Перевірка проміжного кроку
+                const userStepVal = evaluateExpression(stepEl.value);
+                if (!isNaN(userStepVal) && Math.abs(userStepVal - item.targetVal) < 0.0001) {
+                    stepEl.classList.add('correct-field');
+                    earnedCoins += 1;
+                } else if (stepEl.value.trim()) {
+                    stepEl.classList.add('incorrect-field');
+                }
+
+                // Перевірка фінальної відповіді
+                const userAnsVal = parseFraction(ansEl.value);
+                if (!isNaN(userAnsVal) && Math.abs(userAnsVal - item.ansCorrect) < 0.0001) {
+                    ansEl.classList.add('correct-field');
+                    earnedCoins += 1;
+                } else if (ansEl.value.trim()) {
+                    ansEl.classList.add('incorrect-field');
+                }
+            });
+
+            taskCoins[3] = earnedCoins;
+
+            if (earnedCoins === totalFields) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = `<strong>Блискуче! Усі кроки та відповіді правильно записані! +${earnedCoins} грн додано! 🎉</strong>`;
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = `<div class="space-y-2"><p class="font-bold">Зароблено: +${earnedCoins} грн з ${totalFields}. Підказки:</p><p>Перевір переведення десяткових дробів у звичайні та обчислення (наприклад, 1 2/9 - 2/10 = 1 1/45).</p></div>`;
+            }
+            updateTotalCoins();
+        }
+
+        // Завдання 4
+        if (taskNum === 4) {
+            const selectsData = [
+                { id: 't4-a', correct: 'десятка' }, { id: 't4-b', correct: 'звичайний' },
+                { id: 't4-c', correct: 'звичайний' }, { id: 't4-d', correct: 'десятка' },
+                { id: 't4-e', correct: 'десятка' }, { id: 't4-f', correct: 'десятка' },
+                { id: 't4-g', correct: 'десятка' }, { id: 't4-h', correct: 'звичайний' }
+            ];
+
+            let earnedCoins = 0;
+            let incorrectCount = 0;
+
+            selectsData.forEach(item => {
+                const selectEl = document.getElementById(item.id);
+                selectEl.classList.remove('correct-field', 'incorrect-field');
+
+                if (selectEl.value === item.correct) {
+                    selectEl.classList.add('correct-field');
+                    earnedCoins += 1;
+                } else {
+                    if (selectEl.value) {
+                        selectEl.classList.add('incorrect-field');
+                        incorrectCount++;
+                    }
+                }
+            });
+
+            taskCoins[4] = earnedCoins;
+
+            if (incorrectCount === 0 && earnedCoins === 8) {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-green-50 text-green-900 border-green-200';
+                exp.innerHTML = `<strong>Чудово! Усі 8 виборів правильні! +${earnedCoins} грн додано! 🎉</strong>`;
+            } else {
+                exp.className = 'explanation mt-4 p-4 rounded-xl text-sm border bg-amber-50 text-amber-900 border-amber-200';
+                exp.innerHTML = `<div class="space-y-2"><p class="font-bold">Зароблено: +${earnedCoins} грн з 8. Підказки:</p><p>Якщо знаменник звичайного дробу містить множники, відмінні від 2 та 5, його не можна подати скінченним десятковим дробом. У такому випадку слід переходити до звичайних дробів.</p></div>`;
+            }
+            updateTotalCoins();
+        }
+    }
+</script>
+
+</body>
+</html>
