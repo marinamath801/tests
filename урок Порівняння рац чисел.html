@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Раціональні числа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Бібліотека для анімації конфеті / салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.85em;
+            margin: 0 2px;
+        }
+        .fraction .top {
+            border-bottom: 1px solid currentColor;
+            padding: 0 2px;
+        }
+        .fraction .bottom {
+            padding: 0 2px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 px-4 font-sans text-slate-800">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-900 mb-2">Тренажер з математики</h1>
+        <p class="text-center text-slate-500 mb-8">Раціональні числа та їх порівняння</p>
+
+        <div id="quiz-container" class="space-y-10"></div>
+    </div>
+
+    <script>
+        const tasksData = [
+            {
+                title: "Завдання 1",
+                instruction: "Порівняй числа (обери відповідний знак із списку):",
+                type: "inline_select",
+                cols: "grid-cols-1 md:grid-cols-2",
+                options: ["--", ">", "<", "="],
+                items: [
+                    { id: "1_1", left: "19", right: "-28", correct: ">", hint: "Будь-яке додатне число завжди більше за будь-яке від'ємне." },
+                    { id: "1_2", left: "0", right: "-131", correct: ">", hint: "Число 0 більше за будь-яке від'ємне число." },
+                    { id: "1_3", left: "112", right: "0", correct: ">", hint: "Будь-яке додатне число більше за 0." },
+                    { id: "1_4", left: "-1,2", right: "1,1", correct: "<", hint: "Від'ємне число завжди менше за додатне." }
+                ]
+            },
+            {
+                title: "Завдання 2",
+                instruction: "Запиши твердження у вигляді нерівності (обери правильний варіант):",
+                type: "select_per_item",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { 
+                        id: "2_1", 
+                        text: "-2 — від'ємне число", 
+                        options: ["--", "-2 > 0", "-2 < 0", "-2 ≥ 0", "-2 ≤ 0"], 
+                        correct: "-2 < 0", 
+                        hint: "Від'ємні числа менші за нуль." 
+                    },
+                    { 
+                        id: "2_2", 
+                        text: "7,8 — додатне число", 
+                        options: ["--", "7,8 > 0", "7,8 < 0", "7,8 ≥ 0", "7,8 ≤ 0"], 
+                        correct: "7,8 > 0", 
+                        hint: "Додатні числа більші за нуль." 
+                    },
+                    { 
+                        id: "2_3", 
+                        text: "x — від'ємне число", 
+                        options: ["--", "x > 0", "x < 0", "x ≥ 0", "x ≤ 0"], 
+                        correct: "x < 0", 
+                        hint: "Від'ємне число означає, що воно менше за 0." 
+                    },
+                    { 
+                        id: "2_4", 
+                        text: "y — додатне число", 
+                        options: ["--", "y > 0", "y < 0", "y ≥ 0", "y ≤ 0"], 
+                        correct: "y > 0", 
+                        hint: "Додатне число означає, що воно більше за 0." 
+                    },
+                    { 
+                        id: "2_5", 
+                        text: "a — менше за 7", 
+                        options: ["--", "a < 7", "a > 7", "a ≤ 7", "a ≥ 7"], 
+                        correct: "a < 7", 
+                        hint: "Використай знак 'менше' (<)." 
+                    },
+                    { 
+                        id: "2_6", 
+                        text: "b — не більше за -2", 
+                        options: ["--", "b ≤ -2", "b < -2", "b ≥ -2", "b > -2"], 
+                        correct: "b ≤ -2", 
+                        hint: "'Не більше' означає 'менше або дорівнює' (≤)." 
+                    }
+                ]
+            },
+            {
+                title: "Завдання 3",
+                instruction: "Постав замість знака питання знак >, < або =:",
+                type: "inline_select",
+                cols: "grid-cols-1 md:grid-cols-3",
+                options: ["--", ">", "<", "="],
+                items: [
+                    { id: "3_1", left: "-52", right: "-58", correct: ">", hint: "Із двох від'ємних чисел більшим є те, модуль якого менший." },
+                    { id: "3_2", left: "-8,4", right: "-8,3", correct: "<", hint: "Модуль |-8,4| більший за |-8,3|, тому -8,4 менше за -8,3." },
+                    { id: "3_3", left: "-4,18", right: "-4,81", correct: ">", hint: "Порівняй модулі: 4,18 менше за 4,81, тому -4,18 буде більшим." },
+                    { id: "3_4", leftHtml: "-3<div class='fraction'><span class='top'>2</span><span class='bottom'>5</span></div>", rightHtml: "-3<div class='fraction'><span class='top'>1</span><span class='bottom'>5</span></div>", correct: "<", hint: "Знаменники однакові, чисельник 2 > 1. Оскільки модулі |-3 2/5| > |-3 1/5|, саме число менше." },
+                    { id: "3_5", left: "-5,01", right: "-5,001", correct: "<", hint: "5,01 = 5,010. Оскільки 5,010 > 5,001, то -5,01 менше за -5,001." },
+                    { id: "3_6", left: "-6,1", rightHtml: "-6<div class='fraction'><span class='top'>1</span><span class='bottom'>10</span></div>", correct: "=", hint: "Перетвори 1/10 у десятковий дріб: 1/10 = 0,1. Отже, значення однакові." },
+                    { id: "3_7", leftHtml: "-<div class='fraction'><span class='top'>3</span><span class='bottom'>8</span></div>", rightHtml: "-<div class='fraction'><span class='top'>1</span><span class='bottom'>6</span></div>", correct: "<", hint: "Зведи до спільного знаменника 24: 3/8 = 9/24, 1/6 = 4/24. -9/24 менше за -4/24." },
+                    { id: "3_8", leftHtml: "-<div class='fraction'><span class='top'>9</span><span class='bottom'>16</span></div>", rightHtml: "-<div class='fraction'><span class='top'>7</span><span class='bottom'>12</span></div>", correct: ">", hint: "Спільний знаменник 48: 9/16 = 27/48, 7/12 = 28/48. -27/48 більше за -28/48." },
+                    { id: "3_9", leftHtml: "-<div class='fraction'><span class='top'>5</span><span class='bottom'>14</span></div>", rightHtml: "-<div class='fraction'><span class='top'>8</span><span class='bottom'>21</span></div>", correct: ">", hint: "Спільний знаменник 42: 5/14 = 15/42, 8/21 = 16/42. -15/42 більше за -16/42." }
+                ]
+            },
+            {
+                title: "Завдання 4",
+                instruction: "Запиши всі цілі числа, що містяться між числами (через кому з пробілом, від меншого до більшого):",
+                type: "input",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "4_1", text: "-5,2 i 2", correct: ["-5, -4, -3, -2, -1, 0, 1", "-5,-4,-3,-2,-1,0,1"], hint: "Знайди цілі числа, більші за -5,2 та менші за 2." },
+                    { id: "4_2", text: "-8,1 i -3,2", correct: ["-8, -7, -6, -5, -4", "-8,-7,-6,-5,-4"], hint: "Знайди цілі числа між -8,1 та -3,2 (від -8 до -4 включно)." }
+                ]
+            },
+            {
+                title: "Завдання 5",
+                instruction: "Заповни цілі числа у подвійній нерівності:",
+                type: "double_input",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { 
+                        id: "5_1", 
+                        html: "<div class='fraction'><span class='top'>9</span><span class='bottom'>17</span></div>", 
+                        middleText: "5",
+                        correctLeft: "5", 
+                        correctRight: "6", 
+                        hint: "Число 5 9/17 розташоване між 5 та наступним цілим числом 6." 
+                    },
+                    { id: "5_2", text: "-8,4", correctLeft: "-9", correctRight: "-8", hint: "На координатній прямій -8,4 знаходиться між -9 та -8." },
+                    { id: "5_3", text: "0,45", correctLeft: "0", correctRight: "1", hint: "Число 0,45 більше за 0, але менше за 1." },
+                    { id: "5_4", text: "-0,17", correctLeft: "-1", correctRight: "0", hint: "Число -0,17 знаходиться між -1 та 0." }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4";
+                
+                let itemsHTML = '';
+                task.items.forEach((item, itemIdx) => {
+                    let contentHTML = '';
+
+                    if (task.type === 'inline_select') {
+                        const leftDisplay = item.leftHtml ? item.leftHtml : item.left;
+                        const rightDisplay = item.rightHtml ? item.rightHtml : item.right;
+                        const optionsHTML = task.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        
+                        contentHTML = `
+                            <div class="flex items-center justify-center gap-2 font-semibold text-slate-800 text-lg py-1">
+                                <span>${leftDisplay}</span>
+                                <select id="input_${item.id}" class="border border-slate-300 bg-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-700 cursor-pointer">
+                                    ${optionsHTML}
+                                </select>
+                                <span>${rightDisplay}</span>
+                            </div>
+                        `;
+                    } else if (task.type === 'select_per_item') {
+                        const optionsHTML = item.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        contentHTML = `
+                            <div class="flex flex-col gap-2">
+                                <span class="font-medium text-slate-700">${item.text}</span>
+                                <select id="input_${item.id}" class="border border-slate-300 bg-white rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-700 cursor-pointer w-full">
+                                    ${optionsHTML}
+                                </select>
+                            </div>
+                        `;
+                    } else if (task.type === 'input') {
+                        contentHTML = `
+                            <div class="flex flex-col gap-2">
+                                <span class="font-medium text-slate-700">${item.text}</span>
+                                <input type="text" id="input_${item.id}" class="border border-slate-300 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-center font-semibold text-slate-700" placeholder="Наприклад: -2, -1, 0">
+                            </div>
+                        `;
+                    } else if (task.type === 'double_input') {
+                        const middleDisplay = item.middleText ? `${item.middleText} ${item.html}` : (item.html ? item.html : item.text);
+                        contentHTML = `
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="font-medium text-slate-700 self-start">Приклад ${itemIdx + 1}</span>
+                                <div class="flex items-center gap-2 justify-center w-full">
+                                    <input type="text" id="input_${item.id}_left" class="border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-16 text-center font-semibold text-slate-700" placeholder="ліве">
+                                    <span class="font-bold text-slate-500">&lt;</span>
+                                    <span class="font-bold text-indigo-900 px-1">${middleDisplay}</span>
+                                    <span class="font-bold text-slate-500">&lt;</span>
+                                    <input type="text" id="input_${item.id}_right" class="border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-16 text-center font-semibold text-slate-700" placeholder="праве">
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    itemsHTML += `
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="font-bold text-slate-400 text-sm mt-0.5">${itemIdx + 1})</span>
+                                <div class="w-full">${contentHTML}</div>
+                            </div>
+                            <div id="feedback_${item.id}" class="hidden text-sm p-2.5 rounded-md mt-2"></div>
+                        </div>
+                    `;
+                });
+
+                taskCard.innerHTML = `
+                    <h2 class="text-xl font-bold text-indigo-800 border-b border-slate-200 pb-2">${task.title}</h2>
+                    <p class="text-slate-600 font-medium">${task.instruction}</p>
+                    <div class="grid ${task.cols} gap-4">${itemsHTML}</div>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button onclick="checkTask(${tIndex})" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition duration-150 ease-in-out shadow-md">
+                            Перевірити ${task.title}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="font-bold text-base"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function triggerFireworks() {
+            if (typeof confetti === 'function') {
+                // Серія залпів салюту
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                }, 200);
+
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 50,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+                }, 400);
+            }
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctCount = 0;
+
+            task.items.forEach((item) => {
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                let isCorrect = false;
+
+                if (task.type === 'double_input') {
+                    const leftVal = document.getElementById(`input_${item.id}_left`).value.trim();
+                    const rightVal = document.getElementById(`input_${item.id}_right`).value.trim();
+                    isCorrect = (leftVal === item.correctLeft && rightVal === item.correctRight);
+                } else {
+                    const inputEl = document.getElementById(`input_${item.id}`);
+                    const userVal = inputEl.value.trim().toLowerCase().replace(/\s+/g, '');
+
+                    if (Array.isArray(item.correct)) {
+                        isCorrect = item.correct.some(ans => ans.toLowerCase().replace(/\s+/g, '') === userVal);
+                    } else {
+                        isCorrect = (userVal === item.correct.toLowerCase().replace(/\s+/g, ''));
+                    }
+                }
+
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+
+                if (isCorrect) {
+                    correctCount++;
+                    feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✓ Правильно!</span>`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✗ Помилка.</span> <span class="text-slate-700">${item.hint}</span>`;
+                }
+            });
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctCount === task.items.length) {
+                summaryEl.className = "font-bold text-emerald-600";
+                summaryEl.textContent = `Завдання виконано ідеально! 🎉 (${correctCount}/${task.items.length})`;
+                
+                // Запускаємо салют при ідеальному виконанні номера
+                triggerFireworks();
+            } else {
+                summaryEl.className = "font-bold text-amber-600";
+                summaryEl.textContent = `Правильно: ${correctCount} з ${task.items.length}. Переглянь підказки вище!`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
