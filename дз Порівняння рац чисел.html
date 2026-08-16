@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Порівняння рац чисел</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.85em;
+            margin: 0 2px;
+        }
+        .fraction .top {
+            border-bottom: 1px solid currentColor;
+            padding: 0 2px;
+        }
+        .fraction .bottom {
+            padding: 0 2px;
+        }
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.1); }
+        }
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 px-4 font-sans text-slate-800">
+    <!-- Полотно для анімації падаючих монеток -->
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 relative">
+        
+        <!-- Шапка та Скарбничка -->
+        <div class="flex flex-col sm:flex-row items-center justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-indigo-900">Дз Порівняння рац чисел</h1>
+                <p class="text-slate-500 text-sm mt-1">Виконуй завдання та заробляй гривні у скарбничку!</p>
+            </div>
+            
+            <!-- Віджет скарбнички -->
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm min-w-[180px] justify-center">
+                <div id="piggy-icon" class="text-3xl">🪙</div>
+                <div>
+                    <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">Скарбничка</div>
+                    <div class="text-xl font-black text-amber-900"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-10"></div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedItems = new Set();
+
+        const tasksData = [
+            {
+                title: "Завдання 1",
+                instruction: "Запиши твердження у вигляді нерівності (обери правильний варіант):",
+                type: "select_per_item",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { 
+                        id: "983_1", 
+                        text: "1) 4,5 — додатне число", 
+                        options: ["--", "4,5 > 0", "4,5 < 0", "4,5 ≥ 0", "4,5 ≤ 0"], 
+                        correct: "4,5 > 0", 
+                        hint: "Додатні числа більші за нуль." 
+                    },
+                    { 
+                        id: "983_2", 
+                        text: "2) -3,8 — від'ємне число", 
+                        options: ["--", "-3,8 > 0", "-3,8 < 0", "-3,8 ≥ 0", "-3,8 ≤ 0"], 
+                        correct: "-3,8 < 0", 
+                        hint: "Від'ємні числа менші за нуль." 
+                    },
+                    { 
+                        id: "983_3", 
+                        text: "3) b — більше за -2", 
+                        options: ["--", "b > -2", "b < -2", "b ≥ -2", "b ≤ -2"], 
+                        correct: "b > -2", 
+                        hint: "Використай знак 'більше' (>)." 
+                    },
+                    { 
+                        id: "983_4", 
+                        text: "4) c — не менше за 9,5", 
+                        options: ["--", "c ≥ 9,5", "c > 9,5", "c ≤ 9,5", "c < 9,5"], 
+                        correct: "c ≥ 9,5", 
+                        hint: "'Не менше' означає 'більше або дорівнює' (≥)." 
+                    }
+                ]
+            },
+            {
+                title: "Завдання 2",
+                instruction: "Порівняйте числа (обери знак >, < або =):",
+                type: "inline_select",
+                cols: "grid-cols-1 md:grid-cols-2",
+                options: ["--", ">", "<", "="],
+                items: [
+                    { id: "892_1", left: "-58", right: "43", correct: "<", hint: "Від'ємне число завжди менше за додатне." },
+                    { id: "892_2", left: "0", right: "-35", correct: ">", hint: "Нуль завжди більший за будь-яке від'ємне число." },
+                    { id: "892_3", left: "-92", right: "-89", correct: "<", hint: "Із двох від'ємних чисел більшим є те, модуль якого менший. |-92| = 92, |-89| = 89." },
+                    { id: "892_4", left: "-1,1", right: "-1,099", correct: "<", hint: "-1,1 = -1,100. Модуль |-1,100| = 1,100, що більше за 1,099, тому -1,1 менше." },
+                    { id: "892_5", leftHtml: "-<div class='fraction'><span class='top'>5</span><span class='bottom'>7</span></div>", rightHtml: "-<div class='fraction'><span class='top'>9</span><span class='bottom'>14</span></div>", correct: "<", hint: "Зведи до знаменника 14: -5/7 = -10/14. Оскільки |-10/14| > |-9/14|, то -10/14 менше." }
+                ]
+            },
+            {
+                title: "Завдання 3",
+                instruction: "Між якими послідовними цілими числами міститься число:",
+                type: "double_input",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "993_1", text: "-5,3", correctLeft: "-6", correctRight: "-5", hint: "На координатній прямій -5,3 розташоване між -6 та -5." },
+                    { 
+                        id: "993_2", 
+                        html: "<div class='fraction'><span class='top'>1</span><span class='bottom'>18</span></div>", 
+                        middleText: "-2",
+                        correctLeft: "-3", 
+                        correctRight: "-2", 
+                        hint: "Число -2 1/18 знаходиться між -3 та -2." 
+                    },
+                    { id: "993_3", text: "6,2", correctLeft: "6", correctRight: "7", hint: "Число 6,2 знаходиться між 6 та 7." },
+                    { id: "993_4", text: "-0,29", correctLeft: "-1", correctRight: "0", hint: "Число -0,29 знаходиться між -1 та 0." },
+                    { 
+                        id: "993_5", 
+                        html: "<div class='fraction'><span class='top'>1</span><span class='bottom'>9</span></div>", 
+                        middleText: "",
+                        correctLeft: "0", 
+                        correctRight: "1", 
+                        hint: "Правильний додатний дріб 1/9 знаходиться між 0 та 1." 
+                    }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4";
+                
+                let itemsHTML = '';
+                task.items.forEach((item, itemIdx) => {
+                    let contentHTML = '';
+
+                    if (task.type === 'inline_select') {
+                        const leftDisplay = item.leftHtml ? item.leftHtml : item.left;
+                        const rightDisplay = item.rightHtml ? item.rightHtml : item.right;
+                        const optionsHTML = task.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        
+                        contentHTML = `
+                            <div class="flex items-center justify-center gap-2 font-semibold text-slate-800 text-lg py-1">
+                                <span>${leftDisplay}</span>
+                                <select id="input_${item.id}" class="border border-slate-300 bg-white rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-700 cursor-pointer">
+                                    ${optionsHTML}
+                                </select>
+                                <span>${rightDisplay}</span>
+                            </div>
+                        `;
+                    } else if (task.type === 'select_per_item') {
+                        const optionsHTML = item.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        contentHTML = `
+                            <div class="flex flex-col gap-2">
+                                <span class="font-medium text-slate-700">${item.text}</span>
+                                <select id="input_${item.id}" class="border border-slate-300 bg-white rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-700 cursor-pointer w-full">
+                                    ${optionsHTML}
+                                </select>
+                            </div>
+                        `;
+                    } else if (task.type === 'double_input') {
+                        const middleDisplay = item.middleText !== undefined ? `${item.middleText} ${item.html}` : (item.html ? item.html : item.text);
+                        contentHTML = `
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="font-medium text-slate-700 self-start">${itemIdx + 1})</span>
+                                <div class="flex items-center gap-2 justify-center w-full">
+                                    <input type="text" id="input_${item.id}_left" class="border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-16 text-center font-semibold text-slate-700" placeholder="ліве">
+                                    <span class="font-bold text-slate-500">&lt;</span>
+                                    <span class="font-bold text-indigo-900 px-1">${middleDisplay}</span>
+                                    <span class="font-bold text-slate-500">&lt;</span>
+                                    <input type="text" id="input_${item.id}_right" class="border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-16 text-center font-semibold text-slate-700" placeholder="праве">
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    itemsHTML += `
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between space-y-2">
+                            <div class="flex items-start gap-2">
+                                ${task.type !== 'double_input' ? `<span class="font-bold text-slate-400 text-sm mt-0.5">${itemIdx + 1})</span>` : ''}
+                                <div class="w-full">${contentHTML}</div>
+                            </div>
+                            <div id="feedback_${item.id}" class="hidden text-sm p-2.5 rounded-md mt-2"></div>
+                        </div>
+                    `;
+                });
+
+                taskCard.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <h2 class="text-xl font-bold text-indigo-800">${task.title}</h2>
+                        <div id="task_earned_${tIndex}" class="text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-200">
+                            Зароблено: 0 грн із ${task.items.length} грн
+                        </div>
+                    </div>
+                    <p class="text-slate-600 font-medium">${task.instruction}</p>
+                    <div class="grid ${task.cols} gap-4">${itemsHTML}</div>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button onclick="checkTask(${tIndex})" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition duration-150 ease-in-out shadow-md">
+                            Перевірити ${task.title}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="font-bold text-base"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        // --- ЕФЕКТ ПАДАЮЧИХ МОНЕТОК (CANVAS) ---
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                // Зовнішнє золоте коло
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                // Внутрішнє світле коло
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                // Обводка
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                // Символ ₴ у центрі
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain() {
+            coins = [];
+            for (let i = 0; i < 50; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctCount = 0;
+
+            task.items.forEach((item) => {
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                let isCorrect = false;
+
+                if (task.type === 'double_input') {
+                    const leftVal = document.getElementById(`input_${item.id}_left`).value.trim();
+                    const rightVal = document.getElementById(`input_${item.id}_right`).value.trim();
+                    isCorrect = (leftVal === item.correctLeft && rightVal === item.correctRight);
+                } else {
+                    const inputEl = document.getElementById(`input_${item.id}`);
+                    const userVal = inputEl.value.trim().toLowerCase().replace(/\s+/g, '');
+
+                    if (Array.isArray(item.correct)) {
+                        isCorrect = item.correct.some(ans => ans.toLowerCase().replace(/\s+/g, '') === userVal);
+                    } else {
+                        isCorrect = (userVal === item.correct.toLowerCase().replace(/\s+/g, ''));
+                    }
+                }
+
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+
+                if (isCorrect) {
+                    correctCount++;
+                    
+                    if (!solvedItems.has(item.id)) {
+                        solvedItems.add(item.id);
+                        addMoney(1);
+                    }
+
+                    feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✓ Правильно! (+1 грн)</span>`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✗ Помилка.</span> <span class="text-slate-700">${item.hint}</span>`;
+                }
+            });
+
+            let taskEarnedCoins = task.items.filter(item => solvedItems.has(item.id)).length;
+            const taskEarnedEl = document.getElementById(`task_earned_${taskIndex}`);
+            taskEarnedEl.textContent = `Зароблено: ${taskEarnedCoins} грн із ${task.items.length} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctCount === task.items.length) {
+                summaryEl.className = "font-bold text-emerald-600";
+                summaryEl.textContent = `Завдання виконано ідеально! 🪙 (${correctCount}/${task.items.length})`;
+                triggerCoinRain();
+            } else {
+                summaryEl.className = "font-bold text-amber-600";
+                summaryEl.textContent = `Правильно: ${correctCount} з ${task.items.length}. Переглянь підказки вище!`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
