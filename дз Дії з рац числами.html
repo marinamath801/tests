@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Дії з раціональними числами</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.9em;
+            margin: 0 2px;
+        }
+        .fraction .top {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 3px;
+        }
+        .fraction .bottom {
+            padding: 0 3px;
+        }
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.1); }
+        }
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 px-4 font-sans text-slate-800">
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 relative">
+        
+        <!-- Шапка та Скарбничка -->
+        <div class="flex flex-col sm:flex-row items-center justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-indigo-900">Дз Дії з раціональними числами</h1>
+                <p class="text-slate-500 text-sm mt-1">Розв'язуй приклади та збирай гривні у скарбничку!</p>
+            </div>
+            
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm min-w-[180px] justify-center">
+                <div id="piggy-icon" class="text-3xl">🪙</div>
+                <div>
+                    <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">Скарбничка</div>
+                    <div class="text-xl font-black text-amber-900"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-10"></div>
+    </div>
+
+    <!-- Модальне вікно фінального успіху -->
+    <div id="final-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-4 border-amber-300 relative animate-bounce-short">
+            <div class="text-6xl mb-4">🪙🎉</div>
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Вітаємо!</h2>
+            <p class="text-slate-600 font-medium mb-4">Ти успішно виконав усі завдання тренажера!</p>
+            <div id="final-earned-text" class="text-2xl font-black text-amber-600 bg-amber-50 py-3 px-6 rounded-2xl border border-amber-200 mb-6">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedItems = new Set();
+
+        const tasksData = [
+            {
+                title: "Завдання 1",
+                instruction: "Укажіть усі цілі числа, що належать проміжку (записуйте числа через кому або пробіл):",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "t1_1", text: "1) (-2; 1)", correct: ["-1,0", "-1, 0", "-1 0"], hint: "Проміжок відкритий, крайні числа не входять. Знайди цілі числа між -2 та 1." },
+                    { id: "t1_2", text: "2) (-4; -1]", correct: ["-3,-2,-1", "-3, -2, -1", "-3 -2 -1"], hint: "Число -4 не входить, а -1 входить у проміжок." },
+                    { id: "t1_3", text: "3) [-4,1; 0,2]", correct: ["-4,-3,-2,-1,0", "-4, -3, -2, -1, 0", "-4 -3 -2 -1 0"], hint: "Враховуй цілі числа від -4 до 0 включно." },
+                    { id: "t1_4", text: "4) [-5,6; 0]", correct: ["-5,-4,-3,-2,-1,0", "-5, -4, -3, -2, -1, 0", "-5 -4 -3 -2 -1 0"], hint: "-5,6 більше за -6, тому найменше ціле число це -5." }
+                ]
+            },
+            {
+                title: "Завдання 2",
+                instruction: "Укажіть найменше ціле число, що належить проміжку:",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "t2_1", text: "1) (-5; +∞)", correct: ["-4"], hint: "Оскільки кругла дужка, -5 не належить проміжку. Візьми наступне ціле число справа." },
+                    { id: "t2_2", text: "2) [6,3; +∞)", correct: ["7"], hint: "Найменше ціле число, яке більше або дорівнює 6,3." },
+                    { id: "t2_3", text: "3) [-12; +∞)", correct: ["-12"], hint: "Дужка квадратна, тому -12 належить проміжку." },
+                    { id: "t2_4", text: "4) (-1,4; 2,3)", correct: ["-1"], hint: "Перше ціле число праворуч від -1,4 на координатній прямій." }
+                ]
+            },
+            {
+                title: "Завдання 3",
+                instruction: "Укажіть найбільше ціле число, що належить проміжку:",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "t3_1", text: "1) (-∞; -11)", correct: ["-12"], hint: "Число -11 не входить. Найбільше ціле число ліворуч від -11." },
+                    { id: "t3_2", text: "2) (-∞; -7,3]", correct: ["-8"], hint: "Найбільше ціле число, яке менше або дорівнює -7,3." },
+                    { id: "t3_3", text: "3) (-101,2; -99,3)", correct: ["-100"], hint: "Знайди найбільше ціле число на цьому проміжку." },
+                    { id: "t3_4", text: "4) [-15; 34]", correct: ["34"], hint: "Дужка квадратна, тому правий край належить проміжку." }
+                ]
+            },
+            {
+                title: "Завдання 4",
+                instruction: "Обчисліть:",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "t4_1", text: "1) 1,3 · 2", correct: ["2,6", "2.6"], hint: "Перемнож 13 на 2 і відокрем один десятковий знак." },
+                    { id: "t4_2", text: "2) 0,7 · 0,4", correct: ["0,28", "0.28"], hint: "Перемнож 7 на 4 та відокрем два десяткові знаки." },
+                    { id: "t4_3", text: "3) 7 · 2,1", correct: ["14,7", "14.7"], hint: "Перемнож 7 на 21 і відокрем один десятковий знак." },
+                    { id: "t4_4", text: "4) 0,35 · 4", correct: ["1,4", "1.4", "1,40", "1.40"], hint: "Обчисли 35 · 4 = 140 та відокрем два десяткові знаки." }
+                ]
+            },
+            {
+                title: "Завдання 5",
+                instruction: "Обчисліть (ділення на десятковий дріб):",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { id: "t5_1", text: "1) 3,6 : 0,02", correct: ["180"], hint: "Перенеси кому в обох числах на 2 знаки праворуч: 360 : 2." },
+                    { id: "t5_2", text: "2) 6,4 : 0,32", correct: ["20"], hint: "Перенеси кому на 2 знаки праворуч: 640 : 32." },
+                    { id: "t5_3", text: "3) 63,9 : 0,9", correct: ["71"], hint: "Перенеси кому на 1 знак праворуч: 639 : 9." },
+                    { id: "t5_4", text: "4) 25,7 : 0,01", correct: ["2570"], hint: "Ділення на 0,01 рівносильне множенню на 100." }
+                ]
+            },
+            {
+                title: "Завдання 6",
+                instruction: "Перетворіть на десятковий дріб:",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-3",
+                items: [
+                    { id: "t6_1", html: "1) <div class='fraction'><span class='top'>1</span><span class='bottom'>2</span></div>", correct: ["0,5", "0.5"], hint: "Зведи до знаменника 10 або поділи 1 на 2." },
+                    { id: "t6_2", html: "2) <div class='fraction'><span class='top'>3</span><span class='bottom'>4</span></div>", correct: ["0,75", "0.75"], hint: "Помнож чисельник і знаменник на 25." },
+                    { id: "t6_3", html: "3) <div class='fraction'><span class='top'>5</span><span class='bottom'>8</span></div>", correct: ["0,625", "0.625"], hint: "Помнож чисельник і знаменник на 125." },
+                    { id: "t6_4", html: "4) <div class='fraction'><span class='top'>3</span><span class='bottom'>5</span></div>", correct: ["0,6", "0.6"], hint: "Помнож чисельник і знаменник на 2." },
+                    { id: "t6_5", html: "5) <div class='fraction'><span class='top'>14</span><span class='bottom'>25</span></div>", correct: ["0,56", "0.56"], hint: "Помнож чисельник і знаменник на 4." },
+                    { id: "t6_6", html: "6) <div class='fraction'><span class='top'>7</span><span class='bottom'>20</span></div>", correct: ["0,35", "0.35"], hint: "Помнож чисельник і знаменник на 5." }
+                ]
+            },
+            {
+                title: "Завдання 7",
+                instruction: "Знайдіть значення виразу (відповідь запишіть у вигляді десяткового або звичайного дробу, наприклад 3/4):",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { 
+                        id: "t7_1", 
+                        html: "1) <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>5</span><span class='bottom'>6</span></div><span class='text-lg'>|</span> + <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>1</span><span class='bottom'>12</span></div><span class='text-lg'>|</span>", 
+                        correct: ["11/12", "0,9166", "0.9166"], 
+                        hint: "Модуль від'ємного числа є додатним: 5/6 + 1/12 = 10/12 + 1/12." 
+                    },
+                    { 
+                        id: "t7_2", 
+                        html: "2) <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>1</span><span class='bottom'>3</span></div><span class='text-lg'>|</span> - <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>1</span><span class='bottom'>4</span></div><span class='text-lg'>|</span>", 
+                        correct: ["1/12"], 
+                        hint: "Знайди різницю модулів: 1/3 - 1/4 = 4/12 - 3/12." 
+                    },
+                    { 
+                        id: "t7_3", 
+                        html: "3) <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>3</span><span class='bottom'>8</span></div><span class='text-lg'>|</span> · |24|", 
+                        correct: ["9"], 
+                        hint: "Обчисли: 3/8 · 24." 
+                    },
+                    { 
+                        id: "t7_4", 
+                        html: "4) <span class='text-lg'>|</span><div class='fraction'><span class='top'>2</span><span class='bottom'>9</span></div><span class='text-lg'>|</span> : <span class='text-lg'>|</span>-<div class='fraction'><span class='top'>2</span><span class='bottom'>15</span></div><span class='text-lg'>|</span>", 
+                        correct: ["5/3", "1 2/3", "1.66"], 
+                        hint: "Обчисли 2/9 : 2/15 = 2/9 · 15/2." 
+                    }
+                ]
+            },
+            {
+                title: "Завдання 8",
+                instruction: "Виконай віднімання:",
+                type: "input_text",
+                cols: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
+                items: [
+                    { id: "t8_1", text: "1) 7 - 8", correct: ["-1"], hint: "Від меншого числа віднімаємо більше." },
+                    { id: "t8_2", text: "2) -2 - 3", correct: ["-5"], hint: "Додаємо модулі та ставимо знак мінус." },
+                    { id: "t8_3", text: "3) 17 - (-1)", correct: ["18"], hint: "Мінус на мінус дає плюс: 17 + 1." },
+                    { id: "t8_4", text: "4) -12 - (-13)", correct: ["1"], hint: "Заміни на додавання: -12 + 13." },
+                    { id: "t8_5", text: "5) 0 - (-12)", correct: ["12"], hint: "0 + 12 = 12." },
+                    { id: "t8_6", text: "6) -3 - (-1)", correct: ["-2"], hint: "-3 + 1 = -2." },
+                    { id: "t8_7", text: "7) 0 - 17", correct: ["-17"], hint: "Від нуля віднімаємо 17." },
+                    { id: "t8_8", text: "8) -2 - (-2)", correct: ["0"], hint: "-2 + 2 = 0." }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4";
+                
+                let itemsHTML = '';
+                task.items.forEach((item) => {
+                    const displayLabel = item.html ? item.html : item.text;
+                    
+                    itemsHTML += `
+                        <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between space-y-2">
+                            <div class="flex flex-col gap-2">
+                                <span class="font-medium text-slate-700 flex items-center gap-1">${displayLabel}</span>
+                                <input type="text" id="input_${item.id}" class="border border-slate-300 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800 w-full" placeholder="Введіть відповідь">
+                            </div>
+                            <div id="feedback_${item.id}" class="hidden text-sm p-2.5 rounded-md mt-2"></div>
+                        </div>
+                    `;
+                });
+
+                taskCard.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <h2 class="text-xl font-bold text-indigo-800">${task.title}</h2>
+                        <div id="task_earned_${tIndex}" class="text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-200">
+                            Зароблено: 0 грн із ${task.items.length} грн
+                        </div>
+                    </div>
+                    <p class="text-slate-600 font-medium">${task.instruction}</p>
+                    <div class="grid ${task.cols} gap-4">${itemsHTML}</div>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button onclick="checkTask(${tIndex})" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition duration-150 ease-in-out shadow-md">
+                            Перевірити ${task.title}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="font-bold text-base"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        // Canvas Анімація падаючих монеток
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctCount = 0;
+
+            task.items.forEach((item) => {
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                const inputEl = document.getElementById(`input_${item.id}`);
+                const userVal = inputEl.value.trim().toLowerCase().replace(/\s+/g, '');
+
+                let isCorrect = item.correct.some(ans => ans.toLowerCase().replace(/\s+/g, '') === userVal);
+
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+                inputEl.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-rose-500', 'bg-rose-50');
+
+                if (isCorrect) {
+                    correctCount++;
+                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                    
+                    if (!solvedItems.has(item.id)) {
+                        solvedItems.add(item.id);
+                        addMoney(1);
+                    }
+
+                    feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✓ Правильно! (+1 грн)</span>`;
+                } else {
+                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                    feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✗ Помилка.</span> <span class="text-slate-700">${item.hint}</span>`;
+                }
+            });
+
+            let taskEarnedCoins = task.items.filter(item => solvedItems.has(item.id)).length;
+            const taskEarnedEl = document.getElementById(`task_earned_${taskIndex}`);
+            taskEarnedEl.textContent = `Зароблено: ${taskEarnedCoins} грн із ${task.items.length} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctCount === task.items.length) {
+                summaryEl.className = "font-bold text-emerald-600";
+                summaryEl.textContent = `Завдання виконано ідеально! 🪙 (${correctCount}/${task.items.length})`;
+                triggerCoinRain(40);
+            } else {
+                summaryEl.className = "font-bold text-amber-600";
+                summaryEl.textContent = `Правильно: ${correctCount} з ${task.items.length}. Переглянь підказки вище!`;
+            }
+
+            // Перевірка на повне завершення всього тесту
+            const totalItemsCount = tasksData.reduce((acc, curr) => acc + curr.items.length, 0);
+            if (solvedItems.size === totalItemsCount) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(100);
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
