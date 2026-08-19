@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Дії з дробами</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.9em;
+            margin: 0 2px;
+        }
+        .fraction .top {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 3px;
+        }
+        .fraction .bottom {
+            padding: 0 3px;
+        }
+        .mixed-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.1); }
+        }
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 px-4 font-sans text-slate-800">
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 relative">
+        
+        <!-- Шапка та Скарбничка -->
+        <div class="flex flex-col sm:flex-row items-center justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-indigo-900">Дз Дії з дробами</h1>
+                <p class="text-slate-500 text-sm mt-1">Виконуй завдання, заробляй монети та тренуй обчислення!</p>
+            </div>
+            
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm min-w-[180px] justify-center">
+                <div id="piggy-icon" class="text-3xl">🪙</div>
+                <div>
+                    <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">Скарбничка</div>
+                    <div class="text-xl font-black text-amber-900"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-10"></div>
+    </div>
+
+    <!-- Модальне вікно завершення -->
+    <div id="final-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-4 border-amber-300 relative">
+            <div class="text-6xl mb-4">🪙🎉</div>
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Чудова робота!</h2>
+            <p class="text-slate-600 font-medium mb-4">Ти успішно виконав всі завдання тесту!</p>
+            <div id="final-earned-text" class="text-2xl font-black text-amber-600 bg-amber-50 py-3 px-6 rounded-2xl border border-amber-200 mb-6">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
+                Завершити
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedFinalItems = new Set();
+
+        const tasksData = [
+            {
+                title: "Завдання 1",
+                instruction: "Обчисліть значення виразів (відповідь запишіть у вигляді десяткового, звичайного дробу чи мішаного числа, наприклад 10 11/180 або 0,138):",
+                gridCols: "grid-cols-1 md:grid-cols-3",
+                items: [
+                    { 
+                        id: "t1_1", 
+                        html: "1) <div class='mixed-number'>1<div class='fraction'><span class='top'>7</span><span class='bottom'>18</span></div></div> + <div class='mixed-number'>8<div class='fraction'><span class='top'>19</span><span class='bottom'>60</span></div></div>", 
+                        correct: ["9 127/180", "1647/180"], 
+                        hint: "Зведи дроби до спільного знаменника 180 (додаткові множники 10 та 3)." 
+                    },
+                    { 
+                        id: "t1_2", 
+                        html: "2) <div class='fraction'><span class='top'>20</span><span class='bottom'>21</span></div> + <div class='fraction'><span class='top'>15</span><span class='bottom'>56</span></div>", 
+                        correct: ["1 37/168", "205/168"], 
+                        hint: "НСК(21, 56) = 168. Додаткові множники 8 та 3." 
+                    },
+                    { 
+                        id: "t1_3", 
+                        html: "3) <div class='fraction'><span class='top'>8</span><span class='bottom'>15</span></div> · <div class='fraction'><span class='top'>9</span><span class='bottom'>28</span></div>", 
+                        correct: ["6/35"], 
+                        hint: "Скороти 8 і 28 на 4, а 9 і 15 на 3 перед множенням." 
+                    },
+                    { 
+                        id: "t1_4", 
+                        html: "4) <div class='fraction'><span class='top'>18</span><span class='bottom'>35</span></div> · <div class='fraction'><span class='top'>14</span><span class='bottom'>15</span></div>", 
+                        correct: ["12/25", "0,48", "0.48"], 
+                        hint: "Скороти 18 і 15 на 3, а 14 і 35 на 7." 
+                    },
+                    { 
+                        id: "t1_5", 
+                        html: "5) <div class='mixed-number'>5<div class='fraction'><span class='top'>1</span><span class='bottom'>7</span></div></div> : <div class='mixed-number'>1<div class='fraction'><span class='top'>1</span><span class='bottom'>14</span></div></div>", 
+                        correct: ["4 4/5", "24/5", "4,8", "4.8"], 
+                        hint: "Перетвори мішані числа у неправильні дроби: 36/7 : 15/14 = 36/7 · 14/15." 
+                    },
+                    { 
+                        id: "t1_6", 
+                        html: "6) 0,06 · 2,3", 
+                        correct: ["0,138", "0.138"], 
+                        hint: "Помнож 6 на 23 та відокрем 3 знаки комою." 
+                    },
+                    { 
+                        id: "t1_7", 
+                        html: "7) 25,15 · 4,8", 
+                        correct: ["120,72", "120.72", "120,720", "120.720"], 
+                        hint: "Виконай множення в стовпчик та відокрем 3 знаки комою." 
+                    },
+                    { 
+                        id: "t1_8", 
+                        html: "8) 14,97 : 0,3", 
+                        correct: ["49,9", "49.9"], 
+                        hint: "Перенеси кому вдільнику та діленому на 1 знак праворуч: 149,7 : 3." 
+                    },
+                    { 
+                        id: "t1_9", 
+                        html: "9) 0,468 : 0,09", 
+                        correct: ["5,2", "5.2"], 
+                        hint: "Перенеси кому на 2 знаки праворуч: 46,8 : 9." 
+                    }
+                ]
+            },
+            {
+                title: "Завдання 2",
+                instruction: "Перетворіть у десятковий дріб:",
+                gridCols: "grid-cols-1 md:grid-cols-3",
+                items: [
+                    { 
+                        id: "t2_1", 
+                        html: "1) <div class='fraction'><span class='top'>9</span><span class='bottom'>20</span></div>", 
+                        correct: ["0,45", "0.45"], 
+                        hint: "Помнож чисельник і знаменник на 5." 
+                    },
+                    { 
+                        id: "t2_2", 
+                        html: "2) <div class='fraction'><span class='top'>1</span><span class='bottom'>4</span></div>", 
+                        correct: ["0,25", "0.25"], 
+                        hint: "Помнож чисельник і знаменник на 25." 
+                    },
+                    { 
+                        id: "t2_3", 
+                        html: "3) <div class='mixed-number'>2<div class='fraction'><span class='top'>3</span><span class='bottom'>5</span></div></div>", 
+                        correct: ["2,6", "2.6"], 
+                        hint: "Перетвори дробову частину: 3/5 = 6/10 = 0,6." 
+                    },
+                    { 
+                        id: "t2_4", 
+                        html: "4) <div class='mixed-number'>4<div class='fraction'><span class='top'>7</span><span class='bottom'>25</span></div></div>", 
+                        correct: ["4,28", "4.28"], 
+                        hint: "Помнож чисельник і знаменник дробової частини на 4." 
+                    },
+                    { 
+                        id: "t2_5", 
+                        html: "5) <div class='mixed-number'>8<div class='fraction'><span class='top'>7</span><span class='bottom'>20</span></div></div>", 
+                        correct: ["8,35", "8.35"], 
+                        hint: "Помнож чисельник і знаменник дробової частини на 5." 
+                    },
+                    { 
+                        id: "t2_6", 
+                        html: "6) <div class='mixed-number'>5<div class='fraction'><span class='top'>3</span><span class='bottom'>8</span></div></div>", 
+                        correct: ["5,375", "5.375"], 
+                        hint: "Помнож чисельник і знаменник дробової частини на 125." 
+                    }
+                ]
+            },
+            {
+                title: "Завдання 3",
+                instruction: "Обчисліть, записавши проміжний крок перетворення (проміжні кроки грошей не приносять, але допомагають розв'язати):",
+                gridCols: "grid-cols-1 md:grid-cols-2",
+                items: [
+                    { 
+                        id: "t3_1", 
+                        hasIntermediate: true,
+                        html: "1) <div class='fraction'><span class='top'>9</span><span class='bottom'>10</span></div> + 0,2", 
+                        correctInter: ["0,9+0,2", "0.9+0.2", "9/10+2/10"],
+                        hintInter: "Перетвори 9/10 у десятковий дріб 0,9 або 0,2 у звичайний дріб 2/10.",
+                        correct: ["1,1", "1.1", "1 1/10", "11/10"], 
+                        hint: "Знайди суму зведених чисел." 
+                    },
+                    { 
+                        id: "t3_2", 
+                        hasIntermediate: true,
+                        html: "2) <div class='fraction'><span class='top'>1</span><span class='bottom'>4</span></div> - 0,1", 
+                        correctInter: ["0,25-0,1", "0.25-0.1", "1/4-1/10", "5/20-2/20"],
+                        hintInter: "Перетвори 1/4 у десятковий дріб 0,25 або зведите до спільного знаменника.",
+                        correct: ["0,15", "0.15", "3/20"], 
+                        hint: "Обчисли 0,25 - 0,1." 
+                    },
+                    { 
+                        id: "t3_3", 
+                        hasIntermediate: true,
+                        html: "3) <div class='fraction'><span class='top'>1</span><span class='bottom'>9</span></div> · 0,1", 
+                        correctInter: ["1/9*1/10", "1/9·1/10", "1/9x1/10"],
+                        hintInter: "Запиши 0,1 як звичайний дріб 1/10 для зручного множення.",
+                        correct: ["1/90"], 
+                        hint: "Помнож чисельник на чисельник, знаменник на знаменник: 1/(9·10)." 
+                    },
+                    { 
+                        id: "t3_4", 
+                        hasIntermediate: true,
+                        html: "4) <div class='fraction'><span class='top'>2</span><span class='bottom'>3</span></div> : 0,3", 
+                        correctInter: ["2/3:3/10", "2/3*10/3", "2/3·10/3"],
+                        hintInter: "Перетвори 0,3 у звичайний дріб 3/10.",
+                        correct: ["20/9", "2 2/9"], 
+                        hint: "Заміни ділення множенням на обернений дріб: 2/3 · 10/3." 
+                    }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4";
+                
+                let itemsHTML = '';
+                task.items.forEach((item) => {
+                    if (item.hasIntermediate) {
+                        itemsHTML += `
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                                <div class="font-semibold text-slate-800 text-base border-b pb-2 flex items-center gap-1">${item.html}</div>
+                                
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Проміжний крок:</label>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-slate-400 font-bold">=</span>
+                                        <input type="text" id="inter_${item.id}" class="border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-800 w-full text-sm" placeholder="напр. 0,9 + 0,2">
+                                    </div>
+                                    <div id="feedback_inter_${item.id}" class="hidden text-xs p-2 rounded-md"></div>
+                                </div>
+
+                                <div class="space-y-2 pt-1">
+                                    <label class="text-xs font-bold text-indigo-600 uppercase tracking-wide">Остаточна відповідь (+1 грн):</label>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-slate-400 font-bold">=</span>
+                                        <input type="text" id="input_${item.id}" class="border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800 w-full text-sm" placeholder="Відповідь">
+                                    </div>
+                                    <div id="feedback_${item.id}" class="hidden text-xs p-2 rounded-md"></div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        itemsHTML += `
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between space-y-3">
+                                <div class="font-semibold text-slate-800 text-base flex items-center gap-1">${item.html}</div>
+                                <div class="space-y-1">
+                                    <input type="text" id="input_${item.id}" class="border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800 w-full text-sm" placeholder="Відповідь">
+                                    <div id="feedback_${item.id}" class="hidden text-xs p-2 rounded-md mt-1"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                taskCard.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                        <h2 class="text-xl font-bold text-indigo-900">${task.title}</h2>
+                        <div id="task_earned_${tIndex}" class="text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-200 w-fit">
+                            Зароблено: 0 грн із ${task.items.length} грн
+                        </div>
+                    </div>
+                    <p class="text-slate-600 font-medium text-sm md:text-base">${task.instruction}</p>
+                    <div class="grid ${task.gridCols} gap-4">${itemsHTML}</div>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button onclick="checkTask(${tIndex})" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl transition duration-150 ease-in-out shadow-md">
+                            Перевірити ${task.title}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="font-bold text-sm sm:text-base"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        // Canvas Анімація монеток
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, '');
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctFinalCount = 0;
+
+            task.items.forEach((item) => {
+                // Перевірка проміжного кроку (якщо є)
+                if (item.hasIntermediate) {
+                    const interInput = document.getElementById(`inter_${item.id}`);
+                    const interFeedback = document.getElementById(`feedback_inter_${item.id}`);
+                    const userInterVal = normalizeStr(interInput.value);
+
+                    interFeedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+                    interInput.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-rose-500', 'bg-rose-50');
+
+                    let isInterCorrect = item.correctInter.some(ans => normalizeStr(ans) === userInterVal);
+
+                    if (userInterVal !== "") {
+                        if (isInterCorrect) {
+                            interInput.classList.add('border-emerald-500', 'bg-emerald-50');
+                            interFeedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                            interFeedback.innerHTML = `<span class="font-bold">✓ Правильний проміжний крок!</span>`;
+                        } else {
+                            interInput.classList.add('border-rose-500', 'bg-rose-50');
+                            interFeedback.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                            interFeedback.innerHTML = `<span class="font-bold">✗ Помилка у проміжному кроці.</span> <span class="text-slate-600">${item.hintInter}</span>`;
+                        }
+                    }
+                }
+
+                // Перевірка основної відповіді
+                const inputEl = document.getElementById(`input_${item.id}`);
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                const userVal = normalizeStr(inputEl.value);
+
+                let isCorrect = item.correct.some(ans => normalizeStr(ans) === userVal);
+
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+                inputEl.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-rose-500', 'bg-rose-50');
+
+                if (isCorrect) {
+                    correctFinalCount++;
+                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                    
+                    if (!solvedFinalItems.has(item.id)) {
+                        solvedFinalItems.add(item.id);
+                        addMoney(1);
+                    }
+
+                    feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✓ Правильно! (+1 грн)</span>`;
+                } else {
+                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                    feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✗ Помилка.</span> <span class="text-slate-600">${item.hint}</span>`;
+                }
+            });
+
+            // Оновлення лічильника завдань
+            let taskEarnedCoins = task.items.filter(item => solvedFinalItems.has(item.id)).length;
+            const taskEarnedEl = document.getElementById(`task_earned_${taskIndex}`);
+            taskEarnedEl.textContent = `Зароблено: ${taskEarnedCoins} грн із ${task.items.length} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctFinalCount === task.items.length) {
+                summaryEl.className = "font-bold text-emerald-600";
+                summaryEl.textContent = `Завдання виконано ідеально! 🪙 (${correctFinalCount}/${task.items.length})`;
+                triggerCoinRain(40);
+            } else {
+                summaryEl.className = "font-bold text-amber-600";
+                summaryEl.textContent = `Правильно: ${correctFinalCount} з ${task.items.length}. Переглянь підказки!`;
+            }
+
+            // Перевірка завершення всього тесту
+            const totalItemsCount = tasksData.reduce((acc, curr) => acc + curr.items.length, 0);
+            if (solvedFinalItems.size === totalItemsCount) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(100);
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
