@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Властивості прямокутного трикутника</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.1); }
+        }
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-8 px-4 font-sans text-slate-800">
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 relative">
+        
+        <!-- Шапка та Скарбничка -->
+        <div class="flex flex-col sm:flex-row items-center justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-emerald-700">Дз Властивості прямокутного трикутника</h1>
+                <p class="text-slate-500 text-sm mt-1">Розв'язуй геометричні задачі, заробляй монети у скарбничку!</p>
+            </div>
+            
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-sm min-w-[180px] justify-center">
+                <div id="piggy-icon" class="text-3xl">🪙</div>
+                <div>
+                    <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">Скарбничка</div>
+                    <div class="text-xl font-black text-amber-900"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-8"></div>
+    </div>
+
+    <!-- Модальне вікно фінального успіху -->
+    <div id="final-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-4 border-amber-300 relative">
+            <div class="text-6xl mb-4">🪙🎉</div>
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Вітаємо!</h2>
+            <p class="text-slate-600 font-medium mb-4">Ти успішно виконав усі завдання тренажера!</p>
+            <div id="final-earned-text" class="text-2xl font-black text-amber-600 bg-amber-50 py-3 px-6 rounded-2xl border border-amber-200 mb-6">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedItems = new Set();
+
+        const tasksData = [
+            {
+                numberTitle: "№1 (509)",
+                text: "Знайдіть гострі кути прямокутного трикутника, якщо:",
+                items: [
+                    {
+                        id: "t1_1",
+                        subText: "1) один з них у 4 рази більший за другий;",
+                        placeholder: "Наприклад: 10 і 80 або 10, 80",
+                        reward: 2,
+                        correct: ["18,72", "18і72", "18i72", "18та72", "1872", "72,18", "72і18", "72i18", "72та18"],
+                        hint: "Сума гострих кутів прямокутного трикутника дорівнює 90°. Нехай менший кут x, тоді більший 4x. Рівняння: x + 4x = 90°."
+                    },
+                    {
+                        id: "t1_2",
+                        subText: "2) один з них на 16° менший від другого;",
+                        placeholder: "Наприклад: 10 і 80 або 10, 80",
+                        reward: 2,
+                        correct: ["37,53", "37і53", "37i53", "37та53", "3753", "53,37", "53і37", "53i37", "53та37"],
+                        hint: "Нехай менший кут x, тоді більший x + 16°. Рівняння: x + (x + 16°) = 90°."
+                    },
+                    {
+                        id: "t1_3",
+                        subText: "3) їхні градусні міри відносяться як 5 : 4.",
+                        placeholder: "Наприклад: 10 і 80 або 10, 80",
+                        reward: 2,
+                        correct: ["50,40", "50і40", "50i40", "50та40", "5040", "40,50", "40і50", "40i50", "40та50"],
+                        hint: "Нехай одна частина дорівнює x. Тоді кути дорівнюють 5x та 4x. Рівняння: 5x + 4x = 90°."
+                    }
+                ]
+            },
+            {
+                numberTitle: "№2 (511)",
+                text: "Знайдіть більший з кутів, що утворює бісектриса прямого кута трикутника з гіпотенузою, якщо один з гострих кутів трикутника дорівнює 68°.",
+                items: [
+                    {
+                        id: "t2",
+                        subText: "Введіть більший кут (у градусах):",
+                        placeholder: "Введіть число",
+                        reward: 2,
+                        correct: ["113"],
+                        hint: "Бісектриса ділить прямий кут на два кути по 45°. Розгляньте трикутник, утворений бісектрисою, катетом та гіпотенузою. Його кути: 45° і 68°. Один з кутів з гіпотенузою дорівнює 180° - (45° + 68°) = 67°, а більший суміжний кут: 180° - 67° = 113°."
+                    }
+                ]
+            },
+            {
+                numberTitle: "№3 (517)",
+                text: "У прямокутному трикутнику гострий кут дорівнює 60°, а бісектриса цього кута — 4 см. Знайдіть довжину катета, що лежить проти цього кута.",
+                items: [
+                    {
+                        id: "t3",
+                        subText: "Введіть довжину катета (в см):",
+                        placeholder: "Введіть число",
+                        reward: 2,
+                        correct: ["6"],
+                        hint: `<span class="font-bold block mb-1">Покрокова інструкція розв'язання:</span>
+                               <ul class="list-disc list-inside space-y-1 text-slate-700">
+                                   <li>Побудуй трикутник ABC (кут C = 90°, кут A = 60°).</li>
+                                   <li>Проведи бісектрису AK.</li>
+                                   <li>Розглянь трикутник CAK, знайди в ньому кут CAK і катет CK.</li>
+                                   <li>Розглянь трикутник AKB, знайди в ньому кут KAB, кут ABK, зроби висновок, який це трикутник.</li>
+                                   <li>Знайди в трикутника AKB сторону KB.</li>
+                                   <li>Знайди в трикутнику ABC шуканий катет BC.</li>
+                               </ul>`
+                    }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4";
+                
+                let maxTaskReward = task.items.reduce((sum, item) => sum + item.reward, 0);
+
+                let itemsHTML = '';
+                task.items.forEach((item) => {
+                    itemsHTML += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                            <p class="font-semibold text-slate-800 text-sm md:text-base">${item.subText}</p>
+                            <div class="space-y-1">
+                                <input type="text" id="input_${item.id}" class="border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-slate-800 w-full text-sm" placeholder="${item.placeholder}">
+                                <div id="feedback_${item.id}" class="hidden text-xs p-2.5 rounded-lg mt-1 font-medium"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                taskCard.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                        <h2 class="text-xl font-bold text-emerald-800">${task.numberTitle}</h2>
+                        <div id="task_earned_${tIndex}" class="text-xs sm:text-sm font-bold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-200 w-fit">
+                            Зароблено: 0 грн із ${maxTaskReward} грн
+                        </div>
+                    </div>
+                    <p class="text-slate-700 font-medium text-sm md:text-base">${task.text}</p>
+                    <div class="space-y-3">${itemsHTML}</div>
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button onclick="checkTask(${tIndex})" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl transition duration-150 ease-in-out shadow-md">
+                            Перевірити ${task.numberTitle}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="font-bold text-sm sm:text-base"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        // Canvas Анімація падаючих монеток
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/[\s°смcm,іiта]/g, '');
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctCount = 0;
+
+            task.items.forEach((item) => {
+                const inputEl = document.getElementById(`input_${item.id}`);
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                const userVal = normalizeStr(inputEl.value);
+
+                let isCorrect = item.correct.some(ans => normalizeStr(ans) === userVal);
+
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'border');
+                inputEl.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-rose-500', 'bg-rose-50');
+
+                if (isCorrect) {
+                    correctCount++;
+                    inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
+                    
+                    if (!solvedItems.has(item.id)) {
+                        solvedItems.add(item.id);
+                        addMoney(item.reward);
+                    }
+
+                    feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    feedbackEl.innerHTML = `<span class="font-bold">✓ Правильно! (+${item.reward} грн)</span>`;
+                } else {
+                    inputEl.classList.add('border-rose-500', 'bg-rose-50');
+                    feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    feedbackEl.innerHTML = `<span class="font-bold text-rose-700 block mb-1">✗ Помилка.</span> ${item.hint}`;
+                }
+            });
+
+            let taskEarnedCoins = task.items
+                .filter(item => solvedItems.has(item.id))
+                .reduce((sum, item) => sum + item.reward, 0);
+
+            let maxTaskReward = task.items.reduce((sum, item) => sum + item.reward, 0);
+
+            const taskEarnedEl = document.getElementById(`task_earned_${taskIndex}`);
+            taskEarnedEl.textContent = `Зароблено: ${taskEarnedCoins} грн із ${maxTaskReward} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctCount === task.items.length) {
+                summaryEl.className = "font-bold text-emerald-600";
+                summaryEl.textContent = `Усі приклади номера розв'язано правильно! 🪙`;
+                triggerCoinRain(40);
+            } else {
+                summaryEl.className = "font-bold text-amber-600";
+                summaryEl.textContent = `Правильно: ${correctCount} з ${task.items.length}. Переглянь підказки!`;
+            }
+
+            // Перевірка завершення всіх завдань
+            const totalItemsCount = tasksData.reduce((acc, curr) => acc + curr.items.length, 0);
+            if (solvedItems.size === totalItemsCount) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(120);
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
