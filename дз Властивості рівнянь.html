@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Алгебра: Розв'язування рівнянь</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .title-h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .piggy-bank {
+            background-color: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .piggy-icon {
+            font-size: 2rem;
+        }
+
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.15); }
+        }
+
+        .piggy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b45309;
+            text-transform: uppercase;
+        }
+
+        .piggy-balance {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #78350f;
+        }
+
+        /* Стилі для математичних дробів */
+        .math-eq {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            padding: 0 0.2rem;
+        }
+
+        .numerator {
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 1px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .denominator {
+            padding-top: 1px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .mixed-frac {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15rem;
+        }
+
+        .bracket {
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .task-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .task-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1d4ed8;
+        }
+
+        .task-earned {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: #fef3c7;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #fde68a;
+        }
+
+        .task-text {
+            font-weight: 700;
+            color: #334155;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .subtasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .subtask-item {
+            background: #ffffff;
+            padding: 1.25rem;
+            border-radius: 0.85rem;
+            border: 1px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .subtask-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .subtask-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .input-row label {
+            color: #475569;
+            font-size: 0.95rem;
+            min-width: 120px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            max-width: 280px;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .is-correct {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+        }
+
+        .is-wrong {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.5;
+            border: 1px solid transparent;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .feedback-wrong {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecdd3;
+        }
+
+        .btn-check {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            font-size: 0.95rem;
+        }
+
+        .btn-check:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .task-summary {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 10000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #fcd34d;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-text {
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .modal-prize {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #d97706;
+            background: #fffbeb;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #fde68a;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title-h1">Дз Алгебра: Розв'язування рівнянь</h1>
+                <p class="subtitle">Розв'яжи рівняння з дробами та від'ємними числами й зароби монети!</p>
+            </div>
+            
+            <div class="piggy-bank">
+                <div id="piggy-icon" class="piggy-icon">🪙</div>
+                <div>
+                    <div class="piggy-label">Скарбничка</div>
+                    <div class="piggy-balance"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="quiz-container"></div>
+    </div>
+
+    <div id="final-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div style="font-size: 4rem; margin-bottom: 0.5rem;">🪙🎉</div>
+            <h2 class="modal-title">Молодець!</h2>
+            <p class="modal-text">Ти успішно розв'язав усі рівняння!</p>
+            <div id="final-earned-text" class="modal-prize">
+                Ви заробили 8 грн!
+            </div>
+            <button onclick="closeModal()" class="btn-check" style="width: 100%;">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedSubItems = new Set();
+        const TOTAL_MAX_COINS = 8;
+
+        const tasksData = [
+            {
+                id: "t1",
+                numTitle: "№1",
+                titleText: "1) Розв'яжіть рівняння:",
+                maxReward: 4,
+                subtasks: [
+                    {
+                        id: "t1_1",
+                        label: "1)",
+                        reward: 1,
+                        eqHTML: `<span class="math-eq">28 − x = −52</span>`,
+                        correct: ["80"],
+                        hint: "Доданки з іксами вліво, без іксів — вправо. Перевір знаки!"
+                    },
+                    {
+                        id: "t1_2",
+                        label: "2)",
+                        reward: 1,
+                        eqHTML: `<span class="math-eq">−16,4 − x = −20,8</span>`,
+                        correct: ["4,4", "4.4"],
+                        hint: "Доданки з іксами вліво, без іксів — вправо. Перевір знаки!"
+                    },
+                    {
+                        id: "t1_3",
+                        label: "3)",
+                        reward: 1,
+                        eqHTML: `<span class="math-eq"><span class="frac"><span class="numerator">2</span><span class="denominator">9</span></span>x = −<span class="frac"><span class="numerator">4</span><span class="denominator">27</span></span></span>`,
+                        correct: ["-2/3", "-2 / 3", "- 2/3"],
+                        hint: "Яке число зайве — на те число і ділимо обидві частини рівняння. Перевір знаки!"
+                    },
+                    {
+                        id: "t1_4",
+                        label: "4)",
+                        reward: 1,
+                        eqHTML: `<span class="math-eq">−1,2x = −4,2</span>`,
+                        correct: ["3,5", "3.5"],
+                        hint: "Яке число зайве — на те число і ділимо обидві частини рівняння. Перевір знаки!"
+                    }
+                ]
+            },
+            {
+                id: "t2",
+                numTitle: "№2",
+                titleText: "2) Розв'яжи рівняння, спростивши спочатку вираз у його лівій частині:",
+                maxReward: 4,
+                subtasks: [
+                    {
+                        id: "t2_1",
+                        label: "1)",
+                        reward: 2,
+                        eqHTML: `<span class="math-eq">4,9 − (5,2 − x) = −1,8</span>`,
+                        correct: ["-1,5", "-1.5"],
+                        hint: "Спочатку розкрий дужки, звели подібні доданки, а далі: доданки з іксами вліво, без іксів — вправо. Перевір знаки!"
+                    },
+                    {
+                        id: "t2_2",
+                        label: "2)",
+                        reward: 2,
+                        eqHTML: `<span class="math-eq">− <span class="bracket">(</span>x − <span class="mixed-frac">2<span class="frac"><span class="numerator">1</span><span class="denominator">9</span></span></span><span class="bracket">)</span> − <span class="mixed-frac">1<span class="frac"><span class="numerator">1</span><span class="denominator">9</span></span></span> = <span class="mixed-frac">4<span class="frac"><span class="numerator">2</span><span class="denominator">5</span></span></span></span>`,
+                        correct: ["-3 2/5", "-3.4", "-3,4", "-17/5", "-3 2 / 5"],
+                        hint: "Крок 1: Розкрий дужки. Крок 2: Звели подібні доданки. Крок 3: Перенеси відомі доданки у праву частину та знайди x. Перевір знаки!"
+                    }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "task-card";
+                
+                let subtasksHTML = task.subtasks.map(st => `
+                    <div class="subtask-item">
+                        <div class="subtask-header">
+                            <div class="subtask-title">
+                                <span>${st.label}</span>
+                                ${st.eqHTML}
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <label for="${st.id}">Ваша відповідь:</label>
+                            <input type="text" id="${st.id}" placeholder="Ваша відповідь">
+                        </div>
+                        <div id="feedback_${st.id}" class="feedback-box"></div>
+                    </div>
+                `).join('');
+
+                taskCard.innerHTML = `
+                    <div class="task-header">
+                        <h2 class="task-num">${task.numTitle}</h2>
+                        <div id="task_earned_${tIndex}" class="task-earned">
+                            Зароблено: 0 грн із ${task.maxReward} грн
+                        </div>
+                    </div>
+                    <div class="task-text">${task.titleText}</div>
+                    <div class="subtasks-list">
+                        ${subtasksHTML}
+                    </div>
+                    <div class="footer-action">
+                        <button onclick="checkTask(${tIndex})" class="btn-check">
+                            Перевірити ${task.numTitle}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="task-summary"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/,/g, '.');
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let allSubtasksCorrect = true;
+
+            task.subtasks.forEach(st => {
+                const inputEl = document.getElementById(st.id);
+                const feedbackEl = document.getElementById(`feedback_${st.id}`);
+                let userVal = normalizeStr(inputEl.value);
+
+                let isCorrect = st.correct.some(ans => normalizeStr(ans) === userVal);
+
+                inputEl.classList.remove('is-correct', 'is-wrong');
+                feedbackEl.className = "feedback-box show";
+
+                if (isCorrect && userVal !== "") {
+                    inputEl.classList.add('is-correct');
+                    feedbackEl.classList.remove('feedback-wrong');
+                    feedbackEl.classList.add('feedback-correct');
+                    feedbackEl.innerHTML = `<strong>✓ Правильно! (+${st.reward} грн)</strong>`;
+
+                    if (!solvedSubItems.has(st.id)) {
+                        solvedSubItems.add(st.id);
+                        addMoney(st.reward);
+                    }
+                } else {
+                    inputEl.classList.add('is-wrong');
+                    feedbackEl.classList.remove('feedback-correct');
+                    feedbackEl.classList.add('feedback-wrong');
+                    feedbackEl.innerHTML = `<strong>✗ Неправильно.</strong> Підказка: ${st.hint}`;
+                    allSubtasksCorrect = false;
+                }
+            });
+
+            let currentEarned = task.subtasks
+                .filter(st => solvedSubItems.has(st.id))
+                .reduce((sum, st) => sum + st.reward, 0);
+
+            document.getElementById(`task_earned_${taskIndex}`).textContent = `Зароблено: ${currentEarned} грн із ${task.maxReward} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (allSubtasksCorrect) {
+                summaryEl.style.color = "#059669";
+                summaryEl.textContent = `Усі приклади ${task.numTitle} розв'язано правильно! 🪙`;
+                triggerCoinRain(40);
+            } else {
+                summaryEl.style.color = "#d97706";
+                summaryEl.textContent = `Є помилки. Переглянь підказки вище!`;
+            }
+
+            if (totalCoins === TOTAL_MAX_COINS) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(120);
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
