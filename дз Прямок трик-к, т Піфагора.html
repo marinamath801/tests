@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Прямокутний трикутник, теорема Піфагора</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .title-h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .piggy-bank {
+            background-color: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .piggy-icon {
+            font-size: 2rem;
+        }
+
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.15); }
+        }
+
+        .piggy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b45309;
+            text-transform: uppercase;
+        }
+
+        .piggy-balance {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #78350f;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .task-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .task-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1d4ed8;
+        }
+
+        .task-earned {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: #fef3c7;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #fde68a;
+        }
+
+        .task-text {
+            font-weight: 600;
+            color: #334155;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .inputs-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Стилі для чекбоксів та радіо-кнопок */
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f1f5f9;
+        }
+
+        .option-label input[type="checkbox"],
+        .option-label input[type="radio"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+
+        /* Класи підсвічування */
+        .is-correct {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+        }
+
+        .is-wrong {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.4;
+            border: 1px solid transparent;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .feedback-wrong {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecdd3;
+        }
+
+        .btn-check {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            font-size: 0.95rem;
+        }
+
+        .btn-check:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .task-summary {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 10000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #fcd34d;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-text {
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .modal-prize {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #d97706;
+            background: #fffbeb;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #fde68a;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title-h1">Дз Прямокутний трикутник, теорема Піфагора</h1>
+                <p class="subtitle">Розв'яжи геометричні задачі та заробляй монети!</p>
+            </div>
+            
+            <div class="piggy-bank">
+                <div id="piggy-icon" class="piggy-icon">🪙</div>
+                <div>
+                    <div class="piggy-label">Скарбничка</div>
+                    <div class="piggy-balance"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="quiz-container"></div>
+    </div>
+
+    <div id="final-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div style="font-size: 4rem; margin-bottom: 0.5rem;">🪙🎉</div>
+            <h2 class="modal-title">Вітаємо!</h2>
+            <p class="modal-text">Ти успішно виконав усі завдання тренажера!</p>
+            <div id="final-earned-text" class="modal-prize">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="btn-check" style="width: 100%;">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedSubItems = new Set(); // Відстежуємо кожну правильну відповідь окремо
+
+        const tasksData = [
+            {
+                id: "t1",
+                numTitle: "№1",
+                type: "inputs",
+                text: "Висота прямокутного трикутника, що проведена до гіпотенузи, утворює з одним катетом кут, що дорівнює 78°. Знайдіть гострі кути трикутника.",
+                maxReward: 2,
+                fields: [
+                    { id: "t1_a1", label: "Менший гострий кут (°):", correct: ["12", "12°"] },
+                    { id: "t1_a2", label: "Більший гострий кут (°):", correct: ["78", "78°"] }
+                ],
+                hint: "Пригадай, що висота, проведена до гіпотенузи, розбиває прямокутний трикутник на два подібні прямокутні трикутники. Кути між висотою та катетами відповідно дорівнюють протилежним гострим кутам початкового трикутника."
+            },
+            {
+                id: "t2",
+                numTitle: "№2",
+                type: "inputs",
+                text: "У прямокутному трикутнику один з гострих кутів удвічі більший за інший, а гіпотенуза на 4 см більша за менший з катетів. Знайдіть довжину гіпотенузи та медіани, проведеної до неї.",
+                maxReward: 2,
+                fields: [
+                    { id: "t2_a1", label: "Гіпотенуза (см):", correct: ["8", "8 см", "8см"] },
+                    { id: "t2_a2", label: "Медіана (см):", correct: ["4", "4 см", "4см"] }
+                ],
+                hint: "Сума гострих кутів прямокутного трикутника 90°. Якщо один кут удвічі більший за інший, то кути дорівнюють 30° і 60°. Катет навпроти кута 30° дорівнює половині гіпотенузи. А медіана, проведена до гіпотенузи, завжди дорівнює її половині."
+            },
+            {
+                id: "t3",
+                numTitle: "№3",
+                type: "radio",
+                text: "Дві менші сторони прямокутного трикутника дорівнюють 2 см і 3 см. Знайдіть його найбільшу сторону.",
+                maxReward: 1,
+                options: [
+                    { id: "t3_opt1", text: "5 см", isCorrect: false },
+                    { id: "t3_opt2", text: "√13 см", isCorrect: true },
+                    { id: "t3_opt3", text: "√5 см", isCorrect: false },
+                    { id: "t3_opt4", text: "13 см", isCorrect: false }
+                ],
+                hint: "Дві менші сторони прямокутного трикутника — це його катети (a = 2 см, b = 3 см). Найбільша сторона — це гіпотенуза (c). Скористайся теоремою Піфагора: c² = a² + b²."
+            },
+            {
+                id: "t4",
+                numTitle: "№4",
+                type: "checkboxes",
+                text: "Дві сторони прямокутного трикутника дорівнюють 5 см і 6 см. Знайдіть третю сторону (розгляньте всі випадки). Оберіть ВСІ можливі варіанти третьої сторони:",
+                maxReward: 2,
+                options: [
+                    { id: "opt_1", text: "√61 см", isCorrect: true },
+                    { id: "opt_2", text: "√11 см", isCorrect: true },
+                    { id: "opt_3", text: "1 см", isCorrect: false },
+                    { id: "opt_4", text: "√31 см", isCorrect: false },
+                    { id: "opt_5", text: "11 см", isCorrect: false }
+                ],
+                hint: "У цій задачі не вказано, чи є сторона 6 см катетом чи гіпотенузою, тому можливі два випадки: 1) Обидві відомі сторони є катетами (шукаємо гіпотенузу: c² = 5² + 6²); 2) Більша сторона 6 см є гіпотенузою, а 5 см — катетом (шукаємо інший катет: b² = 6² - 5²)."
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "task-card";
+                
+                let bodyHTML = '';
+
+                if (task.type === "inputs") {
+                    let fieldsHTML = task.fields.map(f => `
+                        <div class="input-row">
+                            <span style="min-width: 180px;">${f.label}</span>
+                            <input type="text" id="${f.id}" placeholder="Введіть значення">
+                        </div>
+                    `).join('');
+                    bodyHTML = `<div class="inputs-group" id="group_${task.id}">${fieldsHTML}</div>`;
+                } else if (task.type === "checkboxes") {
+                    let optionsHTML = task.options.map(opt => `
+                        <label class="option-label" id="label_${opt.id}">
+                            <input type="checkbox" id="${opt.id}" value="${opt.id}">
+                            <span>${opt.text}</span>
+                        </label>
+                    `).join('');
+                    bodyHTML = `<div class="option-group" id="group_${task.id}">${optionsHTML}</div>`;
+                } else if (task.type === "radio") {
+                    let optionsHTML = task.options.map(opt => `
+                        <label class="option-label" id="label_${opt.id}">
+                            <input type="radio" name="radio_${task.id}" id="${opt.id}" value="${opt.id}">
+                            <span>${opt.text}</span>
+                        </label>
+                    `).join('');
+                    bodyHTML = `<div class="option-group" id="group_${task.id}">${optionsHTML}</div>`;
+                }
+
+                taskCard.innerHTML = `
+                    <div class="task-header">
+                        <h2 class="task-num">${task.numTitle}</h2>
+                        <div id="task_earned_${tIndex}" class="task-earned">
+                            Зароблено: 0 грн із ${task.maxReward} грн
+                        </div>
+                    </div>
+                    <p class="task-text">${task.text}</p>
+                    ${bodyHTML}
+                    <div id="feedback_${task.id}" class="feedback-box"></div>
+                    <div class="footer-action">
+                        <button onclick="checkTask(${tIndex})" class="btn-check">
+                            Перевірити ${task.numTitle}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="task-summary"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(1, this.scaleY);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fill();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+
+                ctx.fillStyle = '#92400e';
+                ctx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < canvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/[\s,]/g, '');
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            const feedbackEl = document.getElementById(`feedback_${task.id}`);
+            let isTaskFullyCorrect = false;
+            let currentTaskEarned = 0;
+
+            if (task.type === "inputs") {
+                let allFieldsCorrect = true;
+
+                task.fields.forEach(f => {
+                    const inputEl = document.getElementById(f.id);
+                    let userVal = normalizeStr(inputEl.value);
+                    let fieldOk = f.correct.some(ans => normalizeStr(ans) === userVal);
+
+                    inputEl.classList.remove('is-correct', 'is-wrong');
+                    if (fieldOk && userVal !== "") {
+                        inputEl.classList.add('is-correct');
+                        if (!solvedSubItems.has(f.id)) {
+                            solvedSubItems.add(f.id);
+                            addMoney(1);
+                        }
+                    } else {
+                        inputEl.classList.add('is-wrong');
+                        allFieldsCorrect = false;
+                    }
+                });
+
+                isTaskFullyCorrect = allFieldsCorrect;
+
+            } else if (task.type === "radio") {
+                let selectedOption = task.options.find(opt => document.getElementById(opt.id).checked);
+                
+                task.options.forEach(opt => {
+                    const labelEl = document.getElementById(`label_${opt.id}`);
+                    labelEl.classList.remove('is-correct', 'is-wrong');
+                });
+
+                if (selectedOption) {
+                    const labelEl = document.getElementById(`label_${selectedOption.id}`);
+                    if (selectedOption.isCorrect) {
+                        labelEl.classList.add('is-correct');
+                        isTaskFullyCorrect = true;
+                        if (!solvedSubItems.has(task.id)) {
+                            solvedSubItems.add(task.id);
+                            addMoney(1);
+                        }
+                    } else {
+                        labelEl.classList.add('is-wrong');
+                    }
+                }
+
+            } else if (task.type === "checkboxes") {
+                let correctCheckboxesCount = 0;
+                let wrongSelections = 0;
+
+                task.options.forEach(opt => {
+                    const chkEl = document.getElementById(opt.id);
+                    const labelEl = document.getElementById(`label_${opt.id}`);
+                    const isChecked = chkEl.checked;
+
+                    labelEl.classList.remove('is-correct', 'is-wrong');
+
+                    if (opt.isCorrect) {
+                        if (isChecked) {
+                            labelEl.classList.add('is-correct');
+                            correctCheckboxesCount++;
+                            let subKey = `${task.id}_${opt.id}`;
+                            if (!solvedSubItems.has(subKey)) {
+                                solvedSubItems.add(subKey);
+                                addMoney(1);
+                            }
+                        }
+                    } else {
+                        if (isChecked) {
+                            labelEl.classList.add('is-wrong');
+                            wrongSelections++;
+                        }
+                    }
+                });
+
+                let totalCorrectOptions = task.options.filter(o => o.isCorrect).length;
+                isTaskFullyCorrect = (correctCheckboxesCount === totalCorrectOptions) && (wrongSelections === 0);
+            }
+
+            // Рахуємо скільки грн зароблено у цьому номері
+            if (task.type === "inputs") {
+                currentTaskEarned = task.fields.filter(f => solvedSubItems.has(f.id)).length;
+            } else if (task.type === "radio") {
+                currentTaskEarned = solvedSubItems.has(task.id) ? 1 : 0;
+            } else if (task.type === "checkboxes") {
+                currentTaskEarned = task.options.filter(opt => opt.isCorrect && solvedSubItems.has(`${task.id}_${opt.id}`)).length;
+            }
+
+            document.getElementById(`task_earned_${taskIndex}`).textContent = `Зароблено: ${currentTaskEarned} грн із ${task.maxReward} грн`;
+
+            feedbackEl.className = "feedback-box show";
+
+            if (isTaskFullyCorrect) {
+                feedbackEl.classList.remove('feedback-wrong');
+                feedbackEl.classList.add('feedback-correct');
+                feedbackEl.innerHTML = `<strong>✓ Правильно!</strong>`;
+
+                document.getElementById(`task_summary_${taskIndex}`).style.color = "#059669";
+                document.getElementById(`task_summary_${taskIndex}`).textContent = `Завдання виконано правильно! 🪙`;
+
+                triggerCoinRain(40);
+            } else {
+                feedbackEl.classList.remove('feedback-correct');
+                feedbackEl.classList.add('feedback-wrong');
+                feedbackEl.innerHTML = `<strong style="display:block; margin-bottom:0.25rem;">✗ Неправильно.</strong> Підказка: ${task.hint}`;
+
+                document.getElementById(`task_summary_${taskIndex}`).style.color = "#d97706";
+                document.getElementById(`task_summary_${taskIndex}`).textContent = `Є помилки. Переглянь підказку!`;
+            }
+
+            // Перевіряємо чи всі монети (7 грн) вибито
+            const TOTAL_MAX_COINS = 7;
+            if (solvedSubItems.size === TOTAL_MAX_COINS) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(120);
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
