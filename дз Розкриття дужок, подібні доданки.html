@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ: Подібні доданки, розкриття дужок та координатна площина</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .title-h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0d9488;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .piggy-bank {
+            background-color: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .piggy-icon {
+            font-size: 2rem;
+        }
+
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.15); }
+        }
+
+        .piggy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b45309;
+            text-transform: uppercase;
+        }
+
+        .piggy-balance {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #78350f;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .task-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .task-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f766e;
+        }
+
+        .task-earned {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: #fef3c7;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #fde68a;
+        }
+
+        .task-text {
+            font-weight: 700;
+            color: #334155;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .subtasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .subtask-item {
+            background: #ffffff;
+            padding: 1rem 1.25rem;
+            border-radius: 0.85rem;
+            border: 1px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .subtask-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .subtask-label {
+            font-weight: 700;
+            color: #0f172a;
+            min-width: 25px;
+        }
+
+        .eq-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        input[type="text"] {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+            width: 220px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .is-correct {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+        }
+
+        .is-wrong {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            line-height: 1.4;
+            border: 1px solid transparent;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .feedback-wrong {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecdd3;
+        }
+
+        .btn-check {
+            background-color: #0284c7;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-check:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-reset {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-reset:hover {
+            background-color: #dc2626;
+        }
+
+        /* Стилі для координатної площини */
+        .coord-status-box {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-weight: 700;
+            color: #065f46;
+            font-size: 1.05rem;
+        }
+
+        .coord-canvas-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        #grid-canvas {
+            background-color: #ffffff;
+            border: 2px solid #334155;
+            border-radius: 0.5rem;
+            cursor: crosshair;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 10000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #fcd34d;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-text {
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .modal-prize {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #d97706;
+            background: #fffbeb;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid #fde68a;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title-h1">ДЗ: Подібні доданки та координатна площина</h1>
+                <p class="subtitle">Виконуй завдання, відкривай рисунок та заробляй монети у скарбничку!</p>
+            </div>
+            
+            <div class="piggy-bank">
+                <div id="piggy-icon" class="piggy-icon">🪙</div>
+                <div>
+                    <div class="piggy-label">Скарбничка</div>
+                    <div class="piggy-balance"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="quiz-container">
+            <!-- №1 -->
+            <div class="task-card">
+                <div class="task-header">
+                    <h2 class="task-num">№1</h2>
+                    <div id="task_earned_0" class="task-earned">Зароблено: 0 грн із 4 грн</div>
+                </div>
+                <div class="task-text" style="color: #0d9488;">1. Зведіть подібні доданки:</div>
+                <div class="subtasks-list">
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">1)</span>
+                            <span class="eq-text">6x − 4y + 2x + 10y =</span>
+                            <input type="text" id="t1_1" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t1_1', ['8x+6y', '6y+8x', '8x + 6y', '6y + 8x'], 'Зведіть доданки з x та з y. Перевір знаки!', 1, 0)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t1_1" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">2)</span>
+                            <span class="eq-text">−6,3 + 12x + 3,1 − 15x =</span>
+                            <input type="text" id="t1_2" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t1_2', ['-3x-3.2', '-3.2-3x', '-3x-3,2', '-3,2-3x'], 'Зведіть доданки з x та числа. Перевір знаки!', 1, 0)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t1_2" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">3)</span>
+                            <span class="eq-text">−6a + 5 − 3b + 6a − 11b =</span>
+                            <input type="text" id="t1_3" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t1_3', ['-14b+5', '5-14b', '-14b + 5', '5 - 14b'], 'Доданки −6a і 6a взаємознищуються. Перевір знаки!', 1, 0)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t1_3" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">4)</span>
+                            <span class="eq-text">5a − 8b + 4a + 12b =</span>
+                            <input type="text" id="t1_4" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t1_4', ['9a+4b', '4b+9a', '9a + 4b', '4b + 9a'], 'Зведіть доданки з a та з b. Перевір знаки!', 1, 0)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t1_4" class="feedback-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- №2 -->
+            <div class="task-card">
+                <div class="task-header">
+                    <h2 class="task-num">№2</h2>
+                    <div id="task_earned_1" class="task-earned">Зароблено: 0 грн із 6 грн</div>
+                </div>
+                <div class="task-text" style="color: #0d9488;">2. Розкрийте дужки:</div>
+                <div class="subtasks-list">
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">1)</span>
+                            <span class="eq-text">x + (a − b) =</span>
+                            <input type="text" id="t2_1" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_1', ['x+a-b', 'x + a - b'], 'Якщо перед дужками плюс, знаки зберігаються. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_1" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">2)</span>
+                            <span class="eq-text">c − (m − n) =</span>
+                            <input type="text" id="t2_2" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_2', ['c-m+n', 'c - m + n'], 'Перед дужками мінус — зміни всі знаки в дужках. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_2" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">3)</span>
+                            <span class="eq-text">3(2x − 5y) =</span>
+                            <input type="text" id="t2_3" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_3', ['6x-15y', '6x - 15y'], 'Помнож 3 на кожен доданок у дужках. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_3" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">4)</span>
+                            <span class="eq-text">−4(−a + 3b) =</span>
+                            <input type="text" id="t2_4" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_4', ['4a-12b', '-12b+4a', '4a - 12b'], 'Помнож −4 на кожен доданок. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_4" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">5)</span>
+                            <span class="eq-text">(−5,1 + x − y) · (−b) =</span>
+                            <input type="text" id="t2_5" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_5', ['5.1b-bx+by', '5,1b-bx+by', '5.1b-xb+yb', '5,1b-xb+yb'], 'Помнож кожен доданок на −b. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_5" class="feedback-box"></div>
+                    </div>
+
+                    <div class="subtask-item">
+                        <div class="subtask-row">
+                            <span class="subtask-label">6)</span>
+                            <span class="eq-text">−2(3x − 4y + 5) =</span>
+                            <input type="text" id="t2_6" placeholder="Ваша відповідь">
+                            <button onclick="checkSingleInput('t2_6', ['-6x+8y-10', '8y-6x-10', '-6x + 8y - 10'], 'Помнож −2 на кожен доданок у дужках. Перевір знаки!', 1, 1)" class="btn-check">Перевірити</button>
+                        </div>
+                        <div id="feedback_t2_6" class="feedback-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- №3 -->
+            <div class="task-card">
+                <div class="task-header">
+                    <h2 class="task-num">№3</h2>
+                    <div id="task_earned_2" class="task-earned">Зароблено: 0 грн із 2 грн</div>
+                </div>
+                <div class="task-text" style="color: #0d9488;">3. Побудова рисунка за координатами</div>
+                <p style="color: #64748b; font-size: 0.95rem;">Послідовно позначте на координатній площині точки за списком. Натисніть на сітку у відповідних місцях:</p>
+                
+                <div id="coord-status" class="coord-status-box">
+                    Поточне завдання: Знайдіть точку: A(-6; -2)
+                </div>
+
+                <div class="coord-canvas-wrapper">
+                    <canvas id="grid-canvas" width="440" height="440"></canvas>
+                </div>
+
+                <div style="display: flex; justify-content: center;">
+                    <button onclick="resetDrawing()" class="btn-reset">Скинути рисунок</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="final-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div style="font-size: 4rem; margin-bottom: 0.5rem;">🪙🎉</div>
+            <h2 class="modal-title">Молодець!</h2>
+            <p class="modal-text">Ти успішно виконав усі завдання та побудував рисунок!</p>
+            <div id="final-earned-text" class="modal-prize">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="btn-check" style="width: 100%;">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedSubItems = new Set();
+
+        const taskMaxRewards = [4, 6, 2];
+        const taskCurrentEarned = [0, 0, 0];
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+
+            checkFinalCompletion();
+        }
+
+        function checkFinalCompletion() {
+            if (solvedSubItems.size === 11) { // 4 + 6 + 1 (рисунок)
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinRain(120);
+                }, 600);
+            }
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, '').replace(/,/g, '.');
+        }
+
+        function checkSingleInput(inputId, correctAnswers, hint, reward, taskIndex) {
+            const inputEl = document.getElementById(inputId);
+            const feedbackEl = document.getElementById(`feedback_${inputId}`);
+            let userVal = normalizeStr(inputEl.value);
+
+            let isCorrect = correctAnswers.some(ans => normalizeStr(ans) === userVal);
+
+            inputEl.classList.remove('is-correct', 'is-wrong');
+            feedbackEl.className = "feedback-box show";
+
+            if (isCorrect && userVal !== "") {
+                inputEl.classList.add('is-correct');
+                feedbackEl.classList.remove('feedback-wrong');
+                feedbackEl.classList.add('feedback-correct');
+                feedbackEl.innerHTML = `<strong>✓ Правильно! (+${reward} грн)</strong>`;
+
+                if (!solvedSubItems.has(inputId)) {
+                    solvedSubItems.add(inputId);
+                    taskCurrentEarned[taskIndex] += reward;
+                    document.getElementById(`task_earned_${taskIndex}`).textContent = `Зароблено: ${taskCurrentEarned[taskIndex]} грн із ${taskMaxRewards[taskIndex]} грн`;
+                    addMoney(reward);
+
+                    if ((taskIndex === 0 && taskCurrentEarned[0] === 4) || (taskIndex === 1 && taskCurrentEarned[1] === 6)) {
+                        triggerCoinRain(40);
+                    }
+                }
+            } else {
+                inputEl.classList.add('is-wrong');
+                feedbackEl.classList.remove('feedback-correct');
+                feedbackEl.classList.add('feedback-wrong');
+                feedbackEl.innerHTML = `<strong>✗ Неправильно.</strong> Підказка: ${hint}`;
+            }
+        }
+
+        /* ----- КООРДИНАТНА ПЛОЩИНА ----- */
+        const pointList = [
+            { name: "A", x: -6, y: -2 },
+            { name: "B", x: 6, y: -2 },
+            { name: "C", x: 4, y: -4 },
+            { name: "D", x: -4, y: -4 },
+            { name: "E", x: -6, y: -2 },
+            { name: "F", x: 0, y: -2 },
+            { name: "G", x: 0, y: 7 },
+            { name: "H", x: 5, y: 0 },
+            { name: "I", x: 0, y: 0 }
+        ];
+
+        let currentPointIdx = 0;
+        let drawnPoints = [];
+        const gCanvas = document.getElementById('grid-canvas');
+        const gCtx = gCanvas.getContext('2d');
+        const GRID_SIZE = 9;
+        const STEP = 20;
+        const CENTER_X = 220;
+        const CENTER_Y = 220;
+
+        function drawGrid() {
+            gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+            
+            gCtx.strokeStyle = "#e2e8f0";
+            gCtx.lineWidth = 1;
+
+            for (let i = -GRID_SIZE; i <= GRID_SIZE; i++) {
+                gCtx.beginPath();
+                gCtx.moveTo(CENTER_X + i * STEP, 0);
+                gCtx.lineTo(CENTER_X + i * STEP, gCanvas.height);
+                gCtx.stroke();
+
+                gCtx.beginPath();
+                gCtx.moveTo(0, CENTER_Y - i * STEP);
+                gCtx.lineTo(gCanvas.width, CENTER_Y - i * STEP);
+                gCtx.stroke();
+            }
+
+            gCtx.strokeStyle = "#1e293b";
+            gCtx.lineWidth = 2;
+
+            gCtx.beginPath();
+            gCtx.moveTo(CENTER_X, 0);
+            gCtx.lineTo(CENTER_X, gCanvas.height);
+            gCtx.stroke();
+
+            gCtx.beginPath();
+            gCtx.moveTo(0, CENTER_Y);
+            gCtx.lineTo(gCanvas.width, CENTER_Y);
+            gCtx.stroke();
+
+            gCtx.fillStyle = "#475569";
+            gCtx.font = "10px sans-serif";
+            gCtx.textAlign = "center";
+            gCtx.textBaseline = "middle";
+
+            for (let i = -GRID_SIZE; i <= GRID_SIZE; i++) {
+                if (i !== 0) {
+                    gCtx.fillText(i, CENTER_X + i * STEP, CENTER_Y + 12);
+                    gCtx.fillText(i, CENTER_X - 12, CENTER_Y - i * STEP);
+                }
+            }
+            gCtx.fillText("x", gCanvas.width - 10, CENTER_Y - 12);
+            gCtx.fillText("y", CENTER_X + 12, 10);
+
+            if (drawnPoints.length > 0) {
+                gCtx.strokeStyle = "#0284c7";
+                gCtx.lineWidth = 3;
+                gCtx.beginPath();
+                gCtx.moveTo(CENTER_X + drawnPoints[0].x * STEP, CENTER_Y - drawnPoints[0].y * STEP);
+                for (let i = 1; i < drawnPoints.length; i++) {
+                    gCtx.lineTo(CENTER_X + drawnPoints[i].x * STEP, CENTER_Y - drawnPoints[i].y * STEP);
+                }
+                gCtx.stroke();
+
+                drawnPoints.forEach(p => {
+                    gCtx.fillStyle = "#ef4444";
+                    gCtx.beginPath();
+                    gCtx.arc(CENTER_X + p.x * STEP, CENTER_Y - p.y * STEP, 4, 0, Math.PI * 2);
+                    gCtx.fill();
+                });
+            }
+        }
+
+        function updateCoordStatus() {
+            const statusEl = document.getElementById('coord-status');
+            if (currentPointIdx < pointList.length) {
+                const target = pointList[currentPointIdx];
+                statusEl.style.color = "#065f46";
+                statusEl.style.backgroundColor = "#ecfdf5";
+                statusEl.innerHTML = `Поточне завдання: <strong>Знайдіть точку: ${target.name}(${target.x}; ${target.y})</strong>`;
+            } else {
+                statusEl.style.color = "#0369a1";
+                statusEl.style.backgroundColor = "#e0f2fe";
+                statusEl.innerHTML = `🎉 <strong>Чудово! Рисунок (Кораблик) успішно побудовано! (+2 грн)</strong>`;
+            }
+        }
+
+        gCanvas.addEventListener('click', (e) => {
+            if (currentPointIdx >= pointList.length) return;
+
+            const rect = gCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            const mathX = Math.round((clickX - CENTER_X) / STEP);
+            const mathY = Math.round((CENTER_Y - clickY) / STEP);
+
+            const target = pointList[currentPointIdx];
+
+            if (mathX === target.x && mathY === target.y) {
+                drawnPoints.push({ x: mathX, y: mathY });
+                currentPointIdx++;
+                drawGrid();
+                updateCoordStatus();
+
+                if (currentPointIdx === pointList.length) {
+                    if (!solvedSubItems.has('coord_task')) {
+                        solvedSubItems.add('coord_task');
+                        taskCurrentEarned[2] = 2;
+                        document.getElementById('task_earned_2').textContent = `Зароблено: 2 грн із 2 грн`;
+                        addMoney(2);
+                        triggerCoinRain(50);
+                    }
+                }
+            } else {
+                const statusEl = document.getElementById('coord-status');
+                statusEl.style.color = "#991b1b";
+                statusEl.style.backgroundColor = "#fef2f2";
+                statusEl.innerHTML = `<strong>Невірно!</strong> Необхідна точка: <strong>${target.name}(${target.x}; ${target.y})</strong>, а ви вибрали (${mathX}; ${mathY}). Спробуйте ще раз!`;
+            }
+        });
+
+        function resetDrawing() {
+            currentPointIdx = 0;
+            drawnPoints = [];
+            drawGrid();
+            updateCoordStatus();
+        }
+
+        /* ----- АНІМАЦІЯ ДОЩУ З МОНЕТОК ----- */
+        const coinCanvas = document.getElementById('coin-canvas');
+        const coinCtx = coinCanvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCoinCanvas() {
+            coinCanvas.width = window.innerWidth;
+            coinCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCoinCanvas);
+        resizeCoinCanvas();
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * coinCanvas.width;
+                this.y = -20 - Math.random() * 100;
+                this.radius = 12 + Math.random() * 6;
+                this.speedY = 3 + Math.random() * 4;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.rotationSpeed = 0.05 + Math.random() * 0.08;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                coinCtx.save();
+                coinCtx.translate(this.x, this.y);
+                coinCtx.scale(1, this.scaleY);
+
+                coinCtx.beginPath();
+                coinCtx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                coinCtx.fillStyle = '#f59e0b';
+                coinCtx.fill();
+
+                coinCtx.beginPath();
+                coinCtx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                coinCtx.fillStyle = '#fbbf24';
+                coinCtx.fill();
+
+                coinCtx.lineWidth = 1.5;
+                coinCtx.strokeStyle = '#d97706';
+                coinCtx.stroke();
+
+                coinCtx.fillStyle = '#92400e';
+                coinCtx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                coinCtx.textAlign = 'center';
+                coinCtx.textBaseline = 'middle';
+                coinCtx.fillText('₴', 0, 1);
+
+                coinCtx.restore();
+            }
+        }
+
+        function triggerCoinRain(count = 50) {
+            coins = [];
+            for (let i = 0; i < count; i++) {
+                coins.push(new Coin());
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                coinCtx.clearRect(0, 0, coinCanvas.width, coinCanvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(coin => {
+                    coin.update();
+                    coin.draw();
+                    if (coin.y < coinCanvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    coinCtx.clearRect(0, 0, coinCanvas.width, coinCanvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            drawGrid();
+            updateCoordStatus();
+        });
+    </script>
+</body>
+</html>
