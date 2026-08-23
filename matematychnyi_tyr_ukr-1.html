@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#5b2a86">
+  <title>Математичний тир — усний рахунок</title>
+  <style>
+    :root{--ink:#2d2140;--purple:#642d8c;--violet:#8a48b8;--cream:#fff7dc;--gold:#ffc83d;--red:#ef4e62;--green:#35b779;--blue:#3da5d9;--card:#fffdf6;--shadow:0 16px 38px #3b1b5b2c}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#6b3295}
+    button{font:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .app{min-height:100svh;position:relative;overflow:hidden;background:
+      radial-gradient(circle at 13% 14%,#ffffff50 0 2px,transparent 3px),
+      radial-gradient(circle at 83% 8%,#ffffff42 0 3px,transparent 4px),
+      linear-gradient(#693092 0 35%,#8240a4 35% 66%,#f7d17c 66% 100%)}
+    .bunting{height:58px;position:absolute;inset:0 0 auto;background:linear-gradient(12deg,transparent 49%,#fff8 50% 51%,transparent 52%)}
+    .flags{display:flex;justify-content:space-around;padding:0 2%;transform:translateY(-2px)}
+    .flag{width:45px;height:51px;clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 4px 3px #36153d44)}
+    .flag:nth-child(4n+1){background:#ffcb3d}.flag:nth-child(4n+2){background:#ef536c}.flag:nth-child(4n+3){background:#40c090}.flag:nth-child(4n){background:#43a8db}
+    .shell{position:relative;z-index:2;min-height:100svh;max-width:1120px;margin:auto;padding:64px 18px 18px;display:flex;flex-direction:column}
+    .topbar{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;color:#fff}
+    .brand{font-weight:1000;font-size:clamp(18px,3vw,29px);letter-spacing:.3px;text-shadow:0 3px 0 #3d165b}
+    .brand small{display:block;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#ffe89a;text-transform:uppercase}
+    .stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+    .pill{background:#fffdf6;color:#4a2861;border:2px solid #fff;padding:7px 11px;border-radius:999px;font-weight:900;box-shadow:0 5px 0 #44205855;white-space:nowrap}
+    .actions{display:flex;justify-content:flex-end;gap:8px}
+    .iconbtn{width:43px;height:43px;border:2px solid #fff;background:#ffffff20;color:#fff;border-radius:50%;font-size:20px;cursor:pointer}
+    .iconbtn:hover{background:#ffffff38}.iconbtn:focus-visible,.cta:focus-visible,.target:focus-visible{outline:4px solid #ffe66d;outline-offset:3px}
+    .progress{margin:12px 0 10px;height:10px;background:#401b5e88;border:2px solid #ffffff66;border-radius:20px;overflow:hidden}
+    .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffe16a,#ff9f45);transition:width .35s}
+    .game{flex:1;min-height:540px;position:relative;border:5px solid #ffe8a3;border-radius:28px;background:
+      radial-gradient(circle at 25% 25%,#fff 0 2px,transparent 3px),
+      linear-gradient(#a9e5ff 0 58%,#f7df95 58% 61%,#f5c76b 61%);box-shadow:var(--shadow),inset 0 0 0 4px #9c4b58;overflow:hidden}
+    .game:after{content:"";position:absolute;inset:auto 0 0;height:86px;background:repeating-linear-gradient(90deg,#bb5d36 0 42px,#d36c3e 42px 84px);clip-path:polygon(0 28%,100% 0,100% 100%,0 100%);opacity:.9}
+    .cloud{position:absolute;background:#fff;border-radius:999px;width:110px;height:28px;opacity:.75;filter:blur(.2px)}
+    .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}.cloud:before{width:45px;height:45px;left:18px;bottom:0}.cloud:after{width:58px;height:58px;right:9px;bottom:0}
+    .c1{left:6%;top:18%}.c2{right:5%;top:25%;transform:scale(.75)}
+    .question-card{position:relative;z-index:3;margin:20px auto 4px;width:min(92%,650px);text-align:center;background:var(--card);border:4px solid #fff;border-radius:24px;padding:10px 20px 14px;box-shadow:0 8px 0 #9f5b6c55}
+    .round{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:#755184;font-weight:900}
+    .expression{font-family:"Trebuchet MS",system-ui,sans-serif;font-weight:1000;font-size:clamp(32px,7vw,58px);line-height:1.15;font-variant-numeric:tabular-nums;color:#342046}
+    .timer-wrap{height:8px;border-radius:20px;background:#e8dceb;overflow:hidden;margin-top:8px}.timer{height:100%;width:100%;background:#38bd83;transform-origin:left;transition:width .1s linear,background .2s}
+    .arena{position:relative;z-index:4;height:360px;margin:0 4%}
+    .target{--balloon:#ef536c;position:absolute;width:clamp(108px,18vw,170px);height:clamp(125px,19vw,180px);border:0;background:transparent;cursor:crosshair;animation:float 2.4s ease-in-out infinite alternate;filter:drop-shadow(0 10px 6px #5929682e)}
+    .target:nth-child(2){animation-delay:-.7s}.target:nth-child(3){animation-delay:-1.4s}.target:nth-child(4){animation-delay:-2s}
+    .balloon{position:absolute;inset:0 4px 20px;border-radius:50% 50% 48% 48%/44% 44% 56% 56%;display:grid;place-items:center;padding:12px;background:radial-gradient(circle at 30% 22%,#fff9 0 7%,transparent 8%),linear-gradient(145deg,color-mix(in srgb,var(--balloon),white 22%),var(--balloon));border:4px solid #ffffffaa;box-shadow:inset -8px -10px 0 #461d4724}
+    .balloon:after{content:"";position:absolute;bottom:-9px;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:15px solid var(--balloon)}
+    .string{position:absolute;width:2px;height:34px;background:#77546d;bottom:-20px;left:50%;transform:rotate(8deg)}
+    .answer{position:relative;z-index:2;color:#fff;font-size:clamp(23px,4vw,36px);font-weight:1000;text-shadow:0 3px 0 #401a4266;white-space:nowrap}
+    .target:hover{transform:scale(1.04)}
+    .target.good{animation:pop .38s forwards}.target.bad{animation:shake .42s}.target.missed{opacity:.35;pointer-events:none}
+    .feedback{position:absolute;z-index:8;left:50%;top:48%;transform:translate(-50%,-50%) scale(.7);font-size:clamp(35px,8vw,72px);font-weight:1000;color:#fff;text-shadow:0 5px 0 #4a1a55,0 0 20px #fff;opacity:0;pointer-events:none}
+    .feedback.show{animation:feedback .75s}
+    .start,.finish,.pause{position:absolute;z-index:20;inset:0;display:grid;place-items:center;padding:20px;background:#4a1f6dcc;backdrop-filter:blur(5px)}
+    .panel{width:min(94%,620px);background:#fffdf7;border:5px solid #ffd55c;border-radius:30px;padding:clamp(20px,4vw,38px);text-align:center;box-shadow:0 13px 0 #32154266}
+    .panel h1,.panel h2{margin:0 0 8px;font-size:clamp(30px,7vw,51px);color:#65308c;line-height:1}.panel p{font-size:17px;line-height:1.45;margin:12px 0;color:#5c4967}
+    .how{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}.how span{padding:8px 12px;background:#f3eafa;border-radius:12px;font-weight:800}
+    .cta{border:0;border-radius:16px;padding:14px 24px;background:linear-gradient(#ffdc61,#ffb62f);color:#472054;font-weight:1000;font-size:20px;box-shadow:0 6px 0 #c27627;cursor:pointer;margin:6px}.cta:active{transform:translateY(4px);box-shadow:0 2px 0 #c27627}.cta.secondary{background:linear-gradient(#a9e9d0,#52c994);box-shadow:0 6px 0 #248b63}
+    .medal{font-size:70px;line-height:1}.results{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:16px 0}.result{background:#f2eafb;border-radius:15px;padding:11px}.result b{display:block;font-size:24px;color:#66318e}.hidden{display:none!important}
+    .scratch{position:fixed;z-index:50;inset:0;background:#251231aa;display:grid;place-items:center;padding:12px;backdrop-filter:blur(4px)}
+    .scratch-box{width:min(920px,97vw);background:#fff;border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+    .scratch-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.scratch-head strong{font-size:20px}.tools{display:flex;gap:7px;flex-wrap:wrap}.tool{border:0;padding:8px 11px;border-radius:10px;background:#eee3f5;color:#51276c;font-weight:900;cursor:pointer}.tool.active{background:#6f3695;color:#fff}
+    #scratchCanvas{display:block;width:100%;height:min(62vh,520px);border:2px solid #806194;border-radius:12px;touch-action:none;background-color:#fff;background-image:linear-gradient(#b5d5ed66 1px,transparent 1px),linear-gradient(90deg,#b5d5ed66 1px,transparent 1px);background-size:28px 28px}
+    .confetti{position:fixed;z-index:60;pointer-events:none;width:10px;height:18px;top:-25px;animation:fall 2.4s linear forwards}
+    @keyframes float{from{transform:translateY(5px) rotate(-1deg)}to{transform:translateY(-11px) rotate(1deg)}}
+    @keyframes pop{45%{transform:scale(1.2)}to{transform:scale(0);opacity:0}}
+    @keyframes shake{20%,60%{transform:translateX(-10px) rotate(-3deg)}40%,80%{transform:translateX(10px) rotate(3deg)}}
+    @keyframes feedback{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}25%,70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-55%) scale(1.15)}}
+    @keyframes fall{to{transform:translate(var(--drift),110vh) rotate(720deg)}}
+    @media(max-width:650px){.shell{padding:59px 8px 8px}.topbar{grid-template-columns:1fr auto}.brand small{display:none}.stats{grid-column:1/-1;grid-row:2}.actions{grid-column:2;grid-row:1}.game{min-height:535px;border-width:3px}.arena{height:350px;margin:0}.target{width:105px;height:125px}.question-card{margin-top:10px}.pill{padding:5px 9px;font-size:14px}}
+    @media(max-height:700px) and (orientation:landscape){.shell{padding-top:52px}.game{min-height:420px}.question-card{position:absolute;top:8px;left:50%;transform:translateX(-50%);margin:0;width:47%}.expression{font-size:36px}.arena{height:330px;margin-left:48%}.stats{font-size:13px}.target{width:105px;height:120px}.start .panel,.finish .panel{padding:18px}.panel p{margin:7px 0}.medal{font-size:45px}}
+    @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}.target{animation:none}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <div class="bunting"><div class="flags" aria-hidden="true"><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i><i class="flag"></i></div></div>
+  <section class="shell">
+    <header class="topbar">
+      <div class="brand">🎯 Математичний тир<small>ярмарок усного рахунку</small></div>
+      <div class="stats" aria-live="polite">
+        <span class="pill">⭐ <span id="score">0</span></span>
+        <span class="pill">🔥 <span id="streak">0</span></span>
+        <span class="pill" id="lives">❤️ ❤️ ❤️</span>
+        <span class="pill"><span id="count">1</span>/16</span>
+      </div>
+      <div class="actions">
+        <button class="iconbtn" id="soundBtn" aria-label="Вимкнути звук" title="Звук">🔊</button>
+        <button class="iconbtn" id="scratchBtn" aria-label="Відкрити чернетку" title="Чернетка">✏️</button>
+        <button class="iconbtn" id="pauseBtn" aria-label="Пауза" title="Пауза">⏸</button>
+      </div>
+    </header>
+    <div class="progress"><i id="progress"></i></div>
+    <section class="game" aria-label="Ігрове поле">
+      <i class="cloud c1"></i><i class="cloud c2"></i>
+      <div class="question-card">
+        <div class="round" id="round">Раунд 1 · Додавання</div>
+        <div class="expression" id="expression">1,2 + 0,3 = ?</div>
+        <div class="timer-wrap"><div class="timer" id="timer"></div></div>
+      </div>
+      <div class="arena" id="arena"></div>
+      <div class="feedback" id="feedback">Влучно! +10</div>
+
+      <div class="start" id="startScreen">
+        <div class="panel">
+          <div class="medal">🎪</div><h1>Математичний тир</h1>
+          <p>Обчислюй усно та влучай у кульку з правильною відповіддю. На кожен приклад — 15 секунд.</p>
+          <div class="how"><span>16 прикладів</span><span>3 життя</span><span>Бонус за серію</span></div>
+          <button class="cta" id="startBtn">Розпочати гру 🎯</button>
+        </div>
+      </div>
+      <div class="pause hidden" id="pauseScreen"><div class="panel"><h2>Пауза</h2><p>Перепочинь — час зупинено.</p><button class="cta" id="resumeBtn">Продовжити</button></div></div>
+      <div class="finish hidden" id="finishScreen">
+        <div class="panel"><div class="medal" id="medal">🏆</div><h2 id="finishTitle">Чудовий старт!</h2>
+          <div class="results"><div class="result"><b id="finalScore">0</b>балів</div><div class="result"><b id="accuracy">0%</b>точність</div><div class="result"><b id="correct">0/16</b>правильно</div><div class="result"><b id="bestStreak">0</b>найкраща серія</div></div>
+          <button class="cta" id="againBtn">Повторити приклади</button><button class="cta secondary" id="newBtn">Новий набір</button>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<section class="scratch hidden" id="scratch" role="dialog" aria-modal="true" aria-label="Чернетка">
+  <div class="scratch-box"><div class="scratch-head"><strong>✏️ Чернетка в клітинку</strong><div class="tools"><button class="tool active" id="pen">Олівець</button><button class="tool" id="eraser">Гумка</button><button class="tool" id="clear">Очистити</button><button class="tool" id="closeScratch">Згорнути</button></div></div><canvas id="scratchCanvas"></canvas></div>
+</section>
+
+<script>
+(()=>{
+  'use strict';
+  const $=s=>document.querySelector(s);
+  const original=[
+    ['1,2 + 0,3',1.5,'Додавання'],['2,6 + 4',6.6,'Додавання'],['0,9 + 0,6',1.5,'Додавання'],['3,2 + 0,08',3.28,'Додавання'],
+    ['5,4 − 4',1.4,'Віднімання'],['2 − 0,07',1.93,'Віднімання'],['8,3 − 0,5',7.8,'Віднімання'],['20,4 − 1,02',19.38,'Віднімання'],
+    ['0,9 · 3',2.7,'Множення'],['100 · 0,6',60,'Множення'],['0,1 · 0,87',0.087,'Множення'],['5,4 · 0,2',1.08,'Множення'],
+    ['4,8 : 8',0.6,'Ділення'],['7,2 : 0,01',720,'Ділення'],['6,3 : 0,9',7,'Ділення'],['0,24 : 0,8',0.3,'Ділення']
+  ].map(x=>({text:x[0],answer:x[1],kind:x[2]}));
+  let questions=[...original],index=0,score=0,streak=0,best=0,correct=0,lives=3,running=false,paused=false,sound=true,time=15,timerId=null,locked=false,audioCtx=null;
+  const colors=['#ef536c','#3da5d9','#37b982','#f3a72e'];
+  const positions=[{left:'4%',top:'22%'},{left:'28%',top:'5%'},{right:'28%',top:'28%'},{right:'4%',top:'8%'}];
+  const fmt=n=>{let v=Math.abs(n)<1e-10?0:+n.toFixed(3);return String(v).replace('.',',')};
+  const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  function tone(freq,dur,type='sine'){
+    if(!sound)return; try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch(e){}
+  }
+  function distractors(ans){
+    const pool=[ans*10,ans/10,ans*100,ans/100,ans+1,ans-1,ans+.1,ans-.1,Math.round(ans),-ans]
+      .map(x=>+x.toFixed(3)).filter(x=>x>=0&&Math.abs(x-ans)>.0001);
+    const out=[];shuffle(pool);for(const n of pool)if(!out.some(x=>Math.abs(x-n)<.0001)&&out.length<3)out.push(n);
+    while(out.length<3){const n=+(ans+(Math.random()*4-2)).toFixed(2);if(n>=0&&!out.includes(n)&&n!==ans)out.push(n)}return out;
+  }
+  function layout(){
+    const q=questions[index],answers=shuffle([q.answer,...distractors(q.answer)]),arena=$('#arena');arena.innerHTML='';
+    answers.forEach((a,i)=>{const b=document.createElement('button');b.className='target';b.style.setProperty('--balloon',colors[i]);Object.assign(b.style,positions[i]);b.setAttribute('aria-label','Відповідь '+fmt(a));b.innerHTML=`<span class="balloon"><span class="answer">${fmt(a)}</span></span><i class="string"></i>`;b.addEventListener('click',()=>shoot(b,a));arena.appendChild(b)});
+  }
+  function showQuestion(){
+    locked=false;const q=questions[index];$('#count').textContent=index+1;$('#round').textContent=`Раунд ${Math.floor(index/4)+1} · ${q.kind}`;$('#expression').textContent=q.text+' = ?';$('#progress').style.width=(index/questions.length*100)+'%';layout();startTimer();
+  }
+  function startTimer(){clearInterval(timerId);time=15;drawTime();timerId=setInterval(()=>{if(!running||paused)return;time-=.1;drawTime();if(time<=0){clearInterval(timerId);timeout()}},100)}
+  function drawTime(){const p=Math.max(0,time/15*100);$('#timer').style.width=p+'%';$('#timer').style.background=p<28?'#ef536c':p<55?'#f0a62e':'#38bd83'}
+  function shoot(btn,value){
+    if(locked||!running||paused)return;const q=questions[index];
+    if(Math.abs(value-q.answer)<.0001){locked=true;clearInterval(timerId);correct++;streak++;best=Math.max(best,streak);const bonus=Math.min(20,(streak-1)*2)+Math.ceil(time/3);score+=10+bonus;btn.classList.add('good');message(streak>=3?`Серія ×${streak}! +${10+bonus}`:`Влучно! +${10+bonus}`,true);tone(660,.12);setTimeout(()=>tone(880,.18),100);update();setTimeout(next,720)}
+    else{btn.classList.add('bad','missed');lives--;streak=0;score=Math.max(0,score-3);message('Повз ціль! −3',false);tone(170,.28,'sawtooth');update();if(lives<=0){locked=true;clearInterval(timerId);setTimeout(next,800)}}
+  }
+  function timeout(){if(locked)return;locked=true;lives--;streak=0;message('Час вийшов!',false);tone(150,.35);update();setTimeout(next,850)}
+  function message(t,good){const f=$('#feedback');f.textContent=t;f.style.color=good?'#fff6a4':'#ffe0e0';f.classList.remove('show');void f.offsetWidth;f.classList.add('show')}
+  function update(){$('#score').textContent=score;$('#streak').textContent=streak;$('#lives').textContent='❤️ '.repeat(lives)+'🤍 '.repeat(3-lives)}
+  function next(){if(index>=questions.length-1||lives<=0)return finish();index++;showQuestion()}
+  function finish(){running=false;clearInterval(timerId);$('#progress').style.width='100%';const pct=Math.round(correct/questions.length*100);$('#finalScore').textContent=score;$('#accuracy').textContent=pct+'%';$('#correct').textContent=`${correct}/${questions.length}`;$('#bestStreak').textContent=best;$('#finishTitle').textContent=pct>=88?'Блискуча розминка!':pct>=63?'Гарний розігрів!':'Ще одна спроба — і все вийде!';$('#medal').textContent=pct>=88?'🏆':pct>=63?'🥈':'🎯';$('#finishScreen').classList.remove('hidden');if(pct>=63)confetti()}
+  function reset(newSet=false){questions=newSet?generate():[...original];index=score=streak=best=correct=0;lives=3;update();$('#finishScreen').classList.add('hidden');running=true;showQuestion()}
+  function generate(){
+    const q=[];for(let i=0;i<4;i++){let a=(Math.floor(Math.random()*90)+10)/10,b=(Math.floor(Math.random()*90)+1)/100;q.push({text:`${fmt(a)} + ${fmt(b)}`,answer:+(a+b).toFixed(2),kind:'Додавання'})}
+    for(let i=0;i<4;i++){let a=(Math.floor(Math.random()*180)+20)/10,b=(Math.floor(Math.random()*90)+1)/100;if(b>a)[a,b]=[b,a];q.push({text:`${fmt(a)} − ${fmt(b)}`,answer:+(a-b).toFixed(2),kind:'Віднімання'})}
+    const factors=[.1,.2,.3,.5,2,3,10,100];for(let i=0;i<4;i++){let a=(Math.floor(Math.random()*90)+1)/10,b=factors[Math.floor(Math.random()*factors.length)];q.push({text:`${fmt(a)} · ${fmt(b)}`,answer:+(a*b).toFixed(3),kind:'Множення'})}
+    const divs=[.01,.1,.2,.5,.8,2,4,5,8,10];for(let i=0;i<4;i++){let b=divs[Math.floor(Math.random()*divs.length)],ans=(Math.floor(Math.random()*90)+1)/10,a=+(b*ans).toFixed(3);q.push({text:`${fmt(a)} : ${fmt(b)}`,answer:ans,kind:'Ділення'})}return q;
+  }
+  function confetti(){for(let i=0;i<55;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=colors[i%4];c.style.setProperty('--drift',(Math.random()*160-80)+'px');c.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3200)}}
+  $('#startBtn').onclick=()=>{$('#startScreen').classList.add('hidden');reset(false);tone(440,.12)};
+  $('#againBtn').onclick=()=>reset(false);$('#newBtn').onclick=()=>reset(true);
+  $('#pauseBtn').onclick=()=>{if(!running)return;paused=true;$('#pauseScreen').classList.remove('hidden')};
+  $('#resumeBtn').onclick=()=>{paused=false;$('#pauseScreen').classList.add('hidden')};
+  $('#soundBtn').onclick=()=>{sound=!sound;$('#soundBtn').textContent=sound?'🔊':'🔇';$('#soundBtn').ariaLabel=sound?'Вимкнути звук':'Увімкнути звук'};
+  // Чернетка: коректно працює мишею, пальцем і стилусом.
+  const scratch=$('#scratch'),canvas=$('#scratchCanvas'),ctx=canvas.getContext('2d');let drawing=false,eraser=false,last=null,wasPaused=false;
+  function sizeCanvas(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),old=document.createElement('canvas');old.width=canvas.width;old.height=canvas.height;old.getContext('2d').drawImage(canvas,0,0);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);ctx.lineCap=ctx.lineJoin='round';if(old.width)ctx.drawImage(old,0,0,old.width,old.height,0,0,r.width,r.height)}
+  function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+  canvas.addEventListener('pointerdown',e=>{drawing=true;last=point(e);canvas.setPointerCapture(e.pointerId);e.preventDefault()});
+  canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=point(e);ctx.globalCompositeOperation=eraser?'destination-out':'source-over';ctx.strokeStyle='#33233f';ctx.lineWidth=eraser?24:3;ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;e.preventDefault()});
+  const stop=()=>{drawing=false;last=null};canvas.addEventListener('pointerup',stop);canvas.addEventListener('pointercancel',stop);
+  $('#scratchBtn').onclick=()=>{wasPaused=paused;paused=true;scratch.classList.remove('hidden');requestAnimationFrame(sizeCanvas)};
+  $('#closeScratch').onclick=()=>{scratch.classList.add('hidden');paused=wasPaused};
+  $('#pen').onclick=()=>{eraser=false;$('#pen').classList.add('active');$('#eraser').classList.remove('active')};
+  $('#eraser').onclick=()=>{eraser=true;$('#eraser').classList.add('active');$('#pen').classList.remove('active')};
+  $('#clear').onclick=()=>ctx.clearRect(0,0,canvas.width,canvas.height);
+  window.addEventListener('resize',()=>{if(!scratch.classList.contains('hidden'))sizeCanvas()});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused){paused=true;$('#pauseScreen').classList.remove('hidden')}});
+  update();
+})();
+</script>
+</body>
+</html>
