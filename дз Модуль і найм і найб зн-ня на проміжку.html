@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ: Модуль числа та нерівності</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .title-h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .piggy-bank {
+            background-color: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .piggy-icon {
+            font-size: 2rem;
+        }
+
+        .coin-animate {
+            animation: coinBounce 0.4s ease-in-out;
+        }
+
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.15); }
+        }
+
+        .piggy-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b45309;
+            text-transform: uppercase;
+        }
+
+        .piggy-balance {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #78350f;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .task-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .task-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1d4ed8;
+        }
+
+        .task-earned {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: #fef3c7;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #fde68a;
+        }
+
+        .task-text {
+            font-weight: 600;
+            color: #334155;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        /* Двоповерховий дріб */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.95em;
+            padding: 0 0.2em;
+            line-height: 1;
+        }
+        .frac .num {
+            border-bottom: 1.5px solid currentColor;
+            padding: 0 2px 2px 2px;
+        }
+        .frac .den {
+            padding: 2px 2px 0 2px;
+        }
+        .mixed-frac {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15rem;
+        }
+
+        .grid-1 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+        @media (max-width: 640px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        .item-box {
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            justify-content: space-between;
+        }
+
+        .item-expr {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #0f172a;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        input.input-correct {
+            border-color: #10b981 !important;
+            background-color: #ecfdf5 !important;
+            color: #065f46;
+        }
+
+        input.input-wrong {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b;
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.4;
+            border: 1px solid transparent;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .feedback-wrong {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecdd3;
+        }
+
+        .btn-check {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            font-size: 0.95rem;
+        }
+
+        .btn-check:hover {
+            background-color: #1d4ed8;
+        }
+
+        .footer-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .task-summary {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* Підсумкове модальне вікно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 100000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #fcd34d;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 1.85rem;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-text {
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-prize {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #d97706;
+            background: #fffbeb;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            border: 2px solid #fde68a;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="coin-canvas"></canvas>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title-h1">ДЗ: Модуль числа та нерівності</h1>
+                <p class="subtitle">Вводь відповіді у поля та заробляй монети!</p>
+            </div>
+            
+            <div class="piggy-bank">
+                <div id="piggy-icon" class="piggy-icon">🪙</div>
+                <div>
+                    <div class="piggy-label">Скарбничка</div>
+                    <div class="piggy-balance"><span id="balance">0</span> грн</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="quiz-container"></div>
+    </div>
+
+    <!-- Підсумкове модальне вікно -->
+    <div id="final-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div style="font-size: 4rem; margin-bottom: 0.5rem;">🪙✨💰</div>
+            <h2 class="modal-title">Вітаємо!</h2>
+            <p class="modal-text">Ти завершив усі завдання тренажера!</p>
+            <div id="final-earned-text" class="modal-prize">
+                Ви заробили 0 грн!
+            </div>
+            <button onclick="closeModal()" class="btn-check" style="width: 100%;">
+                Чудово!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let totalCoins = 0;
+        const solvedItems = new Set();
+        const checkedTasks = new Set();
+
+        const tasksData = [
+            {
+                numberTitle: "№1",
+                text: "1. Знайдіть значення модуля:",
+                items: [
+                    { id: "t1_1", subText: "1) |14| = ?", placeholder: "Введіть число", reward: 1, correct: ["14"], hint: "Модуль додатного числа дорівнює самому числу." },
+                    { id: "t1_2", subText: "2) |−8| = ?", placeholder: "Введіть число", reward: 1, correct: ["8"], hint: "Модуль від’ємного числа є додатним." },
+                    { id: "t1_3", subText: "3) |0| = ?", placeholder: "Введіть число", reward: 1, correct: ["0"], hint: "Модуль нуля дорівнює нулю." },
+                    { id: "t1_4", subText: "4) |5,7| = ?", placeholder: "Введіть число", reward: 1, correct: ["5.7", "5,7"], hint: "Модуль додатного числа дорівнює самому числу." },
+                    { id: "t1_5", subText: '5) |−<span class="frac"><span class="num">3</span><span class="den">8</span></span>| = ?', placeholder: "Введіть дріб (напр. 3/8)", reward: 1, correct: ["3/8"], hint: "Модуль від’ємного дробу є додатним." },
+                    { id: "t1_6", subText: '6) |−<span class="mixed-frac">2<span class="frac"><span class="num">4</span><span class="den">9</span></span></span>| = ?', placeholder: "Введіть дріб (напр. 2 4/9)", reward: 1, correct: ["2 4/9", "2_4/9"], hint: "Запишіть мішане число через пробіл." }
+                ]
+            },
+            {
+                numberTitle: "№2",
+                text: "2. Знайди значення виразу:",
+                items: [
+                    { id: "t2_1", subText: "1) |2,7| + |−1,8| =", placeholder: "Результат", reward: 1, correct: ["4.5", "4,5"], hint: "Спочатку знайдіть модулі обох чисел, а потім виконайте додавання." },
+                    { id: "t2_2", subText: "2) |−3,9| − |−0,9| =", placeholder: "Результат", reward: 1, correct: ["3", "3.0", "3,0"], hint: "Знайдіть модулі кожного з чисел і виконайте віднімання." },
+                    { id: "t2_3", subText: "3) |−2,5| · |4,2| =", placeholder: "Результат", reward: 1, correct: ["10.5", "10,5"], hint: "Перетворіть числа на додатні та помножте їх." },
+                    { id: "t2_4", subText: "4) |7,2| : |−0,6| =", placeholder: "Результат", reward: 1, correct: ["12"], hint: "Виконайте ділення двох додатних чисел після розкриття модулів." },
+                    { id: "t2_5", subText: '5) |−<span class="frac"><span class="num">3</span><span class="den">7</span></span>| + |−<span class="frac"><span class="num">1</span><span class="den">14</span></span>| =', placeholder: "Дріб (напр. 1/2)", reward: 1, correct: ["7/14", "1/2"], hint: "Розкрийте модулі, зведіть дроби до спільного знаменника та додайте." },
+                    { id: "t2_6", subText: '6) |−<span class="frac"><span class="num">5</span><span class="den">9</span></span>| · |<span class="frac"><span class="num">3</span><span class="den">5</span></span>| =', placeholder: "Дріб (напр. 1/3)", reward: 1, correct: ["3/9", "1/3", "15/45"], hint: "Перемножте додатні дроби та за потреби скоротіть результат." }
+                ]
+            },
+            {
+                numberTitle: "№3",
+                text: "3. Знайдіть найменше ціле значення x, при якому є правильною нерівність x > −45:",
+                items: [
+                    { id: "t3_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-44"], hint: "Подумайте, яке найближче ціле число знаходиться правіше від −45 (строга нерівність)." }
+                ]
+            },
+            {
+                numberTitle: "№4",
+                text: "4. Знайдіть найбільше ціле значення x, при якому є правильною нерівність x < −92:",
+                items: [
+                    { id: "t4_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-93"], hint: "Знайдіть найближче ціле число, розташоване лівіше від −92 (строга нерівність)." }
+                ]
+            },
+            {
+                numberTitle: "№5",
+                text: "5. Знайдіть найменше значення x, при якому є правильною нерівність x ≥ −85:",
+                items: [
+                    { id: "t5_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-85"], hint: "Оскільки нерівність нестрога (≥), межа включена в розв'язок." }
+                ]
+            },
+            {
+                numberTitle: "№6",
+                text: "6. Знайдіть найбільше ціле значення x, при якому є правильною нерівність x ≤ −4,08:",
+                items: [
+                    { id: "t6_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-5"], hint: "Округліть число до найближчого цілого у меншу (ліву) сторону." }
+                ]
+            },
+            {
+                numberTitle: "№7",
+                text: "7. Знайдіть найменше значення x, при якому є правильною нерівність x ≥ −3,4:",
+                items: [
+                    { id: "t7_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-3.4", "-3,4"], hint: "Зверніть увагу, що при нестрогій нерівності (≥) число може дорівнювати межі." }
+                ]
+            },
+            {
+                numberTitle: "№8",
+                text: "8. Знайдіть найбільше значення x, при якому є правильною нерівність x ≤ −7,8:",
+                items: [
+                    { id: "t8_1", subText: "x =", placeholder: "Введіть x", reward: 1, correct: ["-7.8", "-7,8"], hint: "Зверніть увагу, що при нестрогій нерівності (≤) число може дорівнювати межі." }
+                ]
+            },
+            {
+                numberTitle: "№9",
+                text: "9. Скільки цілих значень x задовольняють нерівність −12 < x < 3?",
+                items: [
+                    { id: "t9_1", subText: "Кількість цілих чисел =", placeholder: "Введіть кількість", reward: 2, correct: ["14"], hint: "Порахуйте кількість цілих чисел, не включаючи самі межі −12 та 3." }
+                ]
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            
+            tasksData.forEach((task, tIndex) => {
+                const taskCard = document.createElement('div');
+                taskCard.className = "task-card";
+                
+                let maxTaskReward = task.items.reduce((sum, item) => sum + item.reward, 0);
+                
+                let gridClass = 'grid-3';
+                if (task.items.length === 1) {
+                    gridClass = 'grid-1';
+                } else if (task.items.length % 2 === 0) {
+                    gridClass = 'grid-2';
+                }
+
+                let itemsHTML = '';
+                task.items.forEach((item) => {
+                    itemsHTML += `
+                        <div class="item-box">
+                            <div class="item-expr">${item.subText}</div>
+                            <input type="text" id="input_${item.id}" placeholder="${item.placeholder}">
+                            <div id="feedback_${item.id}" class="feedback-box"></div>
+                        </div>
+                    `;
+                });
+
+                taskCard.innerHTML = `
+                    <div class="task-header">
+                        <h2 class="task-num">${task.numberTitle}</h2>
+                        <div id="task_earned_${tIndex}" class="task-earned">
+                            Зароблено: 0 грн із ${maxTaskReward} грн
+                        </div>
+                    </div>
+                    <p class="task-text">${task.text}</p>
+                    <div class="${gridClass}">${itemsHTML}</div>
+                    <div class="footer-action">
+                        <button onclick="checkTask(${tIndex})" class="btn-check">
+                            Перевірити ${task.numberTitle}
+                        </button>
+                        <div id="task_summary_${tIndex}" class="task-summary"></div>
+                    </div>
+                `;
+                
+                container.appendChild(taskCard);
+            });
+        }
+
+        function addMoney(amount) {
+            totalCoins += amount;
+            const balanceEl = document.getElementById('balance');
+            const piggyIcon = document.getElementById('piggy-icon');
+            
+            balanceEl.textContent = totalCoins;
+            piggyIcon.classList.remove('coin-animate');
+            void piggyIcon.offsetWidth; 
+            piggyIcon.classList.add('coin-animate');
+        }
+
+        function normalizeStr(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, '').replace(/,/g, '.');
+        }
+
+        function checkTask(taskIndex) {
+            const task = tasksData[taskIndex];
+            let correctCount = 0;
+            let newlyEarned = false;
+
+            task.items.forEach((item) => {
+                const feedbackEl = document.getElementById(`feedback_${item.id}`);
+                const inputEl = document.getElementById(`input_${item.id}`);
+
+                let userVal = inputEl ? inputEl.value : "";
+                const normalizedUser = normalizeStr(userVal);
+                let isCorrect = item.correct.some(ans => normalizeStr(ans) === normalizedUser);
+
+                feedbackEl.className = "feedback-box show";
+                inputEl.classList.remove('input-correct', 'input-wrong');
+
+                if (isCorrect && normalizedUser !== "") {
+                    correctCount++;
+                    inputEl.classList.add('input-correct');
+                    if (!solvedItems.has(item.id)) {
+                        solvedItems.add(item.id);
+                        addMoney(item.reward);
+                        newlyEarned = true;
+                    }
+                    feedbackEl.classList.remove('feedback-wrong');
+                    feedbackEl.classList.add('feedback-correct');
+                    feedbackEl.innerHTML = `<strong>✓ Правильно! (+${item.reward} грн)</strong>`;
+                } else {
+                    inputEl.classList.add('input-wrong');
+                    feedbackEl.classList.remove('feedback-correct');
+                    feedbackEl.classList.add('feedback-wrong');
+                    feedbackEl.innerHTML = `<strong style="display:block; margin-bottom:0.25rem;">✗ Неправильно.</strong> Підказка: ${item.hint}`;
+                }
+            });
+
+            checkedTasks.add(taskIndex);
+
+            let taskEarnedCoins = task.items
+                .filter(item => solvedItems.has(item.id))
+                .reduce((sum, item) => sum + item.reward, 0);
+
+            let maxTaskReward = task.items.reduce((sum, item) => sum + item.reward, 0);
+
+            const taskEarnedEl = document.getElementById(`task_earned_${taskIndex}`);
+            taskEarnedEl.textContent = `Зароблено: ${taskEarnedCoins} грн із ${maxTaskReward} грн`;
+
+            const summaryEl = document.getElementById(`task_summary_${taskIndex}`);
+            if (correctCount === task.items.length) {
+                summaryEl.style.color = "#059669";
+                summaryEl.textContent = `Усі приклади номера розв'язано правильно! 🪙`;
+                triggerCoinsRain(); 
+            } else {
+                summaryEl.style.color = "#d97706";
+                summaryEl.textContent = `Правильно: ${correctCount} з ${task.items.length}. Переглянь підказки!`;
+                if (newlyEarned) {
+                    triggerCoinsRain();
+                }
+            }
+
+            if (checkedTasks.size === tasksData.length) {
+                setTimeout(() => {
+                    document.getElementById('final-earned-text').textContent = `Ви заробили ${totalCoins} грн!`;
+                    document.getElementById('final-modal').classList.remove('hidden');
+                    triggerCoinsRain();
+                }, 500);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('final-modal').classList.add('hidden');
+        }
+
+        /* ----- АНІМАЦІЯ ТІЛЬКИ ДОЩУ З МОНЕТ ----- */
+        const coinCanvas = document.getElementById('coin-canvas');
+        const coinCtx = coinCanvas.getContext('2d');
+        let coins = [];
+        let animationFrameId = null;
+
+        function resizeCoinCanvas() {
+            coinCanvas.width = window.innerWidth;
+            coinCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCoinCanvas);
+        resizeCoinCanvas();
+
+        class Coin {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 12 + Math.random() * 8;
+                this.speedY = 3 + Math.random() * 5;
+                this.speedX = (Math.random() - 0.5) * 3;
+                this.rotationSpeed = 0.05 + Math.random() * 0.1;
+                this.scaleY = 1;
+                this.angle = Math.random() * Math.PI;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.rotationSpeed;
+                this.scaleY = Math.cos(this.angle);
+            }
+
+            draw() {
+                coinCtx.save();
+                coinCtx.translate(this.x, this.y);
+                coinCtx.scale(1, this.scaleY);
+                
+                coinCtx.beginPath();
+                coinCtx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                coinCtx.fillStyle = '#f59e0b';
+                coinCtx.fill();
+                
+                coinCtx.beginPath();
+                coinCtx.arc(0, 0, this.radius * 0.8, 0, Math.PI * 2);
+                coinCtx.fillStyle = '#fbbf24';
+                coinCtx.fill();
+                
+                coinCtx.lineWidth = 1.5;
+                coinCtx.strokeStyle = '#d97706';
+                coinCtx.stroke();
+                
+                coinCtx.fillStyle = '#92400e';
+                coinCtx.font = `bold ${this.radius * 0.9}px sans-serif`;
+                coinCtx.textAlign = 'center';
+                coinCtx.textBaseline = 'middle';
+                coinCtx.fillText('₴', 0, 1);
+                
+                coinCtx.restore();
+            }
+        }
+
+        function triggerCoinsRain() {
+            coins = [];
+            
+            for (let i = 0; i < 80; i++) {
+                let c = new Coin(Math.random() * coinCanvas.width, -20 - Math.random() * 250);
+                coins.push(c);
+            }
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                coinCtx.clearRect(0, 0, coinCanvas.width, coinCanvas.height);
+                let activeCoins = 0;
+
+                coins.forEach(c => {
+                    c.update();
+                    c.draw();
+                    if (c.y < coinCanvas.height + 30) {
+                        activeCoins++;
+                    }
+                });
+
+                if (activeCoins > 0) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    coinCtx.clearRect(0, 0, coinCanvas.width, coinCanvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
