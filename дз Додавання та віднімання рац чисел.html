@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Додавання та віднімання раціональних чисел</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .piggy-bank {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: #fff;
+            border: 2px solid #f59e0b;
+            padding: 10px 18px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 18px;
+            color: #d97706;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 26px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Двоповерхові дроби */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+        .frac .num {
+            border-bottom: 1.5px solid currentColor;
+            padding-bottom: 2px;
+        }
+        .frac .den {
+            padding-top: 2px;
+        }
+
+        .grid-even {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 650px) {
+            .grid-even {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #fff;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .sub-item label {
+            font-size: 16px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 140px;
+            outline: none;
+            background-color: #fff;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #f0fdf4;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #fef2f2;
+            color: var(--incorrect);
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--incorrect);
+            display: none;
+            font-weight: 500;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 450px;
+            width: 90%;
+            border: 3px solid #f59e0b;
+        }
+
+        .modal-card h2 {
+            color: #1e40af;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .modal-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d97706;
+            margin-bottom: 15px;
+        }
+
+        .modal-stats {
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 25px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="piggy-bank">
+    🪙 Скарбничка: <span id="coins-count">0</span> грн
+</div>
+
+<canvas id="coin-canvas"></canvas>
+
+<div class="container">
+    <h1>Дз Додавання та віднімання раціональних чисел</h1>
+
+    <!-- Блок 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">Виконай додавання:</div>
+        <div class="grid-even">
+            <div class="sub-item"><label>1) −3 + (−8) =</label> <input type="text" id="t1-1"></div>
+            <div class="sub-item"><label>2) −5 + (−12) =</label> <input type="text" id="t1-2"></div>
+            <div class="sub-item"><label>3) 9 + (−17) =</label> <input type="text" id="t1-3"></div>
+            <div class="sub-item"><label>4) −4 + 15 =</label> <input type="text" id="t1-4"></div>
+            <div class="sub-item"><label>5) 30 + (−7) =</label> <input type="text" id="t1-5"></div>
+            <div class="sub-item"><label>6) −18 + 14 =</label> <input type="text" id="t1-6"></div>
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити завдання 1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Блок 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">Виконай віднімання:</div>
+        <div class="grid-even">
+            <div class="sub-item"><label>1) 2 − 9 =</label> <input type="text" id="t2-1"></div>
+            <div class="sub-item"><label>2) 32 − 50 =</label> <input type="text" id="t2-2"></div>
+            <div class="sub-item"><label>3) 18 − (−42) =</label> <input type="text" id="t2-3"></div>
+            <div class="sub-item"><label>4) −7 − 15 =</label> <input type="text" id="t2-4"></div>
+            <div class="sub-item"><label>5) −28 − 31 =</label> <input type="text" id="t2-5"></div>
+            <div class="sub-item"><label>6) −24 − (−60) =</label> <input type="text" id="t2-6"></div>
+        </div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити завдання 2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Блок 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">Обчисли:</div>
+        <div class="grid-even">
+            <div class="sub-item">
+                <label>1) −<div class="frac"><span class="num">1</span><span class="den">4</span></div> + (−<div class="frac"><span class="num">1</span><span class="den">4</span></div>) =</label> 
+                <input type="text" id="t3-1">
+            </div>
+            <div class="sub-item">
+                <label>2) −3 + <div class="frac"><span class="num">4</span><span class="den">5</span></div> =</label> 
+                <input type="text" id="t3-2">
+            </div>
+            <div class="sub-item">
+                <label>3) −<div class="frac"><span class="num">1</span><span class="den">9</span></div> − (−1<div class="frac"><span class="num">1</span><span class="den">9</span></div>) =</label> 
+                <input type="text" id="t3-3">
+            </div>
+            <div class="sub-item">
+                <label>4) 1<div class="frac"><span class="num">1</span><span class="den">5</span></div> + (−<div class="frac"><span class="num">1</span><span class="den">5</span></div>) =</label> 
+                <input type="text" id="t3-4">
+            </div>
+            <div class="sub-item">
+                <label>5) −<div class="frac"><span class="num">1</span><span class="den">4</span></div> − <div class="frac"><span class="num">3</span><span class="den">4</span></div> =</label> 
+                <input type="text" id="t3-5">
+            </div>
+            <div class="sub-item">
+                <label>6) <div class="frac"><span class="num">5</span><span class="den">9</span></div> − (−1<div class="frac"><span class="num">4</span><span class="den">9</span></div>) =</label> 
+                <input type="text" id="t3-6">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask3()">Перевірити завдання 3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+</div>
+
+<!-- Фінальне модальне вікно -->
+<div class="modal-overlay" id="final-modal">
+    <div class="modal-card">
+        <h2>Тест завершено! 🎉</h2>
+        <p id="final-score-text">Твій заробіток: 0 грн</p>
+        <div class="modal-stats" id="final-stats-text"></div>
+        <button class="check-btn" onclick="location.reload()">Пройти ще раз</button>
+    </div>
+</div>
+
+<script>
+    const REWARD_PER_EXAMPLE = 1.0;
+    const TOTAL_EXAMPLES_COUNT = 18;
+
+    let totalCoins = 0;
+    let totalCorrectExamples = 0;
+    const completedTasks = new Set();
+    const taskScores = {};
+
+    function updateCoins(taskNum, correctCountInTask) {
+        if (!taskScores[taskNum]) {
+            taskScores[taskNum] = 0;
+        }
+        
+        totalCorrectExamples = totalCorrectExamples - taskScores[taskNum] + correctCountInTask;
+        taskScores[taskNum] = correctCountInTask;
+        
+        totalCoins = totalCorrectExamples * REWARD_PER_EXAMPLE;
+        document.getElementById('coins-count').innerText = totalCoins;
+
+        completedTasks.add(taskNum);
+
+        if (correctCountInTask > 0) {
+            triggerCoinSalute();
+        }
+
+        checkAllCompleted();
+    }
+
+    function checkAllCompleted() {
+        if (completedTasks.size === 3) {
+            setTimeout(() => {
+                document.getElementById('final-score-text').innerText = `Ви заробили: ${totalCoins} грн`;
+                document.getElementById('final-stats-text').innerText = `Правильних відповідей: ${totalCorrectExamples} з ${TOTAL_EXAMPLES_COUNT}`;
+                document.getElementById('final-modal').style.display = 'flex';
+                triggerCoinSalute(4000);
+            }, 500);
+        }
+    }
+
+    function norm(str) {
+        if (!str) return '';
+        return str.toString().trim().toLowerCase().replace(/\s+/g, ' ').replace(/\./g, ',');
+    }
+
+    function setFieldState(id, isCorrect) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('correct', 'incorrect');
+        if (isCorrect) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('incorrect');
+        }
+    }
+
+    function showFeedback(taskNum, msg) {
+        const fb = document.getElementById(`fb-${taskNum}`);
+        if (msg) {
+            fb.innerText = msg;
+            fb.style.display = 'block';
+        } else {
+            fb.style.display = 'none';
+        }
+    }
+
+    /* ПЕРЕВІРКИ */
+
+    function checkTask1() {
+        const answers = {
+            't1-1': ['-11'],
+            't1-2': ['-17'],
+            't1-3': ['-8'],
+            't1-4': ['11'],
+            't1-5': ['23'],
+            't1-6': ['-4']
+        };
+
+        let correctCount = 0;
+        let errors = [];
+
+        Object.keys(answers).forEach((id, idx) => {
+            const val = norm(document.getElementById(id).value);
+            const isOk = answers[id].includes(val);
+            setFieldState(id, isOk);
+            if (isOk) correctCount++;
+            else errors.push(idx + 1);
+        });
+
+        if (errors.length > 0) {
+            showFeedback(1, `Помилка у прикладах №: ${errors.join(', ')}. При додаванні чисел з однаковими знаками додаємо модулі та ставимо їхній спільний знак; з різними — від більшого модуля віднімаємо менший.`);
+        } else {
+            showFeedback(1, '');
+        }
+        updateCoins(1, correctCount);
+    }
+
+    function checkTask2() {
+        const answers = {
+            't2-1': ['-7'],
+            't2-2': ['-18'],
+            't2-3': ['60'],
+            't2-4': ['-22'],
+            't2-5': ['-59'],
+            't2-6': ['36']
+        };
+
+        let correctCount = 0;
+        let errors = [];
+
+        Object.keys(answers).forEach((id, idx) => {
+            const val = norm(document.getElementById(id).value);
+            const isOk = answers[id].includes(val);
+            setFieldState(id, isOk);
+            if (isOk) correctCount++;
+            else errors.push(idx + 1);
+        });
+
+        if (errors.length > 0) {
+            showFeedback(2, `Помилка у прикладах №: ${errors.join(', ')}. Пам'ятайте: віднімання можна замінити додаванням протилежного числа (a − (−b) = a + b).`);
+        } else {
+            showFeedback(2, '');
+        }
+        updateCoins(2, correctCount);
+    }
+
+    function checkTask3() {
+        const answers = {
+            't3-1': ['-2/4', '-1/2', '-0,5'],
+            't3-2': ['-2 1/5', '-11/5', '-2,2'],
+            't3-3': ['1', '9/9'],
+            't3-4': ['1', '5/5'],
+            't3-5': ['-1', '-4/4'],
+            't3-6': ['2', '1 9/9', '18/9']
+        };
+
+        let correctCount = 0;
+        let errors = [];
+
+        Object.keys(answers).forEach((id, idx) => {
+            const val = norm(document.getElementById(id).value);
+            const isOk = answers[id].includes(val);
+            setFieldState(id, isOk);
+            if (isOk) correctCount++;
+            else errors.push(idx + 1);
+        });
+
+        if (errors.length > 0) {
+            showFeedback(3, `Помилка у прикладах №: ${errors.join(', ')}. Зверніть увагу на знаки та скорочення дробів.`);
+        } else {
+            showFeedback(3, '');
+        }
+        updateCoins(3, correctCount);
+    }
+
+    /* АНІМАЦІЯ МОНЕТ */
+    function triggerCoinSalute(duration = 2000) {
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const coins = [];
+        const coinCount = 50;
+
+        for (let i = 0; i < coinCount; i++) {
+            const startX = Math.random() < 0.5 ? canvas.width * 0.3 : canvas.width * 0.7;
+            coins.push({
+                x: startX + (Math.random() * 100 - 50),
+                y: canvas.height + 20,
+                size: 12 + Math.random() * 10,
+                speedY: -(12 + Math.random() * 12),
+                speedX: -8 + Math.random() * 16,
+                gravity: 0.3,
+                rot: Math.random() * 360,
+                rotSpeed: -8 + Math.random() * 16
+            });
+        }
+
+        let startTime = Date.now();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            coins.forEach(c => {
+                c.x += c.speedX;
+                c.y += c.speedY;
+                c.speedY += c.gravity;
+                c.rot += c.rotSpeed;
+
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate((c.rot * Math.PI) / 180);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, c.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${c.size}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            });
+
+            if (Date.now() - startTime < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        animate();
+    }
+</script>
+
+</body>
+</html>
