@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Степені</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .piggy-bank {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: #fff;
+            border: 2px solid #f59e0b;
+            padding: 10px 18px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 18px;
+            color: #d97706;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 26px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Двоповерхові дроби */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+        .frac .num {
+            border-bottom: 1.5px solid currentColor;
+            padding-bottom: 2px;
+        }
+        .frac .den {
+            padding-top: 2px;
+        }
+
+        .grid-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #fff;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .sub-item label {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+            background-color: #fff;
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%;
+            max-width: 140px;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct);
+            background-color: #f0fdf4;
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect);
+            background-color: #fef2f2;
+            color: var(--incorrect);
+        }
+
+        /* СТИЛІ ТАБЛИЦІ ВАРІАНТІВ ВІДПОВІДЕЙ */
+        .options-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .options-table th, .options-table td {
+            border: 1px solid var(--border);
+            text-align: center;
+            padding: 10px;
+            width: 20%;
+        }
+
+        .options-table th {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            color: #334155;
+            font-size: 16px;
+        }
+
+        .options-table td {
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .options-table td:hover {
+            background-color: #e2e8f0;
+        }
+
+        .options-table td.selected {
+            background-color: #dbeafe;
+            border-color: var(--primary);
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .options-table td.correct {
+            background-color: #dcfce7 !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        .options-table td.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: var(--incorrect) !important;
+            color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--incorrect);
+            display: none;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        #coin-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 450px;
+            width: 90%;
+            border: 3px solid #f59e0b;
+        }
+
+        .modal-card h2 {
+            color: #1e40af;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .modal-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d97706;
+            margin-bottom: 15px;
+        }
+
+        .modal-stats {
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="piggy-bank">
+    🪙 Скарбничка: <span id="coins-count">0</span> грн
+</div>
+
+<canvas id="coin-canvas"></canvas>
+
+<div class="container">
+    <h1>Дз Степені</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-num">Завдання 1</div>
+        <div class="task-text">Обчисліть:</div>
+        <div class="grid-single">
+            <div class="sub-item">
+                <label>1) 7<sup>−2</sup> =</label>
+                <input type="text" id="t1-1">
+            </div>
+            <div class="sub-item">
+                <label>2) (−2)<sup>−2</sup> =</label>
+                <input type="text" id="t1-2">
+            </div>
+            <div class="sub-item">
+                <label>3) (−<div class="frac"><span class="num">2</span><span class="den">3</span></div>)<sup>−1</sup> =</label>
+                <input type="text" id="t1-8">
+            </div>
+            <div class="sub-item">
+                <label>4) (−2<div class="frac"><span class="num">1</span><span class="den">5</span></div>)<sup>−1</sup> =</label>
+                <input type="text" id="t1-12">
+            </div>
+            <div class="sub-item">
+                <label>5) (−0,2)<sup>−2</sup> =</label>
+                <input type="text" id="t1-14">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити завдання 1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-num">Завдання 2</div>
+        <div class="task-text">Якщо 2<sup>α</sup> = 3, то 4<sup>α + 1</sup> =</div>
+        <table class="options-table" id="table-t2">
+            <thead>
+                <tr>
+                    <th>А</th>
+                    <th>Б</th>
+                    <th>В</th>
+                    <th>Г</th>
+                    <th>Д</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t2', 'A', this)">12</td>
+                    <td onclick="selectOption('t2', 'B', this)">13</td>
+                    <td onclick="selectOption('t2', 'V', this)">18</td>
+                    <td onclick="selectOption('t2', 'G', this)">36</td>
+                    <td onclick="selectOption('t2', 'D', this)">64</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask2()">Перевірити завдання 2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-num">Завдання 3</div>
+        <div class="task-text">Обчисліть: <div class="frac"><span class="num">3<sup>5</sup> · 5<sup>4</sup></span><span class="den">15<sup>3</sup></span></div></div>
+        <table class="options-table" id="table-t3">
+            <thead>
+                <tr>
+                    <th>А</th>
+                    <th>Б</th>
+                    <th>В</th>
+                    <th>Г</th>
+                    <th>Д</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t3', 'A', this)">9</td>
+                    <td onclick="selectOption('t3', 'B', this)">15</td>
+                    <td onclick="selectOption('t3', 'V', this)">45</td>
+                    <td onclick="selectOption('t3', 'G', this)">75</td>
+                    <td onclick="selectOption('t3', 'D', this)">225</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask3()">Перевірити завдання 3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="task-4">
+        <div class="task-num">Завдання 4</div>
+        <div class="task-text">Спростіть вираз (−4a<sup>2</sup>b<sup>3</sup>)<sup>2</sup> · (−ab<sup>3</sup>)<sup>2</sup></div>
+        <table class="options-table" id="table-t4">
+            <thead>
+                <tr>
+                    <th>А</th>
+                    <th>Б</th>
+                    <th>В</th>
+                    <th>Г</th>
+                    <th>Д</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t4', 'A', this)">16a<sup>6</sup>b<sup>8</sup></td>
+                    <td onclick="selectOption('t4', 'B', this)">16a<sup>6</sup>b<sup>12</sup></td>
+                    <td onclick="selectOption('t4', 'V', this)">4a<sup>6</sup>b<sup>12</sup></td>
+                    <td onclick="selectOption('t4', 'G', this)">4a<sup>6</sup>b<sup>10</sup></td>
+                    <td onclick="selectOption('t4', 'D', this)">інша відповідь</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask4()">Перевірити завдання 4</button>
+        <div class="feedback" id="fb-4"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card" id="task-5">
+        <div class="task-num">Завдання 5</div>
+        <div class="task-text">Розташуйте числа у порядку зростання: 2<sup>30</sup>, 3<sup>20</sup>, 7<sup>10</sup></div>
+        <table class="options-table" id="table-t5">
+            <thead>
+                <tr>
+                    <th>А</th>
+                    <th>Б</th>
+                    <th>В</th>
+                    <th>Г</th>
+                    <th>Д</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t5', 'A', this)">7<sup>10</sup>, 2<sup>30</sup>, 3<sup>20</sup></td>
+                    <td onclick="selectOption('t5', 'B', this)">7<sup>10</sup>, 3<sup>20</sup>, 2<sup>30</sup></td>
+                    <td onclick="selectOption('t5', 'V', this)">2<sup>30</sup>, 3<sup>20</sup>, 7<sup>10</sup></td>
+                    <td onclick="selectOption('t5', 'G', this)">2<sup>30</sup>, 7<sup>10</sup>, 3<sup>20</sup></td>
+                    <td onclick="selectOption('t5', 'D', this)">3<sup>20</sup>, 2<sup>30</sup>, 7<sup>10</sup></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask5()">Перевірити завдання 5</button>
+        <div class="feedback" id="fb-5"></div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card" id="task-6">
+        <div class="task-num">Завдання 6</div>
+        <div class="task-text">Подайте одночлен у стандартному вигляді: 4,4(a<sup>2</sup>bc)<sup>3</sup> · (−<div class="frac"><span class="num">1</span><span class="den">2</span></div>b<sup>2</sup>c)<sup>2</sup> · ac<sup>2</sup></div>
+        <table class="options-table" id="table-t6">
+            <thead>
+                <tr>
+                    <th>А</th>
+                    <th>Б</th>
+                    <th>В</th>
+                    <th>Г</th>
+                    <th>Д</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t6', 'A', this)">1,1a<sup>7</sup>b<sup>7</sup>c<sup>7</sup></td>
+                    <td onclick="selectOption('t6', 'B', this)">1,1a<sup>6</sup>b<sup>6</sup>c<sup>6</sup></td>
+                    <td onclick="selectOption('t6', 'V', this)">−1,1a<sup>7</sup>b<sup>6</sup>c<sup>6</sup></td>
+                    <td onclick="selectOption('t6', 'G', this)">0,1a<sup>7</sup>b<sup>7</sup>c<sup>7</sup></td>
+                    <td onclick="selectOption('t6', 'D', this)">інша відповідь</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask6()">Перевірити завдання 6</button>
+        <div class="feedback" id="fb-6"></div>
+    </div>
+
+</div>
+
+<!-- Фінальне модальне вікно -->
+<div class="modal-overlay" id="final-modal">
+    <div class="modal-card">
+        <h2>Тест завершено! 🎉</h2>
+        <p id="final-score-text">Твій заробіток: 0 грн</p>
+        <div class="modal-stats" id="final-stats-text"></div>
+        <div class="modal-actions">
+            <button class="check-btn btn-secondary" onclick="reviewAnswers()">Подивитись свої відповіді</button>
+            <button class="check-btn" onclick="location.reload()">Пройти ще раз</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const REWARD_PER_EXAMPLE = 1.0;
+    const TOTAL_EXAMPLES_COUNT = 10;
+
+    let totalCoins = 0;
+    let totalCorrectExamples = 0;
+    const completedTasks = new Set();
+    const taskScores = {};
+    const selectedOptions = {};
+
+    function selectOption(taskId, value, element) {
+        selectedOptions[taskId] = {
+            value: value,
+            element: element
+        };
+        const table = document.getElementById(`table-${taskId}`);
+        const cells = table.querySelectorAll('td');
+        cells.forEach(cell => cell.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function setTableState(taskId, correctValue) {
+        const selected = selectedOptions[taskId];
+        const table = document.getElementById(`table-${taskId}`);
+        const cells = table.querySelectorAll('td');
+        
+        cells.forEach(cell => cell.classList.remove('correct', 'incorrect'));
+
+        if (selected) {
+            if (selected.value === correctValue) {
+                selected.element.classList.add('correct');
+            } else {
+                selected.element.classList.add('incorrect');
+            }
+        }
+    }
+
+    function updateCoins(taskNum, correctCountInTask) {
+        if (!taskScores[taskNum]) {
+            taskScores[taskNum] = 0;
+        }
+        
+        const newCorrectInTask = correctCountInTask - taskScores[taskNum];
+        totalCorrectExamples = totalCorrectExamples - taskScores[taskNum] + correctCountInTask;
+        taskScores[taskNum] = correctCountInTask;
+        
+        totalCoins = totalCorrectExamples * REWARD_PER_EXAMPLE;
+        document.getElementById('coins-count').innerText = totalCoins;
+
+        completedTasks.add(taskNum);
+
+        if (newCorrectInTask > 0) {
+            triggerCoinSalute();
+        }
+
+        checkAllCompleted();
+    }
+
+    function checkAllCompleted() {
+        if (completedTasks.size === 6) {
+            setTimeout(() => {
+                document.getElementById('final-score-text').innerText = `Ви заробили: ${totalCoins} грн`;
+                document.getElementById('final-stats-text').innerText = `Правильних відповідей: ${totalCorrectExamples} з ${TOTAL_EXAMPLES_COUNT}`;
+                document.getElementById('final-modal').style.display = 'flex';
+                triggerCoinSalute(4000);
+            }, 500);
+        }
+    }
+
+    function reviewAnswers() {
+        document.getElementById('final-modal').style.display = 'none';
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    function norm(str) {
+        if (!str) return '';
+        return str.toString().trim().toLowerCase().replace(/\s+/g, '').replace(/\./g, ',');
+    }
+
+    function setFieldState(id, isCorrect) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('correct', 'incorrect');
+        if (isCorrect) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('incorrect');
+        }
+    }
+
+    function showFeedback(taskNum, msg) {
+        const fb = document.getElementById(`fb-${taskNum}`);
+        if (msg) {
+            fb.innerText = msg;
+            fb.style.display = 'block';
+        } else {
+            fb.style.display = 'none';
+        }
+    }
+
+    /* ПЕРЕВІРКИ */
+
+    function checkTask1() {
+        const answers = {
+            't1-1': ['1/49'],
+            't1-2': ['1/4', '0,25'],
+            't1-8': ['-3/2', '-1 1/2', '-1,5'],
+            't1-12': ['-5/11'],
+            't1-14': ['25']
+        };
+
+        let correctCount = 0;
+        let errors = [];
+
+        Object.keys(answers).forEach((id, idx) => {
+            const val = norm(document.getElementById(id).value);
+            const isOk = answers[id].includes(val);
+            setFieldState(id, isOk);
+            if (isOk) correctCount++;
+            else errors.push(idx + 1);
+        });
+
+        if (errors.length > 0) {
+            showFeedback(1, `Помилка у прикладах №: ${errors.join(', ')}. Скористайтеся означенням степеня з від'ємним цілим показником: a⁻ⁿ = 1 / aⁿ, та перетворіть мішані або десяткові дроби у звичайні перед піднесенням до степеня.`);
+        } else {
+            showFeedback(1, '');
+        }
+        updateCoins(1, correctCount);
+    }
+
+    function checkTask2() {
+        const selected = selectedOptions['t2'];
+        const isOk = selected && (selected.value === 'G');
+        setTableState('t2', 'G');
+
+        if (!isOk) {
+            showFeedback(2, 'Скористайтеся властивостями степеня: 4ᵃ⁺¹ = 4ᵃ · 4¹ = (2²)ᵃ · 4 = (2ᵃ)² · 4.');
+        } else {
+            showFeedback(2, '');
+        }
+        updateCoins(2, isOk ? 1 : 0);
+    }
+
+    function checkTask3() {
+        const selected = selectedOptions['t3'];
+        const isOk = selected && (selected.value === 'V');
+        setTableState('t3', 'V');
+
+        if (!isOk) {
+            showFeedback(3, 'Розкладіть знаменник: 15³ = (3 · 5)³ = 3³ · 5³, після чого застосуйте правило ділення степенів з однаковими основами (aᵐ : aⁿ = aᵐ⁻ⁿ).');
+        } else {
+            showFeedback(3, '');
+        }
+        updateCoins(3, isOk ? 1 : 0);
+    }
+
+    function checkTask4() {
+        const selected = selectedOptions['t4'];
+        const isOk = selected && (selected.value === 'B');
+        setTableState('t4', 'B');
+
+        if (!isOk) {
+            showFeedback(4, 'Спочатку піднесіть кожен множник у дужках до квадрата: (a · b)ⁿ = aⁿ · bⁿ та (aᵐ)ⁿ = aᵐⁿ. Зверніть увагу, що від’ємні числа у парному степені стають додатними. Потім перемножте отримані одночлени.');
+        } else {
+            showFeedback(4, '');
+        }
+        updateCoins(4, isOk ? 1 : 0);
+    }
+
+    function checkTask5() {
+        const selected = selectedOptions['t5'];
+        const isOk = selected && (selected.value === 'A');
+        setTableState('t5', 'A');
+
+        if (!isOk) {
+            showFeedback(5, 'Зведіть усі степені до однакового показника 10, використовуючи властивість aᵐⁿ = (aᵐ)ⁿ: 2³⁰ = (2³)¹⁰, 3²⁰ = (3²)¹⁰, 7¹⁰ = 7¹⁰, після чого порівняйте їхні основи.');
+        } else {
+            showFeedback(5, '');
+        }
+        updateCoins(5, isOk ? 1 : 0);
+    }
+
+    function checkTask6() {
+        const selected = selectedOptions['t6'];
+        const isOk = selected && (selected.value === 'A');
+        setTableState('t6', 'A');
+
+        if (!isOk) {
+            showFeedback(6, 'Розкрийте дужки, піднісши множники до відповідних степенів: (a²bc)³ = a⁶b³c³, (−1/2 b²c)² = 1/4 b⁴c². Після цього перемножте числові коефіцієнти та додайте показники степенів однакових змінних.');
+        } else {
+            showFeedback(6, '');
+        }
+        updateCoins(6, isOk ? 1 : 0);
+    }
+
+    /* АНІМАЦІЯ МОНЕТ */
+    function triggerCoinSalute(duration = 2000) {
+        const canvas = document.getElementById('coin-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const coins = [];
+        const coinCount = 50;
+
+        for (let i = 0; i < coinCount; i++) {
+            const startX = Math.random() < 0.5 ? canvas.width * 0.3 : canvas.width * 0.7;
+            coins.push({
+                x: startX + (Math.random() * 100 - 50),
+                y: canvas.height + 20,
+                size: 12 + Math.random() * 10,
+                speedY: -(12 + Math.random() * 12),
+                speedX: -8 + Math.random() * 16,
+                gravity: 0.3,
+                rot: Math.random() * 360,
+                rotSpeed: -8 + Math.random() * 16
+            });
+        }
+
+        let startTime = Date.now();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            coins.forEach(c => {
+                c.x += c.speedX;
+                c.y += c.speedY;
+                c.speedY += c.gravity;
+                c.rot += c.rotSpeed;
+
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate((c.rot * Math.PI) / 180);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, c.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${c.size}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('₴', 0, 1);
+
+                ctx.restore();
+            });
+
+            if (Date.now() - startTime < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        animate();
+    }
+</script>
+
+</body>
+</html>
