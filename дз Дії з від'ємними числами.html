@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Дії з від'ємними числами</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --incorrect: #dc2626;
+            --incorrect-bg: #fee2e2;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .task-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* Сітка 3 у рядок */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .example-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 16px;
+        }
+
+        .example-label {
+            font-weight: 600;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .example-label i {
+            font-style: italic;
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        /* Двоповерхові дроби */
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 2px;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+
+        .math-num {
+            border-bottom: 1.5px solid var(--text);
+            padding-bottom: 1px;
+        }
+
+        .math-den {
+            padding-top: 1px;
+        }
+
+        input[type="text"] {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct) !important;
+            background-color: var(--correct-bg) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .feedback.error {
+            background-color: #fef2f2;
+            color: var(--incorrect);
+            border: 1px solid #fca5a5;
+        }
+
+        .feedback.success {
+            background-color: #f0fdf4;
+            color: var(--correct);
+            border: 1px solid #86efac;
+        }
+
+        /* Canvas для салюту */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="fireworks-canvas"></canvas>
+
+<div class="container">
+    <h1>Тренажер: Дії з від'ємними числами</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-num">№1. Виконайте додавання</div>
+        <div class="task-text">Обчисліть значення виразів:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span class="example-label">1) −3 + (−8) =</span>
+                <input type="text" id="ex-1-1" data-ans="-11" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">2) 7 + (−15) =</span>
+                <input type="text" id="ex-1-2" data-ans="-8" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">3) −4 + 13 =</span>
+                <input type="text" id="ex-1-3" data-ans="9" placeholder="відповідь">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkNumber(1)">Перевірити №1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-num">№2. Виконайте віднімання</div>
+        <div class="task-text">Обчисліть значення виразів:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span class="example-label">1) 2 − 9 =</span>
+                <input type="text" id="ex-2-1" data-ans="-7" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">2) −5 − 14 =</span>
+                <input type="text" id="ex-2-2" data-ans="-19" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">3) −24 − (−60) =</span>
+                <input type="text" id="ex-2-3" data-ans="36" placeholder="відповідь">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkNumber(2)">Перевірити №2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-num">№3. Виконайте множення</div>
+        <div class="task-text">Знайдіть добутки (для десяткових дробів використовуйте кому або крапку):</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span class="example-label">1) −1,5 · (−0,4) =</span>
+                <input type="text" id="ex-3-1" data-ans="0.6" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">2) −6 · (−0,8) =</span>
+                <input type="text" id="ex-3-2" data-ans="4.8" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">3) −0,4 · 8,2 =</span>
+                <input type="text" id="ex-3-3" data-ans="-3.28" placeholder="відповідь">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkNumber(3)">Перевірити №3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-num">№4. Виконайте ділення</div>
+        <div class="task-text">Знайдіть частки:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span class="example-label">1) −4,8 : 3 =</span>
+                <input type="text" id="ex-4-1" data-ans="-1.6" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">2) −1,44 : (−1,2) =</span>
+                <input type="text" id="ex-4-2" data-ans="1.2" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">3) 0,45 : (−0,9) =</span>
+                <input type="text" id="ex-4-3" data-ans="-0.5" placeholder="відповідь">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkNumber(4)">Перевірити №4</button>
+        <div class="feedback" id="fb-4"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-num">№5. Спростіть вираз</div>
+        <div class="task-text">Запишіть спрощений вираз без пробілів:</div>
+        <div class="examples-grid">
+            <div class="example-item">
+                <span class="example-label">1) 6,3 · 4<i>a</i> =</span>
+                <input type="text" id="ex-5-1" data-ans="25.2a" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">
+                    2) <span class="math-frac"><span class="math-num">3</span><span class="math-den">5</span></span><i>m</i> · 
+                    <span class="math-frac"><span class="math-num">5</span><span class="math-den">6</span></span><i>n</i> =
+                </span>
+                <input type="text" id="ex-5-2" data-ans="0.5mn" data-alt-ans="1/2mn" placeholder="відповідь">
+            </div>
+            <div class="example-item">
+                <span class="example-label">3) −1,2<i>x</i> · (−<i>y</i>) · 4<i>t</i> =</span>
+                <input type="text" id="ex-5-3" data-ans="4.8xyt" placeholder="відповідь">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkNumber(5)">Перевірити №5</button>
+        <div class="feedback" id="fb-5"></div>
+    </div>
+</div>
+
+<script>
+    const hints = {
+        1: "💡 <b>Підказка до №1:</b><br>• Додавання двох від'ємних чисел: додаємо їх модулі та ставимо знак «−».<br>• Додавання чисел з різними знаками: від більшого модуля віднімаємо менший і ставимо знак більшого за модулем числа.",
+        2: "💡 <b>Підказка до №2:</b><br>• Замініть віднімання на додавання протилежного числа: <i>a − b = a + (−b)</i>.<br>• Пам'ятайте, що мінус на мінус дає плюс: <i>a − (−b) = a + b</i>.",
+        3: "💡 <b>Підказка до №3:</b><br>• Множення чисел з однаковими знаками дає <b>плюс</b>.<br>• Множення чисел з різними знаками дає <b>мінус</b>.<br>• Не забудьте правильно відокремити кому у десяткових дробах!",
+        4: "💡 <b>Підказка до №4:</b><br>• При діленні двох від'ємних чисел у результаті буде <b>додатне</b> число.<br>• При діленні чисел з різними знаками у результаті буде <b>від'ємне</b> число.",
+        5: "💡 <b>Підказка до №5:</b><br>• Спочатку визначте знак добутку (парна кількість мінусів дає плюс, непарна — мінус).<br>• Перемножте числові коефіцієнти (при множенні звичайних дробів виконайте скорочення).<br>• Припишіть буквені множники в кінці без знаків множення."
+    };
+
+    function normalize(val) {
+        if (!val) return '';
+        return val.trim().toLowerCase().replace(',', '.').replace(/\s+/g, '');
+    }
+
+    function checkNumber(num) {
+        let allCorrect = true;
+        let hasEmpty = false;
+
+        for (let i = 1; i <= 3; i++) {
+            const input = document.getElementById(`ex-${num}-${i}`);
+            const rawVal = input.value;
+            const val = normalize(rawVal);
+            const correctAns = normalize(input.getAttribute('data-ans'));
+            const altAns = normalize(input.getAttribute('data-alt-ans') || '');
+
+            input.classList.remove('correct', 'incorrect');
+
+            if (val === '') {
+                hasEmpty = true;
+                allCorrect = false;
+                input.classList.add('incorrect');
+            } else if (val === correctAns || (altAns && val === altAns)) {
+                input.classList.add('correct');
+            } else {
+                allCorrect = false;
+                input.classList.add('incorrect');
+            }
+        }
+
+        const fb = document.getElementById(`fb-${num}`);
+        fb.style.display = 'block';
+
+        if (allCorrect) {
+            fb.className = 'feedback success';
+            fb.innerHTML = '🎉 <b>Чудово! Усі приклади цього номера розв\'язано правильно!</b>';
+            triggerFireworks();
+        } else {
+            fb.className = 'feedback error';
+            let msg = hasEmpty ? 'Заповніть усі поля відповіді! ' : 'Є помилки у виділених прикладах. ';
+            msg += '<br>' + hints[num];
+            fb.innerHTML = msg;
+        }
+    }
+
+    /* Салют */
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createParticle(x, y, color) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6 + 2;
+        return {
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            alpha: 1,
+            color: color,
+            decay: Math.random() * 0.02 + 0.015
+        };
+    }
+
+    function triggerFireworks() {
+        const colors = ['#2563eb', '#16a34a', '#d97706', '#dc2626', '#9333ea', '#06b6d4'];
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 3;
+
+        for (let i = 0; i < 80; i++) {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particles.push(createParticle(centerX + (Math.random() - 0.5) * 200, centerY + (Math.random() - 0.5) * 100, color));
+        }
+    }
+
+    function animateFireworks() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.08;
+            p.alpha -= p.decay;
+
+            if (p.alpha <= 0) {
+                particles.splice(i, 1);
+            } else {
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animateFireworks);
+    }
+
+    animateFireworks();
+</script>
+</body>
+</html>
