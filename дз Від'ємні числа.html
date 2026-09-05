@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Дії з від'ємними числами</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --incorrect: #dc2626;
+            --incorrect-bg: #fee2e2;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-panel {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .piggy-bank {
+            background: #fff;
+            border: 2px solid #f59e0b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 16px;
+            color: #d97706;
+        }
+
+        .view-answers-btn {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-answers-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .task-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .math-expr {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .math-sign {
+            margin-right: 2px;
+        }
+
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 3px;
+            font-size: 0.9em;
+            line-height: 1.1;
+        }
+
+        .math-num {
+            border-bottom: 1.5px solid var(--text);
+            padding-bottom: 1px;
+        }
+
+        .math-den {
+            padding-top: 1px;
+        }
+
+        .inline-task-row {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            flex-wrap: wrap;
+        }
+
+        .options-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 15px 0;
+            background: #fff;
+        }
+
+        .options-table th, .options-table td {
+            border: 1px solid var(--border);
+            text-align: center;
+            padding: 10px 6px;
+        }
+
+        .options-table th {
+            background-color: #f1f5f9;
+        }
+
+        .options-table td {
+            cursor: pointer;
+            font-size: 15px;
+            user-select: none;
+        }
+
+        .options-table td.selected {
+            background-color: #dbeafe;
+            border-color: var(--primary);
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .options-table td.correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        .options-table td.incorrect {
+            background-color: var(--incorrect-bg) !important;
+            border-color: var(--incorrect) !important;
+            color: var(--incorrect) !important;
+        }
+
+        input[type="text"], select {
+            padding: 6px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"].correct, select.correct {
+            border-color: var(--correct) !important;
+            background-color: var(--correct-bg) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect, select.incorrect {
+            border-color: var(--incorrect) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .feedback.error {
+            background-color: #fef2f2;
+            color: var(--incorrect);
+            border: 1px solid #fca5a5;
+        }
+
+        .feedback.success {
+            background-color: #f0fdf4;
+            color: var(--correct);
+            border: 1px solid #86efac;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .finish-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .finish-card h2 {
+            color: #1e40af;
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        .coins-badge {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            color: #b45309;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .finish-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .finish-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        #coins-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="coins-canvas"></canvas>
+
+<div class="header-panel">
+    <div class="piggy-bank">🪙 Скарбничка: <span id="coins-count">0</span> грн</div>
+    <button class="view-answers-btn" onclick="reviewAnswers()">📋 Переглянути відповіді</button>
+</div>
+
+<div class="container">
+    <h1>Тренажер: Дії з від'ємними числами</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-num">№1. Порівняйте числа</div>
+        
+        <div class="inline-task-row">
+            <span>1) −5,38</span>
+            <span>та</span>
+            <span>5,1</span>
+            <span style="margin-left: 8px;">⇒ &nbsp; −5,38</span>
+            <select id="t1-1">
+                <option value="">?</option>
+                <option value="<">&lt;</option>
+                <option value=">">&gt;</option>
+                <option value="=">=</option>
+            </select>
+            <span>5,1</span>
+        </div>
+
+        <div class="inline-task-row">
+            <span>2)</span>
+            <span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">2</span><span class="math-den">3</span></span></span>
+            <span>та</span>
+            <span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">4</span><span class="math-den">5</span></span></span>
+            <span style="margin-left: 8px;">⇒ &nbsp;</span>
+            <span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">2</span><span class="math-den">3</span></span></span>
+            <select id="t1-2">
+                <option value="">?</option>
+                <option value="<">&lt;</option>
+                <option value=">">&gt;</option>
+                <option value="=">=</option>
+            </select>
+            <span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">4</span><span class="math-den">5</span></span></span>
+        </div>
+
+        <button class="check-btn" onclick="checkTask1()">Перевірити №1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-num">№2. Порівняйте степені дробів</div>
+        <div class="task-text">
+            Порівняйте значення виразів: 
+            <b>(<span class="math-frac"><span class="math-num">2</span><span class="math-den">3</span></span>)³</b> та 
+            <b>−(<span class="math-frac"><span class="math-num">3</span><span class="math-den">4</span></span>)²</b>
+        </div>
+        <div style="text-align: center; font-size: 18px; margin-bottom: 15px;">
+            (<span class="math-frac"><span class="math-num">2</span><span class="math-den">3</span></span>)³
+            <select id="t2-1" style="font-size: 16px;">
+                <option value="">?</option>
+                <option value="<">&lt;</option>
+                <option value=">">&gt;</option>
+                <option value="=">=</option>
+            </select>
+            −(<span class="math-frac"><span class="math-num">3</span><span class="math-den">4</span></span>)²
+        </div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити №2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-num">№3. Обчисліть вирази з модулями</div>
+        
+        <div class="inline-task-row">
+            <span>1) |<span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">5</span><span class="math-den">12</span></span></span>| + |<span class="math-frac"><span class="math-num">3</span><span class="math-den">8</span></span>| =</span>
+            <input type="text" id="t3-1" placeholder="дріб (напр. 3/4)" style="width: 140px;">
+        </div>
+
+        <div class="inline-task-row">
+            <span>2) |−3,6| · |1,5| =</span>
+            <input type="text" id="t3-2" placeholder="число" style="width: 120px;">
+        </div>
+
+        <button class="check-btn" onclick="checkTask3()">Перевірити №3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-num">№4. Обчисліть суму від'ємних чисел</div>
+        <div class="task-text">Знайдіть значення виразу: <b>−9 + (−6)</b></div>
+        <table class="options-table" id="table-t4">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t4', 'A', this)">3</td>
+                    <td onclick="selectOption('t4', 'B', this)">−3</td>
+                    <td onclick="selectOption('t4', 'V', this)">15</td>
+                    <td onclick="selectOption('t4', 'G', this)">−15</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask4()">Перевірити №4</button>
+        <div class="feedback" id="fb-4"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-num">№5. Обчисліть суму чисел з різними знаками</div>
+        <div class="task-text">Обчисліть суму: <b>5 + (−8)</b></div>
+        <table class="options-table" id="table-t5">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t5', 'A', this)">3</td>
+                    <td onclick="selectOption('t5', 'B', this)">−3</td>
+                    <td onclick="selectOption('t5', 'V', this)">13</td>
+                    <td onclick="selectOption('t5', 'G', this)">−13</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask5()">Перевірити №5</button>
+        <div class="feedback" id="fb-5"></div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card">
+        <div class="task-num">№6. Знайдіть різницю</div>
+        <div class="task-text">Знайдіть значення виразу: <b>−4 − (−9)</b></div>
+        <table class="options-table" id="table-t6">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t6', 'A', this)">5</td>
+                    <td onclick="selectOption('t6', 'B', this)">−5</td>
+                    <td onclick="selectOption('t6', 'V', this)">13</td>
+                    <td onclick="selectOption('t6', 'G', this)">−13</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask6()">Перевірити №6</button>
+        <div class="feedback" id="fb-6"></div>
+    </div>
+
+    <!-- Завдання 7 -->
+    <div class="task-card">
+        <div class="task-num">№7. Обчисліть різницю звичайних дробів</div>
+        <div class="task-text">
+            Обчисліть: <b><span class="math-frac"><span class="math-num">2</span><span class="math-den">15</span></span> − <span class="math-frac"><span class="math-num">4</span><span class="math-den">9</span></span></b>
+        </div>
+        <table class="options-table" id="table-t7">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t7', 'A', this)"><span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">14</span><span class="math-den">45</span></span></span></td>
+                    <td onclick="selectOption('t7', 'B', this)"><span class="math-frac"><span class="math-num">14</span><span class="math-den">45</span></span></td>
+                    <td onclick="selectOption('t7', 'V', this)"><span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">2</span><span class="math-den">6</span></span></span></td>
+                    <td onclick="selectOption('t7', 'G', this)"><span class="math-frac"><span class="math-num">26</span><span class="math-den">45</span></span></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask7()">Перевірити №7</button>
+        <div class="feedback" id="fb-7"></div>
+    </div>
+
+    <!-- Завдання 8 -->
+    <div class="task-card">
+        <div class="task-num">№8. Розкрийте дужки та обчисліть</div>
+        <div class="task-text">
+            Розкрийте дужки у виразі <b>4,3 − (5,8 − 6,1)</b> та знайдіть його значення:
+        </div>
+        <table class="options-table" id="table-t8">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t8', 'A', this)">−4,6</td>
+                    <td onclick="selectOption('t8', 'B', this)">4,6</td>
+                    <td onclick="selectOption('t8', 'V', this)">−7,6</td>
+                    <td onclick="selectOption('t8', 'G', this)">16,2</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask8()">Перевірити №8</button>
+        <div class="feedback" id="fb-8"></div>
+    </div>
+
+    <!-- Завдання 9 -->
+    <div class="task-card">
+        <div class="task-num">№9. Множення дробу на від'ємне число</div>
+        <div class="task-text">
+            Обчисліть: <b>−3 · (<span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">1</span><span class="math-den">6</span></span></span>)</b>
+        </div>
+        <table class="options-table" id="table-t9">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t9', 'A', this)"><span class="math-frac"><span class="math-num">1</span><span class="math-den">2</span></span></td>
+                    <td onclick="selectOption('t9', 'B', this)"><span class="math-expr"><span class="math-sign">−</span><span class="math-frac"><span class="math-num">1</span><span class="math-den">2</span></span></span></td>
+                    <td onclick="selectOption('t9', 'V', this)">2</td>
+                    <td onclick="selectOption('t9', 'G', this)">−2</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask9()">Перевірити №9</button>
+        <div class="feedback" id="fb-9"></div>
+    </div>
+
+    <!-- Завдання 10 -->
+    <div class="task-card">
+        <div class="task-num">№10. Вкажіть коефіцієнт</div>
+        <div class="task-text">
+            Укажіть коефіцієнт буквеного виразу: <b>−0,4<i>y</i></b>
+        </div>
+        <table class="options-table" id="table-t10">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t10', 'A', this)">0,4</td>
+                    <td onclick="selectOption('t10', 'B', this)">−0,4</td>
+                    <td onclick="selectOption('t10', 'V', this)"><i>y</i></td>
+                    <td onclick="selectOption('t10', 'G', this)">0</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask10()">Перевірити №10</button>
+        <div class="feedback" id="fb-10"></div>
+    </div>
+
+    <!-- Завдання 11 -->
+    <div class="task-card">
+        <div class="task-num">№11. Спростіть вираз</div>
+        <div class="task-text">
+            Зведіть подібні доданки: <b>6<i>a</i> − 8<i>b</i> − 2<i>a</i> + 5<i>b</i></b>
+        </div>
+        <table class="options-table" id="table-t11">
+            <thead>
+                <tr><th>А</th><th>Б</th><th>В</th><th>Г</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td onclick="selectOption('t11', 'A', this)">4<i>a</i> + 3<i>b</i></td>
+                    <td onclick="selectOption('t11', 'B', this)">4<i>a</i> − 3<i>b</i></td>
+                    <td onclick="selectOption('t11', 'V', this)">8<i>a</i> − 13<i>b</i></td>
+                    <td onclick="selectOption('t11', 'G', this)">1<i>ab</i></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="check-btn" onclick="checkTask11()">Перевірити №11</button>
+        <div class="feedback" id="fb-11"></div>
+    </div>
+</div>
+
+<!-- Modal Dialog -->
+<div class="modal-overlay" id="finish-modal">
+    <div class="finish-card">
+        <h2>🎉 Тест завершено!</h2>
+        <p style="font-size: 16px; color: #475569;">Чудова робота! Ви пройшли всі 11 завдань тренажера.</p>
+        
+        <div class="coins-badge">
+            <span>🪙 Зароблена сума:</span>
+            <span id="final-coins">0</span> грн
+        </div>
+
+        <button class="finish-btn" onclick="reviewAnswers()">📋 Подивитись свої відповіді</button>
+    </div>
+</div>
+
+<script>
+    const TOTAL_TASKS = 11;
+    let taskScores = {};
+    let selectedOptions = {};
+    let completedTasks = new Set();
+
+    function normalize(val) {
+        if (!val) return '';
+        return val.trim().toLowerCase().replace(',', '.').replace(/\s+/g, '');
+    }
+
+    function selectOption(taskId, value, element) {
+        selectedOptions[taskId] = { value: value, text: element.innerText };
+        document.querySelectorAll(`#table-${taskId} td`).forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function setTableState(taskId, correctValue) {
+        const selected = selectedOptions[taskId];
+        if (!selected) return;
+        document.querySelectorAll(`#table-${taskId} td`).forEach(c => c.classList.remove('correct', 'incorrect'));
+        
+        const tds = document.querySelectorAll(`#table-${taskId} td`);
+        const map = ['A', 'B', 'V', 'G'];
+        tds.forEach((td, index) => {
+            if (map[index] === selected.value) {
+                if (selected.value === correctValue) td.classList.add('correct');
+                else td.classList.add('incorrect');
+            }
+        });
+    }
+
+    function updateScore(taskNum, isCorrect) {
+        taskScores[taskNum] = isCorrect ? 1 : 0;
+        completedTasks.add(taskNum);
+
+        let total = Object.values(taskScores).reduce((a, b) => a + b, 0);
+        document.getElementById('coins-count').innerText = total;
+
+        if (isCorrect) {
+            triggerCoinRain();
+        }
+
+        if (completedTasks.size === TOTAL_TASKS) {
+            setTimeout(showFinishModal, 800);
+        }
+    }
+
+    function showFeedback(taskNum, msg, isSuccess) {
+        const fb = document.getElementById(`fb-${taskNum}`);
+        fb.innerHTML = msg;
+        fb.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+        fb.style.display = 'block';
+    }
+
+    function showFinishModal() {
+        let total = Object.values(taskScores).reduce((a, b) => a + b, 0);
+        document.getElementById('final-coins').innerText = total;
+        document.getElementById('finish-modal').style.display = 'flex';
+        triggerCoinRain();
+    }
+
+    function reviewAnswers() {
+        document.getElementById('finish-modal').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Logic Checking */
+    function checkTask1() {
+        const v1 = document.getElementById('t1-1').value;
+        const v2 = document.getElementById('t1-2').value;
+        const el1 = document.getElementById('t1-1');
+        const el2 = document.getElementById('t1-2');
+
+        el1.className = v1 === '<' ? 'correct' : (v1 ? 'incorrect' : '');
+        el2.className = v2 === '>' ? 'correct' : (v2 ? 'incorrect' : '');
+
+        const ok = (v1 === '<' && v2 === '>');
+        if (ok) {
+            showFeedback(1, '🎉 Відмінно! Від\'ємне число завжди менше за додатне, а з двох від\'ємних більшим є те, чий модуль менший.', true);
+        } else {
+            showFeedback(1, '💡 Спробуйте ще раз! Згадайте: від\'ємне число менше за додатне, а при порівнянні від\'ємних дробів зведіть їх до спільного знаменника.', false);
+        }
+        updateScore(1, ok);
+    }
+
+    function checkTask2() {
+        const v1 = document.getElementById('t2-1').value;
+        const el1 = document.getElementById('t2-1');
+        const ok = v1 === '>';
+        el1.className = ok ? 'correct' : (v1 ? 'incorrect' : '');
+
+        if (ok) {
+            showFeedback(2, '🎉 Вірно! Додатне число в кубі є додатним, а мінус перед квадратом залишає число від\'ємним.', true);
+        } else {
+            showFeedback(2, '💡 Порівняйте знаки: додатне число в кубі є додатним, а вираз з мінусом перед квадратом — від\'ємним.', false);
+        }
+        updateScore(2, ok);
+    }
+
+    function checkTask3() {
+        const v1 = normalize(document.getElementById('t3-1').value);
+        const v2 = normalize(document.getElementById('t3-2').value);
+        const el1 = document.getElementById('t3-1');
+        const el2 = document.getElementById('t3-2');
+
+        const ok1 = v1 === '19/24';
+        const ok2 = v2 === '5.4' || v2 === '5,4';
+
+        el1.className = ok1 ? 'correct' : 'incorrect';
+        el2.className = ok2 ? 'correct' : 'incorrect';
+
+        const ok = ok1 && ok2;
+        if (ok) {
+            showFeedback(3, '🎉 Чудово! Ви правильно розкрили модулі та виконали обчислення.', true);
+        } else {
+            showFeedback(3, '💡 Помилка у значеннях. Згадайте: модуль будь-якого числа завжди невід\'ємний (|−x| = x). Перевірте обчислення.', false);
+        }
+        updateScore(3, ok);
+    }
+
+    function checkTask4() {
+        const sel = selectedOptions['t4']?.value;
+        const ok = sel === 'G';
+        setTableState('t4', 'G');
+        if (ok) {
+            showFeedback(4, '🎉 Вірно! При додаванні двох від\'ємних чисел додаємо їх модулі та ставимо знак «−».', true);
+        } else {
+            showFeedback(4, '💡 Додайте модулі чисел та збережіть знак мінус.', false);
+        }
+        updateScore(4, ok);
+    }
+
+    function checkTask5() {
+        const sel = selectedOptions['t5']?.value;
+        const ok = sel === 'B';
+        setTableState('t5', 'B');
+        if (ok) {
+            showFeedback(5, '🎉 Молодець! Від більшого модуля відняли менший і поставили знак більшого за модулем числа.', true);
+        } else {
+            showFeedback(5, '💡 Числа мають різні знаки: відніміть від більшого модуля менший і поставте знак більшого.', false);
+        }
+        updateScore(5, ok);
+    }
+
+    function checkTask6() {
+        const sel = selectedOptions['t6']?.value;
+        const ok = sel === 'A';
+        setTableState('t6', 'A');
+        if (ok) {
+            showFeedback(6, '🎉 Точно! Віднімання від\'ємного числа замінюється на додавання: −4 + 9 = 5.', true);
+        } else {
+            showFeedback(6, '💡 Віднімання від\'ємного числа означає додавання протилежного: −4 − (−9) = −4 + 9.', false);
+        }
+        updateScore(6, ok);
+    }
+
+    function checkTask7() {
+        const sel = selectedOptions['t7']?.value;
+        const ok = sel === 'A';
+        setTableState('t7', 'A');
+        if (ok) {
+            showFeedback(7, '🎉 Правильно! Спільний знаменник 45: (6 − 20)/45 = −14/45.', true);
+        } else {
+            showFeedback(7, '💡 Зведіть дроби до спільного знаменника (45).', false);
+        }
+        updateScore(7, ok);
+    }
+
+    function checkTask8() {
+        const sel = selectedOptions['t8']?.value;
+        const ok = sel === 'B';
+        setTableState('t8', 'B');
+        if (ok) {
+            showFeedback(8, '🎉 Відмінно! 4,3 − 5,8 + 6,1 = 4,6.', true);
+        } else {
+            showFeedback(8, '💡 При розкритті дужок, перед якими стоїть мінус, змінюйте всі знаки в дужках на протилежні.', false);
+        }
+        updateScore(8, ok);
+    }
+
+    function checkTask9() {
+        const sel = selectedOptions['t9']?.value;
+        const ok = sel === 'A';
+        setTableState('t9', 'A');
+        if (ok) {
+            showFeedback(9, '🎉 Правильно! Множення двох від\'ємних чисел дає додатний результат: 3/6 = 1/2.', true);
+        } else {
+            showFeedback(9, '💡 Добуток двох від\'ємних чисел є додатним. Не забудьте скоротити дріб.', false);
+        }
+        updateScore(9, ok);
+    }
+
+    function checkTask10() {
+        const sel = selectedOptions['t10']?.value;
+        const ok = sel === 'B';
+        setTableState('t10', 'B');
+        if (ok) {
+            showFeedback(10, '🎉 Вірно! Коефіцієнт — це числовий множник перед буквою разом зі своїм знаком.', true);
+        } else {
+            showFeedback(10, '💡 Числовий множник перед буквою (разом зі знаком) і є коефіцієнтом.', false);
+        }
+        updateScore(10, ok);
+    }
+
+    function checkTask11() {
+        const sel = selectedOptions['t11']?.value;
+        const ok = sel === 'B';
+        setTableState('t11', 'B');
+        if (ok) {
+            showFeedback(11, '🎉 Чудово! (6a − 2a) + (−8b + 5b) = 4a − 3b.', true);
+        } else {
+            showFeedback(11, '💡 Зведіть окремо доданки з буквою «a» та окремо з буквою «b».', false);
+        }
+        updateScore(11, ok);
+    }
+
+    /* Fast Falling Coins Animation */
+    const canvas = document.getElementById('coins-canvas');
+    const ctx = canvas.getContext('2d');
+    let coins = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerCoinRain() {
+        for (let i = 0; i < 25; i++) {
+            coins.push({
+                x: Math.random() * canvas.width,
+                y: -30 - Math.random() * 50,
+                speedY: Math.random() * 3 + 4.5,
+                speedX: (Math.random() - 0.5) * 1.5,
+                size: Math.random() * 8 + 20,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.15,
+                opacity: 1
+            });
+        }
+    }
+
+    function animateCoins() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = coins.length - 1; i >= 0; i--) {
+            let c = coins[i];
+            c.y += c.speedY;
+            c.x += c.speedX;
+            c.rotation += c.rotSpeed;
+            c.opacity -= 0.015;
+
+            if (c.opacity <= 0 || c.y > canvas.height) {
+                coins.splice(i, 1);
+            } else {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, c.opacity);
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.font = `${c.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🪙', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        requestAnimationFrame(animateCoins);
+    }
+
+    animateCoins();
+</script>
+</body>
+</html>
