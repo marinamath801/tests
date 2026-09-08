@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Перетворення виразів з коренями</title>
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --incorrect: #dc2626;
+            --incorrect-bg: #fee2e2;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-panel {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .piggy-bank {
+            background: #fff;
+            border: 2px solid #f59e0b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 16px;
+            color: #d97706;
+        }
+
+        .view-answers-btn {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-answers-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 650px) {
+            .task-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inline-task-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .math-expr {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .coef {
+            display: inline-block;
+            font-style: italic;
+            margin-right: 2px;
+        }
+
+        /* Корінь та підкореневий вираз */
+        .sqrt-expr {
+            display: inline-flex;
+            align-items: stretch;
+            font-style: italic;
+            vertical-align: middle;
+        }
+
+        .sqrt-symbol {
+            height: auto;
+            width: 0.75em;
+            align-self: stretch;
+            margin-right: -1px;
+            flex-shrink: 0;
+        }
+
+        .sqrt-body {
+            border-top: 2px solid currentColor;
+            padding-left: 3px;
+            padding-right: 3px;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1.1;
+        }
+
+        /* Двоповерхові дроби */
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 2px;
+            font-size: 0.88em;
+            line-height: 1.1;
+        }
+
+        .math-num {
+            border-bottom: 1.5px solid currentColor;
+            padding-bottom: 1px;
+        }
+
+        .math-den {
+            padding-top: 1px;
+        }
+
+        select {
+            padding: 6px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            width: 135px;
+            font-style: normal;
+            background-color: white;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        select.correct {
+            border-color: var(--correct) !important;
+            background-color: var(--correct-bg) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        select.incorrect {
+            border-color: var(--incorrect) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .feedback.error {
+            background-color: #fef2f2;
+            color: var(--incorrect);
+            border: 1px solid #fca5a5;
+        }
+
+        .feedback.success {
+            background-color: #f0fdf4;
+            color: var(--correct);
+            border: 1px solid #86efac;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .finish-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .finish-card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        .coins-badge {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            color: #b45309;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .finish-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .finish-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        #coins-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<svg style="display: none;">
+    <g id="sqrt-icon">
+        <path d="M 1 12 L 4 11 L 7 20 L 11 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+</svg>
+
+<canvas id="coins-canvas"></canvas>
+
+<div class="header-panel">
+    <div class="piggy-bank">🪙 Скарбничка: <span id="coins-count">0</span> грн</div>
+    <button class="view-answers-btn" onclick="reviewAnswers()">📋 Переглянути завдання</button>
+</div>
+
+<div class="container">
+    <h1>Дз Перетворення виразів з коренями</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 1. Винесіть множник з-під знака кореня:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span class="math-expr">1) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">8</span></span> =</span>
+                <select id="t1-1">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">2√2</option>
+                    <option value="v1">4√2</option>
+                    <option value="v2">2√4</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">2) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">12</span></span> =</span>
+                <select id="t1-2">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">3√2</option>
+                    <option value="correct">2√3</option>
+                    <option value="v2">4√3</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">3) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">32</span></span> =</span>
+                <select id="t1-3">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">4√2</option>
+                    <option value="v1">2√8</option>
+                    <option value="v2">16√2</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">4) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">54</span></span> =</span>
+                <select id="t1-4">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">9√6</option>
+                    <option value="correct">3√6</option>
+                    <option value="v2">6√3</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">5) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">490</span></span> =</span>
+                <select id="t1-5">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">7√10</option>
+                    <option value="v1">10√7</option>
+                    <option value="v2">49√10</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">6) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">500</span></span> =</span>
+                <select id="t1-6">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">5√10</option>
+                    <option value="correct">10√5</option>
+                    <option value="v2">100√5</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">7) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,72</span></span> =</span>
+                <select id="t1-7">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">0,36√2</option>
+                    <option value="correct">0,6√2</option>
+                    <option value="v2">6√0,2</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">8) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">36300</span></span> =</span>
+                <select id="t1-8">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">330√3</option>
+                    <option value="correct">110√3</option>
+                    <option value="v2">1100√3</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити Завдання 1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 2. Внесіть множник під знак кореня:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span class="math-expr">1) <span class="coef">7</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">2</span></span> =</span>
+                <select id="t2-1">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">√14</option>
+                    <option value="correct">√98</option>
+                    <option value="v2">√28</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">2) <span class="coef">−10</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">14</span></span> =</span>
+                <select id="t2-2">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">−√1400</option>
+                    <option value="v1">√1400</option>
+                    <option value="v2">−√140</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">3) <span class="math-frac"><span class="math-num">1</span><span class="math-den">4</span></span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">32</span></span> =</span>
+                <select id="t2-3">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">√8</option>
+                    <option value="correct">√2</option>
+                    <option value="v2">√4</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">4) <span class="coef">−0,3</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">10b</span></span> =</span>
+                <select id="t2-4">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">−√3b</option>
+                    <option value="correct">−√0,9b</option>
+                    <option value="v2">√0,9b</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити Завдання 2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 3. Спростіть вираз:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span class="math-expr">1) <span class="coef">3</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">a</span></span> − <span class="coef">2</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">a</span></span> =</span>
+                <select id="t3-1">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">√a</option>
+                    <option value="v1">a</option>
+                    <option value="v2">5√a</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">2) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">c</span></span> + <span class="coef">10</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">c</span></span> − <span class="coef">14</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">c</span></span> =</span>
+                <select id="t3-2">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">3√c</option>
+                    <option value="correct">−3√c</option>
+                    <option value="v2">−4√c</option>
+                </select>
+            </div>
+            <div class="inline-task-item" style="grid-column: 1 / -1;">
+                <span class="math-expr">3) <span class="coef">9</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">6</span></span> − <span class="coef">2</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">3</span></span> + <span class="coef">8</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">3</span></span> − <span class="coef">3</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">6</span></span> =</span>
+                <select id="t3-3" style="width: 170px;">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">6√6 + 6√3</option>
+                    <option value="v1">12√9</option>
+                    <option value="v2">6√6 − 6√3</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask3()">Перевірити Завдання 3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 4. Спростіть вираз:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span class="math-expr">
+                    1) <span class="coef">2</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">4x</span></span>
+                    + <span class="coef">6</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">16x</span></span>
+                    − <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">625x</span></span> =
+                </span>
+                <select id="t4-1">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">3√x</option>
+                    <option value="v1">−3√x</option>
+                    <option value="v2">7√x</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">
+                    2) <span class="math-frac"><span class="math-num">2</span><span class="math-den">3</span></span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,09y</span></span>
+                    − <span class="coef">0,6</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">144y</span></span>
+                    + <span class="math-frac"><span class="math-num">18</span><span class="math-den">11</span></span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body"><span class="math-frac"><span class="math-num">121</span><span class="math-den">36</span></span>y</span></span> =
+                </span>
+                <select id="t4-2">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">0,9√y</option>
+                    <option value="correct">3,3√y</option>
+                    <option value="v2">−3,3√y</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask4()">Перевірити Завдання 4</button>
+        <div class="feedback" id="fb-4"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-num">Завдання 5. Спростіть вираз:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span class="math-expr">1) <span class="coef">4</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">700</span></span> − <span class="coef">27</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">7</span></span> =</span>
+                <select id="t5-1">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">13√7</option>
+                    <option value="v1">13√70</option>
+                    <option value="v2">−13√7</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">2) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">75</span></span> − <span class="coef">6</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">3</span></span> =</span>
+                <select id="t5-2">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">√3</option>
+                    <option value="correct">−√3</option>
+                    <option value="v2">−3√3</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">3) <span class="coef">2</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">50</span></span> − <span class="coef">8</span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">2</span></span> =</span>
+                <select id="t5-3">
+                    <option value="">-- виберіть --</option>
+                    <option value="v1">2√48</option>
+                    <option value="correct">2√2</option>
+                    <option value="v2">4√2</option>
+                </select>
+            </div>
+            <div class="inline-task-item">
+                <span class="math-expr">4) <span class="math-frac"><span class="math-num">1</span><span class="math-den">3</span></span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">108</span></span> + <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">363</span></span> − <span class="math-frac"><span class="math-num">2</span><span class="math-den">9</span></span><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22" preserveAspectRatio="none"><use href="#sqrt-icon"/></svg><span class="sqrt-body">243</span></span> =</span>
+                <select id="t5-4">
+                    <option value="">-- виберіть --</option>
+                    <option value="correct">11√3</option>
+                    <option value="v1">13√3</option>
+                    <option value="v2">9√3</option>
+                </select>
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask5()">Перевірити Завдання 5</button>
+        <div class="feedback" id="fb-5"></div>
+    </div>
+</div>
+
+<!-- Модальне вікно -->
+<div class="modal-overlay" id="finish-modal">
+    <div class="finish-card">
+        <h2>🎉 Завдання виконано!</h2>
+        <p style="font-size: 16px; color: #475569;">Чудова робота! Ви пройшли всі завдання домашньої роботи.</p>
+        
+        <div class="coins-badge">
+            <span>🪙 Зароблена сума:</span>
+            <span id="final-coins">0</span> грн
+        </div>
+
+        <button class="finish-btn" onclick="reviewAnswers()">📋 Подивитись свої відповіді</button>
+    </div>
+</div>
+
+<script>
+    const TOTAL_BLOCKS = 5;
+    let itemStatus = {}; 
+    let completedBlocks = new Set();
+
+    function updateTotalCoins() {
+        let totalCoins = 0;
+        for (let key in itemStatus) {
+            if (itemStatus[key] === true) {
+                totalCoins += 1;
+            }
+        }
+        document.getElementById('coins-count').innerText = totalCoins;
+        return totalCoins;
+    }
+
+    function showFeedback(fbId, msg, isSuccess) {
+        const fb = document.getElementById(fbId);
+        fb.innerHTML = msg;
+        fb.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+        fb.style.display = 'block';
+    }
+
+    function checkBlockCompletion(blockId, isBlockOk) {
+        completedBlocks.add(blockId);
+        let currentTotal = updateTotalCoins();
+
+        if (isBlockOk) {
+            triggerCoinRain();
+        }
+
+        if (completedBlocks.size === TOTAL_BLOCKS) {
+            setTimeout(() => showFinishModal(currentTotal), 800);
+        }
+    }
+
+    function showFinishModal(total) {
+        document.getElementById('final-coins').innerText = total;
+        document.getElementById('finish-modal').style.display = 'flex';
+        triggerCoinRain();
+    }
+
+    function reviewAnswers() {
+        document.getElementById('finish-modal').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function checkGenericTask(taskNum, ids, hintMsg) {
+        let allOk = true;
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            const isOk = el.value === 'correct';
+            el.className = isOk ? 'correct' : 'incorrect';
+            itemStatus[id] = isOk;
+            if (!isOk) allOk = false;
+        });
+
+        if (allOk) {
+            showFeedback(`fb-${taskNum}`, '🎉 Чудово! Усі приклади цього блоку розв’язано правильно.', true);
+        } else {
+            showFeedback(`fb-${taskNum}`, `❌ Є помилки. 💡 Підказка: ${hintMsg}`, false);
+        }
+        checkBlockCompletion(`t${taskNum}`, allOk);
+    }
+
+    function checkTask1() {
+        checkGenericTask(1, ['t1-1', 't1-2', 't1-3', 't1-4', 't1-5', 't1-6', 't1-7', 't1-8'], 'розкладіть підкореневе число на добуток двох множників, один із яких є точним квадратом (наприклад, 8 = 4 · 2).');
+    }
+
+    function checkTask2() {
+        checkGenericTask(2, ['t2-1', 't2-2', 't2-3', 't2-4'], 'піднесіть додатний множник до квадрата та внесіть під знак кореня. Знак «мінус» залишається перед коренем!');
+    }
+
+    function checkTask3() {
+        checkGenericTask(3, ['t3-1', 't3-2', 't3-3'], 'додавайте та віднімайте тільки коефіцієнти біля коренів з однаковими підкореневими виразами.');
+    }
+
+    function checkTask4() {
+        checkGenericTask(4, ['t4-1', 't4-2'], 'спочатку добудьте квадратні корені з числових множників під коренем (наприклад, √4x = 2√x), а потім зведіть подібні доданки.');
+    }
+
+    function checkTask5() {
+        checkGenericTask(5, ['t5-1', 't5-2', 't5-3', 't5-4'], 'винесіть множники з-під знаків коренів у кожному доданку, щоб отримати однакові підкореневі вирази.');
+    }
+
+    /* Анімація дощу з монеток */
+    const canvas = document.getElementById('coins-canvas');
+    const ctx = canvas.getContext('2d');
+    let coins = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerCoinRain() {
+        for (let i = 0; i < 30; i++) {
+            coins.push({
+                x: Math.random() * canvas.width,
+                y: -30 - Math.random() * 50,
+                speedY: Math.random() * 3 + 5,
+                speedX: (Math.random() - 0.5) * 1.5,
+                size: Math.random() * 8 + 20,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.15,
+                opacity: 1
+            });
+        }
+    }
+
+    function animateCoins() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = coins.length - 1; i >= 0; i--) {
+            let c = coins[i];
+            c.y += c.speedY;
+            c.x += c.speedX;
+            c.rotation += c.rotSpeed;
+            c.opacity -= 0.015;
+
+            if (c.opacity <= 0 || c.y > canvas.height) {
+                coins.splice(i, 1);
+            } else {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, c.opacity);
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.font = `${c.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🪙', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        requestAnimationFrame(animateCoins);
+    }
+
+    animateCoins();
+</script>
+</body>
+</html>
