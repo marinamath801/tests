@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дз Означення арифметичного квадратного кореня</title>
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --correct: #16a34a;
+            --correct-bg: #dcfce7;
+            --incorrect: #dc2626;
+            --incorrect-bg: #fee2e2;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-panel {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .piggy-bank {
+            background: #fff;
+            border: 2px solid #f59e0b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 16px;
+            color: #d97706;
+        }
+
+        .view-answers-btn {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-answers-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 40px;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .task-card {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .task-num {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .task-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inline-task-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .sqrt-expr {
+            display: inline-flex;
+            align-items: flex-start;
+            font-style: italic;
+            vertical-align: middle;
+        }
+
+        .sqrt-symbol {
+            height: 1.3em;
+            width: 0.7em;
+            margin-right: -1px;
+            flex-shrink: 0;
+        }
+
+        .sqrt-body {
+            border-top: 1.8px solid currentColor;
+            padding-left: 2px;
+            padding-right: 2px;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1.1;
+        }
+
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 3px;
+            font-size: 0.88em;
+            line-height: 1.1;
+        }
+
+        .math-num {
+            border-bottom: 1.5px solid currentColor;
+            padding-bottom: 1px;
+        }
+
+        .math-den {
+            padding-top: 1px;
+        }
+
+        sup {
+            font-size: 0.75em;
+            vertical-align: super;
+            line-height: 0;
+        }
+
+        input[type="text"] {
+            padding: 6px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            width: 100px;
+            font-style: normal;
+        }
+
+        input[type="text"].correct {
+            border-color: var(--correct) !important;
+            background-color: var(--correct-bg) !important;
+            color: var(--correct) !important;
+            font-weight: bold;
+        }
+
+        input[type="text"].incorrect {
+            border-color: var(--incorrect) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: var(--incorrect) !important;
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .check-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .feedback.error {
+            background-color: #fef2f2;
+            color: var(--incorrect);
+            border: 1px solid #fca5a5;
+        }
+
+        .feedback.success {
+            background-color: #f0fdf4;
+            color: var(--correct);
+            border: 1px solid #86efac;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .finish-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .finish-card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        .coins-badge {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            color: #b45309;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .finish-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .finish-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        #coins-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<svg style="display: none;">
+    <g id="sqrt-icon">
+        <path d="M 1 12 L 4 11 L 7 20 L 11 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+</svg>
+
+<canvas id="coins-canvas"></canvas>
+
+<div class="header-panel">
+    <div class="piggy-bank">🪙 Скарбничка: <span id="coins-count">0</span> грн</div>
+    <button class="view-answers-btn" onclick="reviewAnswers()">📋 Переглянути відповіді</button>
+</div>
+
+<div class="container">
+    <h1>Дз Означення арифметичного квадратного кореня</h1>
+
+    <!-- Завдання №1 -->
+    <div class="task-card">
+        <div class="task-num">№1. Обчисліть:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span>1) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,16</span></span> =</span>
+                <input type="text" id="t1-1" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>2) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">4900</span></span> =</span>
+                <input type="text" id="t1-2" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>3) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,04</span></span> =</span>
+                <input type="text" id="t1-3" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>4) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">1<span class="math-frac"><span class="math-num">11</span><span class="math-den">25</span></span></span></span> =</span>
+                <input type="text" id="t1-4" placeholder="число або дріб">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask1()">Перевірити №1</button>
+        <div class="feedback" id="fb-1"></div>
+    </div>
+
+    <!-- Завдання №2 -->
+    <div class="task-card">
+        <div class="task-num">№2. За допомогою таблиці квадратів або калькулятора знайдіть:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span>1) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">1296</span></span> =</span>
+                <input type="text" id="t2-1" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>2) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">30,25</span></span> =</span>
+                <input type="text" id="t2-2" placeholder="число">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask2()">Перевірити №2</button>
+        <div class="feedback" id="fb-2"></div>
+    </div>
+
+    <!-- Завдання №3 -->
+    <div class="task-card">
+        <div class="task-num">№3. Обчисліть:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span>1) (<span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">6</span></span>)<sup>2</sup> =</span>
+                <input type="text" id="t3-1" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>2) (−<span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">21</span></span>)<sup>2</sup> =</span>
+                <input type="text" id="t3-2" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>3) (3<span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">2</span></span>)<sup>2</sup> =</span>
+                <input type="text" id="t3-3" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>4) (−<span class="math-frac"><span class="math-num"><span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">6</span></span></span><span class="math-den">3</span></span>)<sup>2</sup> =</span>
+                <input type="text" id="t3-4" placeholder="число або дріб">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask3()">Перевірити №3</button>
+        <div class="feedback" id="fb-3"></div>
+    </div>
+
+    <!-- Завдання №4 -->
+    <div class="task-card">
+        <div class="task-num">№4. Знайдіть значення виразу:</div>
+        <div class="task-grid">
+            <div class="inline-task-item">
+                <span>1) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">64</span></span> : <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,25</span></span> =</span>
+                <input type="text" id="t4-1" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>2) −5<span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,36</span></span> + 2,8 =</span>
+                <input type="text" id="t4-2" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>3) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">10<sup>2</sup> − 8<sup>2</sup></span></span> =</span>
+                <input type="text" id="t4-3" placeholder="число">
+            </div>
+            <div class="inline-task-item">
+                <span>4) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">0,3<sup>2</sup> − 0,09</span></span> =</span>
+                <input type="text" id="t4-4" placeholder="число">
+            </div>
+            <div class="inline-task-item" style="grid-column: 1 / -1;">
+                <span>5) <span class="sqrt-expr"><svg class="sqrt-symbol" viewBox="0 0 12 22"><use href="#sqrt-icon"/></svg><span class="sqrt-body">5(0,4<sup>2</sup> + 0,64)</span></span> =</span>
+                <input type="text" id="t4-5" placeholder="число">
+            </div>
+        </div>
+        <button class="check-btn" onclick="checkTask4()">Перевірити №4</button>
+        <div class="feedback" id="fb-4"></div>
+    </div>
+</div>
+
+<!-- Модальне вікно -->
+<div class="modal-overlay" id="finish-modal">
+    <div class="finish-card">
+        <h2>🎉 Завдання виконано!</h2>
+        <p style="font-size: 16px; color: #475569;">Чудова робота! Ви пройшли всі завдання домашньої роботи.</p>
+        
+        <div class="coins-badge">
+            <span>🪙 Зароблена сума:</span>
+            <span id="final-coins">0</span> грн
+        </div>
+
+        <button class="finish-btn" onclick="reviewAnswers()">📋 Подивитись свої відповіді</button>
+    </div>
+</div>
+
+<script>
+    const TOTAL_BLOCKS = 4;
+    let itemStatus = {}; 
+    let completedBlocks = new Set();
+
+    function norm(val) {
+        if (!val) return '';
+        return val.trim().toLowerCase().replace(',', '.').replace(/\s+/g, '');
+    }
+
+    function updateTotalCoins() {
+        let totalCoins = 0;
+        for (let key in itemStatus) {
+            if (itemStatus[key] === true) {
+                totalCoins += 1; // 1 грн за кожен правильно розв'язаний приклад
+            }
+        }
+        document.getElementById('coins-count').innerText = totalCoins;
+        return totalCoins;
+    }
+
+    function showFeedback(fbId, msg, isSuccess) {
+        const fb = document.getElementById(fbId);
+        fb.innerHTML = msg;
+        fb.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+        fb.style.display = 'block';
+    }
+
+    function checkBlockCompletion(blockId, isBlockOk) {
+        completedBlocks.add(blockId);
+        let currentTotal = updateTotalCoins();
+
+        if (isBlockOk) {
+            triggerCoinRain();
+        }
+
+        if (completedBlocks.size === TOTAL_BLOCKS) {
+            setTimeout(() => showFinishModal(currentTotal), 800);
+        }
+    }
+
+    function showFinishModal(total) {
+        document.getElementById('final-coins').innerText = total;
+        document.getElementById('finish-modal').style.display = 'flex';
+        triggerCoinRain();
+    }
+
+    function reviewAnswers() {
+        document.getElementById('finish-modal').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Перевірка №1 */
+    function checkTask1() {
+        const ok1 = norm(document.getElementById('t1-1').value) === '0.4';
+        const ok2 = norm(document.getElementById('t1-2').value) === '70';
+        const ok3 = norm(document.getElementById('t1-3').value) === '0.2';
+        const v4 = norm(document.getElementById('t1-4').value);
+        const ok4 = (v4 === '1.2' || v4 === '6/5' || v4 === '11/5');
+
+        document.getElementById('t1-1').className = ok1 ? 'correct' : 'incorrect';
+        document.getElementById('t1-2').className = ok2 ? 'correct' : 'incorrect';
+        document.getElementById('t1-3').className = ok3 ? 'correct' : 'incorrect';
+        document.getElementById('t1-4').className = ok4 ? 'correct' : 'incorrect';
+
+        itemStatus['t1-1'] = ok1;
+        itemStatus['t1-2'] = ok2;
+        itemStatus['t1-3'] = ok3;
+        itemStatus['t1-4'] = ok4;
+
+        const allOk = ok1 && ok2 && ok3 && ok4;
+        if (allOk) {
+            showFeedback('fb-1', '🎉 Чудово! Усі значення квадратних коренів знайдено правильно.', true);
+        } else {
+            showFeedback('fb-1', '💡 Підказка: згадайте означення арифметичного квадратного кореня (√a = b, де b ≥ 0 і b² = a). Для мішаного числа спочатку перетворіть його у неправильний дріб.', false);
+        }
+        checkBlockCompletion('t1', allOk);
+    }
+
+    /* Перевірка №2 */
+    function checkTask2() {
+        const ok1 = norm(document.getElementById('t2-1').value) === '36';
+        const ok2 = norm(document.getElementById('t2-2').value) === '5.5';
+
+        document.getElementById('t2-1').className = ok1 ? 'correct' : 'incorrect';
+        document.getElementById('t2-2').className = ok2 ? 'correct' : 'incorrect';
+
+        itemStatus['t2-1'] = ok1;
+        itemStatus['t2-2'] = ok2;
+
+        const allOk = ok1 && ok2;
+        if (allOk) {
+            showFeedback('fb-2', '🎉 Відмінно! Значення коренів знайдені вірно.', true);
+        } else {
+            showFeedback('fb-2', '💡 Підказка: скористайтеся таблицею квадратів двоцифрових чисел або знайдіть число, квадрат якого дорівнює підкореневому виразу.', false);
+        }
+        checkBlockCompletion('t2', allOk);
+    }
+
+    /* Перевірка №3 */
+    function checkTask3() {
+        const ok1 = norm(document.getElementById('t3-1').value) === '6';
+        const ok2 = norm(document.getElementById('t3-2').value) === '21';
+        const ok3 = norm(document.getElementById('t3-3').value) === '18';
+        const v4 = norm(document.getElementById('t3-4').value);
+        const ok4 = (v4 === '6/9' || v4 === '2/3' || v4 === '0.666' || v4 === '0.67');
+
+        document.getElementById('t3-1').className = ok1 ? 'correct' : 'incorrect';
+        document.getElementById('t3-2').className = ok2 ? 'correct' : 'incorrect';
+        document.getElementById('t3-3').className = ok3 ? 'correct' : 'incorrect';
+        document.getElementById('t3-4').className = ok4 ? 'correct' : 'incorrect';
+
+        itemStatus['t3-1'] = ok1;
+        itemStatus['t3-2'] = ok2;
+        itemStatus['t3-3'] = ok3;
+        itemStatus['t3-4'] = ok4;
+
+        const allOk = ok1 && ok2 && ok3 && ok4;
+        if (allOk) {
+            showFeedback('fb-3', '🎉 Вірно! Ви відмінно застосували тотожність.', true);
+        } else {
+            showFeedback('fb-3', '💡 Підказка: скористайтеся тотожністю (√a)² = a (при a ≥ 0), а також властивостями піднесення до степеня добутку (a·b)ⁿ = aⁿ·bⁿ та частки (a/b)ⁿ = aⁿ/bⁿ.', false);
+        }
+        checkBlockCompletion('t3', allOk);
+    }
+
+    /* Перевірка №4 */
+    function checkTask4() {
+        const ok1 = norm(document.getElementById('t4-1').value) === '16';
+        const v2 = norm(document.getElementById('t4-2').value);
+        const ok2 = (v2 === '-0.2' || v2 === '-0,2');
+        const ok3 = norm(document.getElementById('t4-3').value) === '6';
+        const ok4 = norm(document.getElementById('t4-4').value) === '0';
+        const ok5 = norm(document.getElementById('t4-5').value) === '2';
+
+        document.getElementById('t4-1').className = ok1 ? 'correct' : 'incorrect';
+        document.getElementById('t4-2').className = ok2 ? 'correct' : 'incorrect';
+        document.getElementById('t4-3').className = ok3 ? 'correct' : 'incorrect';
+        document.getElementById('t4-4').className = ok4 ? 'correct' : 'incorrect';
+        document.getElementById('t4-5').className = ok5 ? 'correct' : 'incorrect';
+
+        itemStatus['t4-1'] = ok1;
+        itemStatus['t4-2'] = ok2;
+        itemStatus['t4-3'] = ok3;
+        itemStatus['t4-4'] = ok4;
+        itemStatus['t4-5'] = ok5;
+
+        const allOk = ok1 && ok2 && ok3 && ok4 && ok5;
+        if (allOk) {
+            showFeedback('fb-4', '🎉 Молодець! Усі вирази обчислено бездоганно.', true);
+        } else {
+            showFeedback('fb-4', '💡 Підказка: спочатку обчисліть значення знаків коренів або виконайте дії під значущим коренем, дотримуючись стандартного порядку арифметичних дій.', false);
+        }
+        checkBlockCompletion('t4', allOk);
+    }
+
+    /* Анімація дощу з монеток */
+    const canvas = document.getElementById('coins-canvas');
+    const ctx = canvas.getContext('2d');
+    let coins = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function triggerCoinRain() {
+        for (let i = 0; i < 30; i++) {
+            coins.push({
+                x: Math.random() * canvas.width,
+                y: -30 - Math.random() * 50,
+                speedY: Math.random() * 3 + 5,
+                speedX: (Math.random() - 0.5) * 1.5,
+                size: Math.random() * 8 + 20,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.15,
+                opacity: 1
+            });
+        }
+    }
+
+    function animateCoins() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = coins.length - 1; i >= 0; i--) {
+            let c = coins[i];
+            c.y += c.speedY;
+            c.x += c.speedX;
+            c.rotation += c.rotSpeed;
+            c.opacity -= 0.015;
+
+            if (c.opacity <= 0 || c.y > canvas.height) {
+                coins.splice(i, 1);
+            } else {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, c.opacity);
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.font = `${c.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🪙', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        requestAnimationFrame(animateCoins);
+    }
+
+    animateCoins();
+</script>
+</body>
+</html>
