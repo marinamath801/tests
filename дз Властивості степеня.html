@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Супергерой Бісектриса</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0d0f17;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="p-4 flex flex-col items-center">
+    <canvas id="posterCanvas" width="600" height="850" class="rounded-xl shadow-2xl border border-slate-800"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('posterCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 1. Темне космічно-геометричне тло
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, 850);
+    bgGradient.addColorStop(0, '#0a0c16');
+    bgGradient.addColorStop(0.5, '#121829');
+    bgGradient.addColorStop(1, '#06070c');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, 600, 850);
+
+    // Геометрична сітка на тлі
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < 600; x += 30) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 850);
+      ctx.stroke();
+    }
+    for (let y = 0; y < 850; y += 30) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(600, y);
+      ctx.stroke();
+    }
+
+    // 2. Сяючий кут (Вершина внизу-центрі)
+    const vertexX = 300;
+    const vertexY = 560;
+    const leftRayX = 70;
+    const leftRayY = 180;
+    const rightRayX = 530;
+    const rightRayY = 180;
+
+    // Сторони кута
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#00f0ff';
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(leftRayX, leftRayY);
+    ctx.lineTo(vertexX, vertexY);
+    ctx.lineTo(rightRayX, rightRayY);
+    ctx.stroke();
+
+    // 3. Лазерний промінь Бісектриси (Центральний)
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = '#ff007f';
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(vertexX, vertexY);
+    ctx.lineTo(vertexX, 120);
+    ctx.stroke();
+
+    // Білейше ядро променя
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffffff';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(vertexX, vertexY);
+    ctx.lineTo(vertexX, 120);
+    ctx.stroke();
+
+    // 4. Дуги однаковість кутів та голографічні значки α
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00ffcc';
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+
+    // Ліва дуга
+    ctx.beginPath();
+    ctx.arc(vertexX, vertexY, 140, Math.PI * 1.25, Math.PI * 1.5);
+    ctx.stroke();
+
+    // Права дуга
+    ctx.beginPath();
+    ctx.arc(vertexX, vertexY, 140, Math.PI * 1.5, Math.PI * 1.75);
+    ctx.stroke();
+
+    // Позначки α (італік)
+    ctx.font = 'italic bold 32px serif';
+    ctx.fillStyle = '#00ffcc';
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#00ffcc';
+    ctx.fillText('α', 230, 420);
+    ctx.fillText('α', 350, 420);
+
+    // 5. Поза та силует Супергероїні
+    ctx.shadowBlur = 0; // скидаємо тінь для чіткості
+
+    // Тіло / Костюм
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.moveTo(285, 560);
+    ctx.lineTo(315, 560);
+    ctx.lineTo(325, 470);
+    ctx.lineTo(275, 470);
+    ctx.closePath();
+    ctx.fill();
+
+    // Плечі та торс
+    ctx.beginPath();
+    ctx.moveTo(270, 470);
+    ctx.lineTo(330, 470);
+    ctx.lineTo(340, 410);
+    ctx.lineTo(260, 410);
+    ctx.closePath();
+    ctx.fill();
+
+    // Голова та маска
+    ctx.fillStyle = '#334155';
+    ctx.beginPath();
+    ctx.arc(300, 375, 22, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Неонова маска/очі
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00f0ff';
+    ctx.fillRect(288, 370, 24, 6);
+
+    // Емблема на грудях (гострий кут з променем)
+    ctx.strokeStyle = '#ff007f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(290, 425);
+    ctx.lineTo(300, 445);
+    ctx.lineTo(310, 425);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(300, 445);
+    ctx.lineTo(300, 420);
+    ctx.stroke();
+
+    // Руки, випромінюючі світло
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(265, 420);
+    ctx.lineTo(290, 400);
+    ctx.moveTo(335, 420);
+    ctx.lineTo(310, 400);
+    ctx.stroke();
+
+    // 6. Енергетичні помічники-щурі з неоновими хвостиками
+    function drawCyberRat(x, y, scale, flip) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (flip) ctx.scale(-1, 1);
+
+      // Неоновий хвіст
+      ctx.strokeStyle = '#ff007f';
+      ctx.shadowColor = '#ff007f';
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-15 * scale, 0);
+      ctx.quadraticCurveTo(-25 * scale, -10 * scale, -35 * scale, -5 * scale);
+      ctx.stroke();
+
+      // Тіло
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 12 * scale, 7 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Вушко
+      ctx.beginPath();
+      ctx.arc(5 * scale, -6 * scale, 4 * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    drawCyberRat(140, 540, 1, false);
+    drawCyberRat(460, 540, 1, true);
+    drawCyberRat(300, 610, 0.8, false);
+
+    // 7. Слогани та текстове оформлення
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#00f0ff';
+
+    // Заголовок
+    ctx.font = '900 40px system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.fillText('БІСЕКТРИСА', 300, 75);
+
+    ctx.font = '600 16px system-ui, sans-serif';
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillText('ПРОМІНЬ АБСОЛЮТНОЇ СПРАВЕДЛИВОСТІ', 300, 105);
+
+    // Слогани внизу
+    ctx.shadowColor = '#ff007f';
+    ctx.font = 'italic 700 20px system-ui, sans-serif';
+    ctx.fillStyle = '#ff3399';
+    ctx.fillText('«Жодного градуса на користь когось одного!»', 300, 740);
+
+    ctx.shadowColor = '#00ffcc';
+    ctx.font = 'bold 18px system-ui, sans-serif';
+    ctx.fillStyle = '#00ffcc';
+    ctx.fillText('РОЗТИНАЮ ХАОС. РОЗДІЛЯЮ НАВПІЛ.', 300, 780);
+
+  </script>
+</body>
+</html>
