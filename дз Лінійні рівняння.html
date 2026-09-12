@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Розв'язування рівнянь</title>
+    <!-- Анімація салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .equation {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a252f;
+            background-color: #edf2f7;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 0.95rem;
+            color: #555;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+        }
+        .correct-input {
+            border-color: #2ecc71 !important;
+            background-color: #e8f8f5 !important;
+        }
+        .incorrect-input {
+            border-color: #e74c3c !important;
+            background-color: #fadbd8 !important;
+        }
+        .correct-msg {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .incorrect-msg {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .algorithm-box {
+            margin-top: 15px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .algorithm-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        .algorithm-box ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+        .algorithm-box li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Дз алгебра: Знайти корінь рівняння</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="card-1">
+        <div class="task-title">Завдання 1</div>
+        <div class="equation">(4x - 2) + (5x - 4) = 9 - (5 - 11x)</div>
+        <div class="input-group">
+            <label for="ans-1">Запис відповіді (наприклад: 3 або -2,5):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-1" placeholder="x = ...">
+                <button onclick="checkAnswer(1)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-1" class="result-message"></div>
+        <div id="alg-1" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Згадай, як розкривати дужки, коли перед ними стоїть плюс чи мінус. Перевір, чи правильно у тебе розкриті дужки;</li>
+                <li>Спрости ліву і праву частини рівняння і перевір знаки;</li>
+                <li>Перенеси ікси вліво, числа вправо. Знаки правильні?</li>
+                <li>Перевір, чи ти правильно поділив (-ла) на зайве число біля ікса.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="card-2">
+        <div class="task-title">Завдання 2</div>
+        <div class="equation">3(4x - 5) - 10(2x - 1) = 33</div>
+        <div class="input-group">
+            <label for="ans-2">Запис відповіді (запиши у вигляді скороченого звичайного дробу, наприклад: -3/4 або 5/7):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-2" placeholder="x = ...">
+                <button onclick="checkAnswer(2)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-2" class="result-message"></div>
+        <div id="alg-2" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Згадай, як помножити число на дужки («фонтанчиком»). Перевір, чи правильно помножені всі доданки всередині дужок та враховані знаки;</li>
+                <li>Спрости ліву і праву частини рівняння і перевір знаки;</li>
+                <li>Перенеси ікси вліво, числа вправо. Знаки правильні?</li>
+                <li>Перевір, чи ти правильно поділив (-ла) на зайве число біля ікса та чи скорочено дріб.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    const correctAnswers = {
+        1: ["-5"],
+        2: ["-19/4"]
+    };
+
+    function triggerFireworks() {
+        if (typeof confetti === 'function') {
+            var count = 200;
+            var defaults = { origin: { y: 0.7 } };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+    }
+
+    function checkAnswer(taskNum) {
+        const inputElem = document.getElementById(`ans-${taskNum}`);
+        const resElem = document.getElementById(`res-${taskNum}`);
+        const algElem = document.getElementById(`alg-${taskNum}`);
+        
+        let userVal = inputElem.value.trim().replace(/\s+/g, '');
+        userVal = userVal.replace(/^x=/, '');
+
+        if (userVal === "") {
+            resElem.textContent = "Будь ласка, введіть відповідь!";
+            resElem.className = "result-message incorrect-msg";
+            resElem.style.display = "block";
+            return;
+        }
+
+        const isCorrect = correctAnswers[taskNum].includes(userVal);
+
+        if (isCorrect) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Правильно! Чудова робота! 🎉🎉🎉";
+            resElem.className = "result-message correct-msg";
+            algElem.style.display = "none";
+            triggerFireworks();
+        } else {
+            inputElem.className = "incorrect-input";
+            resElem.textContent = "Неправильно. Спробуй ще раз, користуючись алгоритмом нижче:";
+            resElem.className = "result-message incorrect-msg";
+            algElem.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
