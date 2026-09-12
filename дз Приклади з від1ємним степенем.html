@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Приклади з від'ємним степенем</title>
+    <!-- MathJax для математичних формул -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Анімація салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 750px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .instruction-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        .instruction-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .equation {
+            font-size: 1.4rem;
+            background-color: #edf2f7;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .hints-container {
+            margin-bottom: 15px;
+        }
+        .hint-step {
+            display: none;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 4px;
+            color: #856404;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .btn-hint {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-hint:hover {
+            background-color: #d35400;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+        .btn-check {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-check:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+        }
+        .correct-input { border-color: #2ecc71 !important; background-color: #e8f8f5 !important; }
+        .incorrect-input { border-color: #e74c3c !important; background-color: #fadbd8 !important; }
+        .correct-msg { background-color: #d4edda; color: #155724; display: block; }
+        .incorrect-msg { background-color: #f8d7da; color: #721c24; display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Приклади з від'ємним степенем</h1>
+
+    <!-- Блок інструкції для учня -->
+    <div class="instruction-box">
+        <h3>📌 Як користуватися тренажером:</h3>
+        <ol>
+            <li>Якщо ти не знаєш, з чого почати — натисни жовту кнопку <strong>«💡 Потрібна підказка?»</strong>. З'явиться перший крок.</li>
+            <li>Виконай дію з підказки. Якщо ти знову не знаєш, що робити далі — <strong>натисни на цю ж кнопку ще раз</strong>, і з'явиться наступний крок.</li>
+            <li>Натискай кнопку підказки стільки разів, скільки потрібно, поки не пройдеш усі кроки до кінця!</li>
+            <li>Отримане число введи у поле для відповіді та натисни <strong>«Перевірити»</strong>.</li>
+        </ol>
+    </div>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="task-1">
+        <div class="task-title">Завдання 1</div>
+        <div class="equation">\[ 128 \cdot 2^{-5} \]</div>
+        
+        <button class="btn-hint" id="btn-hint-1" onclick="showNextHint(1)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Подай число \(128\) як степінь двійки. Згадай: \(128 = 2^7\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Запиши вираз у вигляді: \(2^7 \cdot 2^{-5}\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> При множенні степенів з однаковими основами показники додаються: \(2^{7 + (-5)} = 2^2\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Обчисли значення виразу \(2^2\) та введіть отримане число у поле нижче.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-1" placeholder="наприклад: 5">
+            <button class="btn-check" onclick="checkAnswer(1)">Перевірити</button>
+        </div>
+        <div id="res-1" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="task-2">
+        <div class="task-title">Завдання 2</div>
+        <div class="equation">\[ 81 \cdot (3^{-2})^3 \]</div>
+        
+        <button class="btn-hint" id="btn-hint-2" onclick="showNextHint(2)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-2">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Розкрий дужки у виразі \((3^{-2})^3\). При піднесенні степеня до степеня показники перемножуються: \(-2 \cdot 3 = -6\). Отримуємо \(3^{-6}\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Подай число \(81\) як степінь трійки: \(81 = 3^4\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> Перемнож степені: \(3^4 \cdot 3^{-6} = 3^{4 + (-6)} = 3^{-2}\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Запиши \(3^{-2}\) у вигляді звичайного дробу \(\frac{1}{3^2}\) та обчисли його значення.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-2" placeholder="наприклад: 1/2 або 0,5">
+            <button class="btn-check" onclick="checkAnswer(2)">Перевірити</button>
+        </div>
+        <div id="res-2" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="task-3">
+        <div class="task-title">Завдання 3</div>
+        <div class="equation">\[ 7^{-8} \cdot 343^3 : 49 \]</div>
+        
+        <button class="btn-hint" id="btn-hint-3" onclick="showNextHint(3)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-3">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Подай усі числа через основу \(7\): \(343 = 7^3\) та \(49 = 7^2\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Спрости \(343^3 = (7^3)^3 = 7^9\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> Запиши вираз: \(7^{-8} \cdot 7^9 : 7^2\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Виконай дії з показниками: \(-8 + 9 - 2 = -1\). Отримуємо \(7^{-1}\).
+            </div>
+            <div class="hint-step" data-step="5">
+                <strong>Крок 5:</strong> Перетвори \(7^{-1}\) у звичайний дріб \(\frac{1}{7^1}\) та введи результат.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-3" placeholder="наприклад: 1/2 або 0,5">
+            <button class="btn-check" onclick="checkAnswer(3)">Перевірити</button>
+        </div>
+        <div id="res-3" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="task-4">
+        <div class="task-title">Завдання 4</div>
+        <div class="equation">\[ 36^{-2} \cdot \left(\frac{1}{6}\right)^{-6} \]</div>
+        
+        <button class="btn-hint" id="btn-hint-4" onclick="showNextHint(4)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-4">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Подай число \(36\) як степінь шістки: \(36 = 6^2\). Тоді \(36^{-2} = (6^2)^{-2} = 6^{-4}\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Подай \(\left(\frac{1}{6}\right)^{-6}\) через шістку. Згадай: \(\left(\frac{1}{a}\right)^{-n} = a^n\), отже \(\left(\frac{1}{6}\right)^{-6} = 6^6\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> Перемнож отримані степені: \(6^{-4} \cdot 6^6 = 6^{-4 + 6} = 6^2\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Піднеси шістку до квадрата та запиши результат.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-4" placeholder="наприклад: 5">
+            <button class="btn-check" onclick="checkAnswer(4)">Перевірити</button>
+        </div>
+        <div id="res-4" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card" id="task-5">
+        <div class="task-title">Завдання 5</div>
+        <div class="equation">\[ \frac{100^{-2} \cdot 10^{-7}}{1000^{-3}} \]</div>
+        
+        <button class="btn-hint" id="btn-hint-5" onclick="showNextHint(5)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-5">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Зведи всі числа до основи \(10\): \(100 = 10^2\), а \(1000 = 10^3\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Спрости чисельник: \((10^2)^{-2} \cdot 10^{-7} = 10^{-4} \cdot 10^{-7} = 10^{-11}\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> Спрости знаменник: \((10^3)^{-3} = 10^{-9}\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Поділи чисельник на знаменник: \(\frac{10^{-11}}{10^{-9}} = 10^{-11 - (-9)} = 10^{-2}\).
+            </div>
+            <div class="hint-step" data-step="5">
+                <strong>Крок 5:</strong> Обчисли значення \(10^{-2}\) (у вигляді десяткового або звичайного дробу).
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-5" placeholder="наприклад: 1/2 або 0,5">
+            <button class="btn-check" onclick="checkAnswer(5)">Перевірити</button>
+        </div>
+        <div id="res-5" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 6 -->
+    <div class="task-card" id="task-6">
+        <div class="task-title">Завдання 6</div>
+        <div class="equation">\[ \frac{5^{-3} \cdot 25^8}{125^5} \]</div>
+        
+        <button class="btn-hint" id="btn-hint-6" onclick="showNextHint(6)">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-6">
+            <div class="hint-step" data-step="1">
+                <strong>Крок 1:</strong> Зведи числа до основи \(5\): \(25 = 5^2\) та \(125 = 5^3\).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Крок 2:</strong> Спрости чисельник: \(5^{-3} \cdot (5^2)^8 = 5^{-3} \cdot 5^{16} = 5^{13}\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Крок 3:</strong> Спрости знаменник: \((5^3)^5 = 5^{15}\).
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Крок 4:</strong> Обчисли частку: \(\frac{5^{13}}{5^{15}} = 5^{13 - 15} = 5^{-2}\).
+            </div>
+            <div class="hint-step" data-step="5">
+                <strong>Крок 5:</strong> Запиши значення \(5^{-2}\) у вигляді звичайного або десяткового дробу.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="ans-6" placeholder="наприклад: 1/2 або 0,5">
+            <button class="btn-check" onclick="checkAnswer(6)">Перевірити</button>
+        </div>
+        <div id="res-6" class="result-message"></div>
+    </div>
+</div>
+
+<script>
+    const currentSteps = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
+
+    const correctValues = {
+        1: [4],
+        2: [1/9],
+        3: [1/7],
+        4: [36],
+        5: [0.01],
+        6: [0.04]
+    };
+
+    function showNextHint(taskNum) {
+        currentSteps[taskNum]++;
+        const container = document.getElementById(`hints-${taskNum}`);
+        const hintStep = container.querySelector(`[data-step="${currentSteps[taskNum]}"]`);
+        const btn = document.getElementById(`btn-hint-${taskNum}`);
+        
+        if (hintStep) {
+            hintStep.style.display = "block";
+            btn.textContent = "💡 Потрібна наступна підказка? Натисни ще раз!";
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise([hintStep]);
+            }
+        } else {
+            btn.textContent = "✅ Усі підказки вже відкрито!";
+            btn.style.backgroundColor = "#7f8c8d";
+        }
+    }
+
+    function triggerFireworks() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        }
+    }
+
+    function parseNumber(s) {
+        if (!s) return null;
+        s = s.trim().replace(',', '.');
+        if (s.includes('/')) {
+            let parts = s.split('/');
+            if (parts.length === 2) {
+                let num = parseFloat(parts[0]);
+                let den = parseFloat(parts[1]);
+                if (!isNaN(num) && !isNaN(den) && den !== 0) return num / den;
+            }
+        }
+        let val = parseFloat(s);
+        return isNaN(val) ? null : val;
+    }
+
+    function checkAnswer(taskNum) {
+        const inputElem = document.getElementById(`ans-${taskNum}`);
+        const resElem = document.getElementById(`res-${taskNum}`);
+        
+        let userNum = parseNumber(inputElem.value);
+
+        if (userNum === null) {
+            resElem.textContent = "Будь ласка, введіть число!";
+            resElem.className = "result-message incorrect-msg";
+            return;
+        }
+
+        const expected = correctValues[taskNum][0];
+        const isCorrect = Math.abs(userNum - expected) < 1e-4;
+
+        if (isCorrect) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Чудово! Відповідь правильна! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerFireworks();
+        } else {
+            inputElem.className = "incorrect-input";
+            resElem.textContent = "Невірно. Натисни на кнопку підказки вище, щоб відкрити наступний крок!";
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+</script>
+
+</body>
+</html>
