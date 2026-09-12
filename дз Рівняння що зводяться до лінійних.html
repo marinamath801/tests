@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Розв'язування рівнянь</title>
+    <!-- MathJax для красивого відображення дробів -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Анімація салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 680px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .equation {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a252f;
+            background-color: #edf2f7;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 0.95rem;
+            color: #555;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+        }
+        .correct-input {
+            border-color: #2ecc71 !important;
+            background-color: #e8f8f5 !important;
+        }
+        .incorrect-input {
+            border-color: #e74c3c !important;
+            background-color: #fadbd8 !important;
+        }
+        .correct-msg {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .incorrect-msg {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .algorithm-box {
+            margin-top: 15px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .algorithm-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        .algorithm-box ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+        .algorithm-box li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Дз алгебра: Розв'яжіть рівняння</h1>
+
+    <!-- Завдання 1 -->
+    <div class="task-card" id="card-1">
+        <div class="task-title">Завдання 1</div>
+        <div class="equation">(1,8 - 0,3y)(2y + 9) = 0</div>
+        <div class="input-group">
+            <label for="ans-1">Запис відповіді (два корені розділяй крапкою з комою `;`):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-1" placeholder="наприклад: 1; -2,5 або 1; -2 1/3">
+                <button onclick="checkAnswer(1)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-1" class="result-message"></div>
+        <div id="alg-1" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Згадай: добуток двох множників дорівнює нулю тоді, коли хоча б один із множників дорівнює нулю. Прирівняй кожну дужку до нуля окремо;</li>
+                <li>Розв'яжи перше просте рівняння: 1,8 - 0,3y = 0;</li>
+                <li>Розв'яжи друге просте рівняння: 2y + 9 = 0;</li>
+                <li>Перевір обчислення та запиши обидва корені через крапку з комою `;`.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card" id="card-2">
+        <div class="task-title">Завдання 2</div>
+        <div class="equation">(5y + 4)(1,1y - 3,3) = 0</div>
+        <div class="input-group">
+            <label for="ans-2">Запис відповіді (два корені розділяй крапкою з комою `;`):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-2" placeholder="наприклад: 1; -2,5 або 1; -2/3">
+                <button onclick="checkAnswer(2)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-2" class="result-message"></div>
+        <div id="alg-2" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Згадай: добуток дорівнює нулю, якщо один з множників дорівнює нулю. Прирівняй кожну дужку до нуля;</li>
+                <li>Розв'яжи перше рівняння: 5y + 4 = 0 (пам'ятай про знак при перенесенні);</li>
+                <li>Розв'яжи друге рівняння: 1,1y - 3,3 = 0;</li>
+                <li>Запиши обидва отримані корені через крапку з комою `;`.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card" id="card-3">
+        <div class="task-title">Завдання 3</div>
+        <div class="equation">\[ \frac{7x}{6} - \frac{5x}{18} = \frac{4}{27} \]</div>
+        <div class="input-group">
+            <label for="ans-3">Запис відповіді (можна вводити звичайним дробом або десятковим):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-3" placeholder="наприклад: 2/5 або 0,4">
+                <button onclick="checkAnswer(3)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-3" class="result-message"></div>
+        <div id="alg-3" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Зведи дроби у лівій частині рівняння до спільного знаменника (або помнож обидві частини рівняння на найменше спільне кратне знаменників);</li>
+                <li>Обчисли різницю іксів у лівій частині;</li>
+                <li>Знайди x, поділивши число у правій частині на коефіцієнт біля x;</li>
+                <li>Перевір, чи скорочено отриманий звичайний дріб.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card" id="card-4">
+        <div class="task-title">Завдання 4</div>
+        <div class="equation">\[ \frac{5x + 3}{5} = \frac{x - 5}{8} \]</div>
+        <div class="input-group">
+            <label for="ans-4">Запис відповіді (можна вводити десятковим дробом, звичайним або мішаним числом):</label>
+            <div class="input-wrapper">
+                <input type="text" id="ans-4" placeholder="наприклад: -2,5 або -2 1/2 або -5/2">
+                <button onclick="checkAnswer(4)">Перевірити</button>
+            </div>
+        </div>
+        <div id="res-4" class="result-message"></div>
+        <div id="alg-4" class="algorithm-box">
+            <div class="algorithm-title">Алгоритм підказки:</div>
+            <ol>
+                <li>Скористайся основною властивістю пропорції (перемнож навхрест: чисельник першого на знаменник другого і навпаки);</li>
+                <li>Розкрий дужки «фонтанчиком» в обох частинах рівняння;</li>
+                <li>Перенеси доданки з x вліво, а числа — вправо, змінюючи знаки на протилежні;</li>
+                <li>Зведи подібні доданки та знайди x.</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    function triggerFireworks() {
+        if (typeof confetti === 'function') {
+            var count = 200;
+            var defaults = { origin: { y: 0.7 } };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+    }
+
+    function parseNumber(s) {
+        if (!s) return null;
+        s = s.trim().replace(',', '.').replace(/^x=/, '').replace(/^y=/, '');
+        
+        // Мішане число
+        if (s.includes(' ')) {
+            let parts = s.split(/\s+/);
+            if (parts.length === 2 && parts[1].includes('/')) {
+                let whole = parseFloat(parts[0]);
+                let fracParts = parts[1].split('/');
+                if (fracParts.length === 2) {
+                    let num = parseFloat(fracParts[0]);
+                    let den = parseFloat(fracParts[1]);
+                    if (!isNaN(whole) && !isNaN(num) && !isNaN(den) && den !== 0) {
+                        let sign = (whole < 0 || parts[0].startsWith('-')) ? -1 : 1;
+                        return whole + sign * (num / den);
+                    }
+                }
+            }
+        }
+        
+        // Звичайний дріб
+        if (s.includes('/')) {
+            let parts = s.split('/');
+            if (parts.length === 2) {
+                let num = parseFloat(parts[0]);
+                let den = parseFloat(parts[1]);
+                if (!isNaN(num) && !isNaN(den) && den !== 0) {
+                    return num / den;
+                }
+            }
+        }
+        
+        // Десятковий дріб або ціле число
+        let val = parseFloat(s);
+        return isNaN(val) ? null : val;
+    }
+
+    function checkAnswer(taskNum) {
+        const inputElem = document.getElementById(`ans-${taskNum}`);
+        const resElem = document.getElementById(`res-${taskNum}`);
+        const algElem = document.getElementById(`alg-${taskNum}`);
+        
+        let rawVal = inputElem.value.trim();
+
+        if (rawVal === "") {
+            resElem.textContent = "Будь ласка, введіть відповідь!";
+            resElem.className = "result-message incorrect-msg";
+            resElem.style.display = "block";
+            return;
+        }
+
+        let isCorrect = false;
+        const EPS = 1e-4;
+
+        if (taskNum === 1) {
+            let parts = rawVal.split(';');
+            if (parts.length === 2) {
+                let n1 = parseNumber(parts[0]);
+                let n2 = parseNumber(parts[1]);
+                if (n1 !== null && n2 !== null) {
+                    if ((Math.abs(n1 - 6) < EPS && Math.abs(n2 - (-4.5)) < EPS) ||
+                        (Math.abs(n1 - (-4.5)) < EPS && Math.abs(n2 - 6) < EPS)) {
+                        isCorrect = true;
+                    }
+                }
+            }
+        } else if (taskNum === 2) {
+            let parts = rawVal.split(';');
+            if (parts.length === 2) {
+                let n1 = parseNumber(parts[0]);
+                let n2 = parseNumber(parts[1]);
+                if (n1 !== null && n2 !== null) {
+                    if ((Math.abs(n1 - 3) < EPS && Math.abs(n2 - (-0.8)) < EPS) ||
+                        (Math.abs(n1 - (-0.8)) < EPS && Math.abs(n2 - 3) < EPS)) {
+                        isCorrect = true;
+                    }
+                }
+            }
+        } else if (taskNum === 3) {
+            let n = parseNumber(rawVal);
+            if (n !== null && Math.abs(n - (1/6)) < EPS) {
+                isCorrect = true;
+            }
+        } else if (taskNum === 4) {
+            let n = parseNumber(rawVal);
+            if (n !== null && Math.abs(n - (-1.4)) < EPS) {
+                isCorrect = true;
+            }
+        }
+
+        if (isCorrect) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Правильно! Чудова робота! 🎉🎉🎉";
+            resElem.className = "result-message correct-msg";
+            algElem.style.display = "none";
+            triggerFireworks();
+        } else {
+            inputElem.className = "incorrect-input";
+            resElem.textContent = "Неправильно. Спробуй ще раз, користуючись алгоритмом нижче:";
+            resElem.className = "result-message incorrect-msg";
+            algElem.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
