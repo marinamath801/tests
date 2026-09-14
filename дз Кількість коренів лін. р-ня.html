@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Кількість коренів рівняння</title>
+    <!-- MathJax для математичних формул -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Анімація салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 850px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .instruction-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        .instruction-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #16a085;
+            border-bottom: 2px solid #16a085;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .equation {
+            font-size: 1.2rem;
+            background-color: #edf2f7;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .hints-container {
+            margin-bottom: 12px;
+        }
+        .hint-step {
+            display: none;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 4px;
+            color: #856404;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .btn-hint {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-hint:hover {
+            background-color: #d35400;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-row label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 180px;
+        }
+        input[type="text"], select {
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            flex: 1;
+            min-width: 200px;
+        }
+        .btn-check {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-check:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .correct-input { border-color: #2ecc71 !important; background-color: #e8f8f5 !important; }
+        .incorrect-input { border-color: #e74c3c !important; background-color: #fadbd8 !important; }
+        .correct-msg { background-color: #d4edda; color: #155724; display: block; }
+        .incorrect-msg { background-color: #f8d7da; color: #721c24; display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Кількість коренів рівняння</h1>
+
+    <!-- Блок інструкції -->
+    <div class="instruction-box">
+        <h3>📌 Як користуватися тренажером:</h3>
+        <ol>
+            <li>Виконуй завдання крок за кроком, вводячи відповідні рівняння та обираючи варіанти з випадаючого списку.</li>
+            <li>Якщо виникли труднощі — натисни кнопку <strong>«💡 Потрібна підказка?»</strong>. Вона підкаже правильний математичний крок.</li>
+            <li>Якщо одного кроку замало — натисни кнопку ще раз для наступної підказки.</li>
+            <li>В кінці кожного завдання натисни <strong>«Перевірити»</strong>. Правильні відповіді стануть зеленими, а неправильні — червоними.</li>
+        </ol>
+    </div>
+
+    <!-- Завдання 1 -->
+    <div class="section-title">104. Чи має розв’язки рівняння:</div>
+
+    <!-- 1.1 -->
+    <div class="task-card" id="task-1-1">
+        <div class="task-title">1) \(x + 4 = 4 - x\)</div>
+        <button class="btn-hint" id="btn-hint-1-1" onclick="showNextHint('1-1')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-1">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Перенеси доданок із змінною \(x\) з правої частини в ліву, змінивши його знак на протилежний, а число \(4\) з лівої частини перенеси в праву.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Зведи подібні доданки у лівій та правій частинах рівняння (обчисли \(x + x\) та \(4 - 4\)).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Проаналізуй отримане рівняння виду \(ax = b\): якщо \(a \neq 0\), рівняння має один корінь.
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-1" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-1">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(1)">Перевірити 1)</button>
+        <div id="res-1-1" class="result-message"></div>
+    </div>
+
+    <!-- 1.2 -->
+    <div class="task-card" id="task-1-2">
+        <div class="task-title">2) \(x + 2 = 2 + x\)</div>
+        <button class="btn-hint" id="btn-hint-1-2" onclick="showNextHint('1-2')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-2">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Перенеси доданок з \(x\) у ліву частину, а числа — у праву частину, не забуваючи змінювати знаки.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Зведи подібні доданки. Зверни увагу, що вийде з коефіцієнтом біля \(x\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Якщо отримано тотожність виду \(0x = 0\), то яке б число ми не підставили замість \(x\), рівність буде правильною.
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-2" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-2">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(2)">Перевірити 2)</button>
+        <div id="res-1-2" class="result-message"></div>
+    </div>
+
+    <!-- 1.3 -->
+    <div class="task-card" id="task-1-3">
+        <div class="task-title">3) \(x + 3 = -3 + x\)</div>
+        <button class="btn-hint" id="btn-hint-1-3" onclick="showNextHint('1-3')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-3">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Перенеси доданок з \(x\) ліворуч, а числа праворуч.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Зведи подібні доданки у лівій та правій частинах.
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Якщо отримано вираз виду \(0x = c\) (де \(c \neq 0\)), чи існує таке значення \(x\), яке при множенні на нуль дасть не нуль?
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-3" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-3">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(3)">Перевірити 3)</button>
+        <div id="res-1-3" class="result-message"></div>
+    </div>
+
+    <!-- 1.4 -->
+    <div class="task-card" id="task-1-4">
+        <div class="task-title">4) \(0x = 0\)</div>
+        <button class="btn-hint" id="btn-hint-1-4" onclick="showNextHint('1-4')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-4">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Рівняння вже записане у спрощеному вигляді! Повтори цей запис.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Подумай, чи буде рівність правильною, якщо замість \(x\) підставити 1? А 5? А -100?
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-4" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-4">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(4)">Перевірити 4)</button>
+        <div id="res-1-4" class="result-message"></div>
+    </div>
+
+    <!-- 1.5 -->
+    <div class="task-card" id="task-1-5">
+        <div class="task-title">5) \(0 \cdot (x + 4) = 7\)</div>
+        <button class="btn-hint" id="btn-hint-1-5" onclick="showNextHint('1-5')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-5">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Розкрий дужки в лівій частині (помнож нуль на кожен доданок у дужках).
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Зведи подібні доданки у лівій частині та запиши рівняння у стандартному вигляді \(0x = b\).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Оціни, чи можливо при множенні нуля на будь-яке число отримати 7.
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-5" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-5">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(5)">Перевірити 5)</button>
+        <div id="res-1-5" class="result-message"></div>
+    </div>
+
+    <!-- 1.6 -->
+    <div class="task-card" id="task-1-6">
+        <div class="task-title">6) \(3(x + 1) = 3x + 3\)</div>
+        <button class="btn-hint" id="btn-hint-1-6" onclick="showNextHint('1-6')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-6">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Розкрий дужки в лівій частині рівняння за розподільним законом.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Перенеси доданки з \(x\) ліворуч, а числа — праворуч та спрости вираз.
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Спробуй зробити висновок щодо кількості коренів, отримавши тотожність.
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-6" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-6">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(6)">Перевірити 6)</button>
+        <div id="res-1-6" class="result-message"></div>
+    </div>
+
+    <!-- 1.7 -->
+    <div class="task-card" id="task-1-7">
+        <div class="task-title">7) \(0 : x = 0\)</div>
+        <button class="btn-hint" id="btn-hint-1-7" onclick="showNextHint('1-7')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-7">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Згадай важливе математичне правило: на яке число ніколи не можна ділити?
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Запиши рівняння через множення або спрости вираз, враховуючи область допустимих значень.
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Чи може \(x\) дорівнювати 0? Чи підходять всі інші числа? (У шкільній програмі таке рівняння має безліч коренів, крім 0).
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-7" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-7">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(7)">Перевірити 7)</button>
+        <div id="res-1-7" class="result-message"></div>
+    </div>
+
+    <!-- 1.8 -->
+    <div class="task-card" id="task-1-8">
+        <div class="task-title">8) \(5(x - 1) = 5x - 4\)</div>
+        <button class="btn-hint" id="btn-hint-1-8" onclick="showNextHint('1-8')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-1-8">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка 1:</strong> Розкрий дужки у лівій частині рівняння.
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка 2:</strong> Перенеси доданки із змінною ліворуч, а без змінної — праворуч та зведи подібні.
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка 3:</strong> Подивись на отримане рівняння і зроби висновок про наявність коренів.
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-row">
+                <label>Спрощене рівняння:</label>
+                <input type="text" id="eq-1-8" placeholder="наприклад: 2x=5">
+            </div>
+            <div class="input-row">
+                <label>Кількість коренів:</label>
+                <select id="type-1-8">
+                    <option value="">-- Оберіть варіант --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkTask1Sub(8)">Перевірити 8)</button>
+        <div id="res-1-8" class="result-message"></div>
+    </div>
+
+
+    <!-- Завдання 2 -->
+    <div class="section-title">2. Розв’яжіть рівняння:</div>
+
+    <div class="task-card" id="task-2">
+        <div class="equation">\[ 4x - 3(20 - x) = 10x - 3(11 + x) \]</div>
+        
+        <button class="btn-hint" id="btn-hint-2" onclick="showNextHint('2')">💡 Потрібна підказка?</button>
+        <div class="hints-container" id="hints-2">
+            <div class="hint-step" data-step="1">
+                <strong>Підказка до кроку 1:</strong> Розкрий дужки у лівій та правій частинах рівняння, помноживши \(-3\) на кожне число в дужках. Уважно стеж за знаками!
+            </div>
+            <div class="hint-step" data-step="2">
+                <strong>Підказка до кроку 2:</strong> Зведи подібні доданки окремо у лівій частині (\(4x + 3x\)) та окремо у правій частині (\(10x - 3x\)).
+            </div>
+            <div class="hint-step" data-step="3">
+                <strong>Підказка до кроку 3:</strong> Перенеси доданки із змінною \(x\) з правої частини в ліву, а вільні числа з лівої частини в праву, змінюючи їхні знаки на протилежні.
+            </div>
+            <div class="hint-step" data-step="4">
+                <strong>Підказка до кроку 4:</strong> Зведи подібні доданки з обох боків від знака дорівнює.
+            </div>
+            <div class="hint-step" data-step="5">
+                <strong>Підказка до кроку 5:</strong> Зроби висновок про кількість коренів на основі отриманого рівняння виду \(0x = b\).
+            </div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-row">
+                <label>1 крок (розкриття дужок):</label>
+                <input type="text" id="t2-s1" placeholder="Введіть рівняння після розкриття дужок">
+            </div>
+            <div class="input-row">
+                <label>2 крок (зведення подібних):</label>
+                <input type="text" id="t2-s2" placeholder="Введіть спрощене рівняння">
+            </div>
+            <div class="input-row">
+                <label>3 крок (перенесення доданків):</label>
+                <input type="text" id="t2-s3" placeholder="Ікси вліво, числа вправо">
+            </div>
+            <div class="input-row">
+                <label>4 крок (фінальне спрощення):</label>
+                <input type="text" id="t2-s4" placeholder="Запишіть результат у вигляді рівняння">
+            </div>
+            <div class="input-row">
+                <label>5 крок (висновок):</label>
+                <select id="t2-s5">
+                    <option value="">-- Оберіть висновок про корені --</option>
+                    <option value="one">рівняння має один корінь</option>
+                    <option value="inf">рівняння має безліч коренів</option>
+                    <option value="none">рівняння не має коренів</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-check" onclick="checkTask2()">Перевірити завдання №2</button>
+        <div id="res-2" class="result-message"></div>
+    </div>
+
+</div>
+
+<script>
+    const currentSteps = {};
+
+    function showNextHint(taskId) {
+        if (!currentSteps[taskId]) currentSteps[taskId] = 0;
+        currentSteps[taskId]++;
+        
+        const container = document.getElementById(`hints-${taskId}`);
+        const hintStep = container.querySelector(`[data-step="${currentSteps[taskId]}"]`);
+        const btn = document.getElementById(`btn-hint-${taskId}`);
+        
+        if (hintStep) {
+            hintStep.style.display = "block";
+            btn.textContent = "💡 Потрібна наступна підказка? Натисни ще раз!";
+            if (window.MathJax) {
+                MathJax.typesetPromise([hintStep]);
+            }
+        } else {
+            btn.textContent = "✅ Усі підказки вже відкрито!";
+            btn.style.backgroundColor = "#7f8c8d";
+        }
+    }
+
+    function triggerFireworks() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        }
+    }
+
+    function cleanString(str) {
+        if (!str) return '';
+        return str.toLowerCase().replace(/\s+/g, '').replace(/\*/g, '').replace(/,/g, '.');
+    }
+
+    // Правильні відповіді для №1
+    const task1Answers = {
+        1: { eq: ['2x=0', '2*x=0', 'x=0'], type: 'one' },
+        2: { eq: ['0x=0', '0*x=0', '0=0'], type: 'inf' },
+        3: { eq: ['0x=-6', '0*x=-6'], type: 'none' },
+        4: { eq: ['0x=0', '0*x=0'], type: 'inf' },
+        5: { eq: ['0x=7', '0*x=7'], type: 'none' },
+        6: { eq: ['0x=0', '0*x=0', '0=0'], type: 'inf' },
+        7: { eq: ['0x=0', '0*x=0', '0=0'], type: 'inf' },
+        8: { eq: ['0x=1', '0*x=1'], type: 'none' }
+    };
+
+    function checkTask1Sub(subNum) {
+        const eqInput = document.getElementById(`eq-1-${subNum}`);
+        const typeSelect = document.getElementById(`type-1-${subNum}`);
+        const resElem = document.getElementById(`res-1-${subNum}`);
+
+        const userEq = cleanString(eqInput.value);
+        const userType = typeSelect.value;
+
+        const correct = task1Answers[subNum];
+        const isEqCorrect = correct.eq.includes(userEq);
+        const isTypeCorrect = userType === correct.type;
+
+        if (isEqCorrect) {
+            eqInput.className = "correct-input";
+        } else {
+            eqInput.className = "incorrect-input";
+        }
+
+        if (isTypeCorrect) {
+            typeSelect.className = "correct-input";
+        } else {
+            typeSelect.className = "incorrect-input";
+        }
+
+        if (isEqCorrect && isTypeCorrect) {
+            resElem.textContent = "Чудово! Все правильно! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerFireworks();
+        } else {
+            resElem.textContent = "Є помилки. Скористайся підказками та перевір свої обчислення!";
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+
+    function checkTask2() {
+        const s1 = document.getElementById('t2-s1');
+        const s2 = document.getElementById('t2-s2');
+        const s3 = document.getElementById('t2-s3');
+        const s4 = document.getElementById('t2-s4');
+        const s5 = document.getElementById('t2-s5');
+        const resElem = document.getElementById('res-2');
+
+        const u1 = cleanString(s1.value);
+        const u2 = cleanString(s2.value);
+        const u3 = cleanString(s3.value);
+        const u4 = cleanString(s4.value);
+        const u5 = s5.value;
+
+        const valid1 = ['4x-60+3x=10x-33-3x', '4x-60+3x=10x-3x-33'];
+        const valid2 = ['7x-60=7x-33'];
+        const valid3 = ['7x-7x=60-33', '7x-7x=-33+60'];
+        const valid4 = ['0x=27', '0*x=27'];
+        const valid5 = 'none';
+
+        let c1 = valid1.includes(u1);
+        let c2 = valid2.includes(u2);
+        let c3 = valid3.includes(u3);
+        let c4 = valid4.includes(u4);
+        let c5 = u5 === valid5;
+
+        s1.className = c1 ? "correct-input" : "incorrect-input";
+        s2.className = c2 ? "correct-input" : "incorrect-input";
+        s3.className = c3 ? "correct-input" : "incorrect-input";
+        s4.className = c4 ? "correct-input" : "incorrect-input";
+        s5.className = c5 ? "correct-input" : "incorrect-input";
+
+        if (c1 && c2 && c3 && c4 && c5) {
+            resElem.textContent = "Блискуче! Завдання №2 виконано абсолютно правильно! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerFireworks();
+        } else {
+            resElem.textContent = "Деякі кроки містять помилки. Перевірте підсвічені червоним поля!";
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+</script>
+
+</body>
+</html>
