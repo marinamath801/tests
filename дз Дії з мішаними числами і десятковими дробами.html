@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Динамічний тренажер: Дії з мішаними числами та десятковими дробами</title>
+    <!-- MathJax для математичних формул -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Анімація салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 850px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .controls-top {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .btn-generate {
+            background-color: #27ae60;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .btn-generate:hover {
+            background-color: #219150;
+            transform: translateY(-2px);
+        }
+        .instruction-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        .instruction-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #16a085;
+            border-bottom: 2px solid #16a085;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .hints-container {
+            margin-bottom: 12px;
+        }
+        .hint-step {
+            display: none;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 4px;
+            color: #856404;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .btn-hint {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-hint:hover {
+            background-color: #d35400;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-row label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 100px;
+        }
+        input[type="text"] {
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            flex: 1;
+            min-width: 200px;
+        }
+        .btn-check {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-check:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .correct-input { border-color: #2ecc71 !important; background-color: #e8f8f5 !important; }
+        .incorrect-input { border-color: #e74c3c !important; background-color: #fadbd8 !important; }
+        .correct-msg { background-color: #d4edda; color: #155724; display: block; }
+        .incorrect-msg { background-color: #f8d7da; color: #721c24; display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Тренажер: Дії з мішаними числами та десятковими дробами</h1>
+
+    <div class="controls-top">
+        <button class="btn-generate" onclick="generateAllTasks()">🔄 Згенерувати нові приклади</button>
+    </div>
+
+    <div class="instruction-box">
+        <h3>📌 Інструкція для учня:</h3>
+        <ol>
+            <li>Записуй відповіді у поля вводу. Для звичайних/мішаних дробів використовуй формат: <code>ціла_частина чисельник/знаменник</code> (наприклад: <code>2 1/3</code>), <code>чисельник/знаменник</code> (наприклад: <code>3/5</code>) або ціле число (наприклад: <code>4</code>).</li>
+            <li><strong>Звичайні дроби обов'язково треба скорочувати</strong>, а з неправильних дробів — <strong>виділяти цілу частину</strong> (наприклад, замість <code>2/4</code> пиши <code>1/2</code>, а замість <code>5/3</code> пиши <code>1 2/3</code>).</li>
+            <li>Для десяткових дробів можна використовувати як кому, так і крапку: <code>3.14</code> або <code>3,14</code>.</li>
+            <li>Якщо виникають труднощі — скористайся кнопкою <strong>«💡 Потрібна підказка?»</strong>.</li>
+            <li>Натискай <strong>«Згенерувати нові приклади»</strong> зверху, щоб тренуватися на нових числах!</li>
+        </ol>
+    </div>
+
+    <!-- БЛОК 1: Дії з мішаними числами -->
+    <div class="section-title">1. Дії з мішаними числами</div>
+    <div id="tasks-block-1"></div>
+
+    <!-- БЛОК 2: Запис звичайного дробу десятковим -->
+    <div class="section-title">2. Запис дробу десятковим дробом</div>
+    <div id="tasks-block-2"></div>
+
+    <!-- БЛОК 3: Додавання та віднімання десяткових дробів -->
+    <div class="section-title">3. Додавання та віднімання десяткових дробів</div>
+    <div id="tasks-block-3"></div>
+
+    <!-- БЛОК 4: Множення десяткових дробів -->
+    <div class="section-title">4. Множення десяткових дробів</div>
+    <div id="tasks-block-4"></div>
+
+</div>
+
+<script>
+    const taskData = {};
+    const currentSteps = {};
+
+    function gcd(a, b) {
+        return b === 0 ? a : gcd(b, a % b);
+    }
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getRandomChoice(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function formatFraction(num, den) {
+        const g = gcd(Math.abs(num), Math.abs(den));
+        num /= g;
+        den /= g;
+
+        if (den === 1) return `${num}`;
+        
+        const w = Math.floor(num / den);
+        const rem = num % den;
+
+        if (w === 0) return `${rem}/${den}`;
+        if (rem === 0) return `${w}`;
+        return `${w} ${rem}/${den}`;
+    }
+
+    function getIrreducibleFraction(maxDenominator) {
+        const den = getRandomInt(2, maxDenominator);
+        let num = getRandomInt(1, den - 1);
+        while (gcd(num, den) !== 1) {
+            num = getRandomInt(1, den - 1);
+        }
+        return { num, den };
+    }
+
+    // --- БЛОК 1: МІШАНІ ЧИСЛА ---
+    function genTask1() {
+        const f1 = getIrreducibleFraction(20);
+        const f2 = getIrreducibleFraction(20);
+        
+        const w1 = getRandomInt(2, 12);
+        const w2 = getRandomInt(1, 9);
+
+        const totalNum = (w1 * f1.den + f1.num) * f2.den + (w2 * f2.den + f2.num) * f1.den;
+        const totalDen = f1.den * f2.den;
+        const ans = formatFraction(totalNum, totalDen);
+
+        return {
+            title: `1) Додавання мішаних чисел: \\( ${w1}\\frac{${f1.num}}{${f1.den}} + ${w2}\\frac{${f2.num}}{${f2.den}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Знайди найменший спільний знаменник для дробових частин і обчисли додаткові множники.",
+                "<strong>Крок 2:</strong> Зведи дробові частини до спільного знаменника та додай окремо цілі й дробові частини.",
+                "<strong>Крок 3:</strong> За потреби скороти дробову частину та виділи з неї цілу частину."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask2() {
+        const f1 = getIrreducibleFraction(20);
+        const f2 = getIrreducibleFraction(20);
+        
+        const w1 = getRandomInt(8, 18);
+        const w2 = getRandomInt(2, 7);
+
+        let totalNum = (w1 * f1.den + f1.num) * f2.den - (w2 * f2.den + f2.num) * f1.den;
+        if (totalNum <= 0) return genTask2();
+
+        const totalDen = f1.den * f2.den;
+        const ans = formatFraction(totalNum, totalDen);
+
+        return {
+            title: `2) Віднімання мішаних чисел: \\( ${w1}\\frac{${f1.num}}{${f1.den}} - ${w2}\\frac{${f2.num}}{${f2.den}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Знайди спільний знаменник і зведи дробові частини обох чисел до цього знаменника.",
+                "<strong>Крок 2:</strong> Порівняй чисельники: якщо чисельник зменшуваного менший за чисельник від'ємника, позич 1 цілу у зменшуваного.",
+                "<strong>Крок 3:</strong> Виконай віднімання та обов'язково скороти отриману дробову частину, якщо це можливо."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    // Множення мішаних чисел із підбором подвійного скорочення по двох діагоналях
+    function genTask3() {
+        const g1 = getRandomChoice([2, 3, 4, 5]);
+        const g2 = getRandomChoice([2, 3, 4, 5]);
+
+        const a1 = getRandomInt(1, 5);
+        const b2 = getRandomInt(1, 5);
+        const b1 = getRandomInt(1, 5);
+        const a2 = getRandomInt(1, 5);
+
+        const N1 = a1 * g1;
+        const d1 = b1 * g2;
+        const N2 = a2 * g2;
+        const d2 = b2 * g1;
+
+        if (N1 <= d1 || N2 <= d2) return genTask3();
+
+        const w1 = Math.floor(N1 / d1);
+        const n1 = N1 % d1;
+        const w2 = Math.floor(N2 / d2);
+        const n2 = N2 % d2;
+
+        if (n1 === 0 || n2 === 0 || gcd(n1, d1) !== 1 || gcd(n2, d2) !== 1) {
+            return genTask3();
+        }
+
+        if (gcd(N1, d2) <= 1 || gcd(N2, d1) <= 1) {
+            return genTask3();
+        }
+
+        const totalNum = N1 * N2;
+        const totalDen = d1 * d2;
+        const ans = formatFraction(totalNum, totalDen);
+
+        return {
+            title: `3) Множення мішаних чисел: \\( ${w1}\\frac{${n1}}{${d1}} \\cdot ${w2}\\frac{${n2}}{${d2}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Перетвори обидва мішані числа у неправильні дроби.",
+                "<strong>Крок 2:</strong> Запиши множення під однією дробовою рискою та скороти чисельники зі знаменниками **навхрест (по обох діагоналях)**.",
+                "<strong>Крок 3:</strong> Перемнож скорочені залишки. Залежно від результату, виділи цілу частину, скороти дріб або запиши ціле число."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    // Ділення мішаних чисел із підбором подвійного скорочення по двох діагоналях
+    function genTask4() {
+        const g1 = getRandomChoice([2, 3, 4, 5]);
+        const g2 = getRandomChoice([2, 3, 4, 5]);
+
+        const a1 = getRandomInt(1, 5);
+        const b2 = getRandomInt(1, 5);
+        const b1 = getRandomInt(1, 5);
+        const a2 = getRandomInt(1, 5);
+
+        const N1 = a1 * g1;
+        const d1 = b1 * g2;
+        const d2 = a2 * g2;
+        const N2 = b2 * g1;
+
+        if (N1 <= d1 || N2 <= d2) return genTask4();
+
+        const w1 = Math.floor(N1 / d1);
+        const n1 = N1 % d1;
+        const w2 = Math.floor(N2 / d2);
+        const n2 = N2 % d2;
+
+        if (n1 === 0 || n2 === 0 || gcd(n1, d1) !== 1 || gcd(n2, d2) !== 1) {
+            return genTask4();
+        }
+
+        if (gcd(N1, N2) <= 1 || gcd(d2, d1) <= 1) {
+            return genTask4();
+        }
+
+        const totalNum = N1 * d2;
+        const totalDen = d1 * N2;
+        const ans = formatFraction(totalNum, totalDen);
+
+        return {
+            title: `4) Ділення мішаних чисел: \\( ${w1}\\frac{${n1}}{${d1}} : ${w2}\\frac{${n2}}{${d2}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Перетвори обидва мішані числа у неправильні дроби.",
+                "<strong>Крок 2:</strong> Заміни ділення на множення, перевернувши другий дріб (дільник).",
+                "<strong>Крок 3:</strong> Скорати дроби **в обох діагоналях** перед множенням та запиши результат (це може бути ціле число, правильний дріб або мішане число)."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    // --- БЛОК 2: ЗАПИС У ДЕСЯТКОВИЙ ДРІБ ---
+    function genTask5() {
+        const denChoice = getRandomChoice([10, 100, 1000]);
+        let num;
+        if (denChoice === 10) num = getRandomInt(1, 99);
+        else if (denChoice === 100) num = getRandomChoice([getRandomInt(3, 9), getRandomInt(11, 99), getRandomInt(101, 350)]);
+        else num = getRandomChoice([getRandomInt(1, 9), getRandomInt(12, 99), getRandomInt(105, 890)]);
+
+        const ans = (num / denChoice).toString();
+
+        return {
+            title: `5) Запиши десятковим дробом: \\( \\frac{${num}}{${denChoice}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Порахуй кількість нулів у знаменнику та кількість цифр у чисельнику.",
+                "<strong>Крок 2:</strong> Відокрем комою справа наліво стільки знаків, скільки нулів у знаменнику (або допиши нулі попереду)."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask6() {
+        const w = getRandomInt(1, 25);
+        const denChoice = getRandomChoice([100, 1000]);
+        let num;
+        if (denChoice === 100) num = getRandomInt(1, 9);
+        else num = getRandomChoice([getRandomInt(1, 9), getRandomInt(10, 99)]);
+
+        const val = w + (num / denChoice);
+        const ans = val.toString();
+
+        return {
+            title: `6) Запиши десятковим дробом: \\( ${w}\\frac{${num}}{${denChoice}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Зістав кількість нулів у знаменнику з кількістю цифр у чисельнику.",
+                "<strong>Крок 2:</strong> Запиши цілу частину, постав кому та допиши необхідну кількість нулів перед чисельником, щоб кількість цифр після коми дорівнювала кількості нулів у знаменнику."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask7() {
+        const denChoice = getRandomChoice([100, 1000, 10000]);
+        const num = getRandomInt(1, 9);
+        const val = num / denChoice;
+        const ans = val.toString();
+
+        return {
+            title: `7) Запиши десятковим дробом: \\( \\frac{${num}}{${denChoice}} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Порахуй, на скільки цифр чисельник коротший за кількість нулів у знаменнику.",
+                "<strong>Крок 2:</strong> Запиши 0 цілих, а після коми додай нулі ліворуч від числа з чисельника, щоб вирівняти кількість розрядів."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    // --- БЛОК 3: ДОДАВАННЯ ТА ВІДНІМАННЯ ДЕСЯТКОВИХ ДРОБІВ ---
+    function genTask8() {
+        const aInt = getRandomInt(5, 120);
+        const aDec = getRandomChoice([1, 2, 3]);
+        const a = (aInt + Math.random()).toFixed(aDec);
+
+        const bInt = getRandomInt(1, 45);
+        const bDec = getRandomChoice([1, 2, 3]);
+        const b = (bInt + Math.random()).toFixed(bDec);
+
+        const sum = (parseFloat(a) + parseFloat(b)).toFixed(Math.max(aDec, bDec));
+        const ans = parseFloat(sum).toString();
+
+        return {
+            title: `8) Додавання десяткових дробів: \\( ${a.replace('.', ',')} + ${b.replace('.', ',')} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Зрівняй кількість знаків після коми в обох числах, приписавши нуль справа, де це необхідно.",
+                "<strong>Крок 2:</strong> Запиши числа у стовпчик так, щоб кома була під комою, та виконай додавання по розрядах."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask9() {
+        const mode = getRandomChoice(['int_minus_dec', 'dec_minus_dec']);
+        let aStr, bStr, diff;
+
+        if (mode === 'int_minus_dec') {
+            const a = getRandomInt(15, 150);
+            const bDec = getRandomChoice([1, 2, 3]);
+            const b = (getRandomInt(1, a - 1) + Math.random()).toFixed(bDec);
+            aStr = a.toString();
+            bStr = b.toString();
+            diff = (a - parseFloat(b)).toFixed(bDec);
+        } else {
+            const aDec = getRandomChoice([1, 2]);
+            const bDec = getRandomChoice([2, 3]);
+            const a = (getRandomInt(20, 99) + Math.random()).toFixed(aDec);
+            const b = (getRandomInt(1, 19) + Math.random()).toFixed(bDec);
+            aStr = a.toString();
+            bStr = b.toString();
+            diff = (parseFloat(a) - parseFloat(b)).toFixed(Math.max(aDec, bDec));
+        }
+
+        const ans = parseFloat(diff).toString();
+
+        return {
+            title: `9) Віднімання десяткових дробів: \\( ${aStr.replace('.', ',')} - ${bStr.replace('.', ',')} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Постав кому після цілого числа (або зрівняй кількість знаків після коми) та допиши необхідну кількість нулів.",
+                "<strong>Крок 2:</strong> Виконай віднімання у стовпчик, дотримуючись правила «кома під комою»."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    // --- БЛОК 4: УСНЕ МНОЖЕННЯ ДЕСЯТКОВИХ ДРОБІВ ---
+    function genTask10() {
+        const intNum = getRandomChoice([3, 4, 5, 6, 7, 8, 9, 12, 15, 25]);
+        const decPlaces = getRandomChoice([1, 2]);
+        const baseDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9, 11, 12, 14]);
+        
+        const decVal = baseDigits / Math.pow(10, decPlaces);
+        const decStr = decVal.toFixed(decPlaces);
+
+        const prod = (intNum * decVal).toFixed(decPlaces);
+        const ans = parseFloat(prod).toString();
+
+        return {
+            title: `10) Множення десяткових дробів: \\( ${intNum} \\cdot ${decStr.replace('.', ',')} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Перемнож числа усно, не звертаючи уваги на кому.",
+                "<strong>Крок 2:</strong> Порахуй кількість знаків після коми в дробові та відокрем стільки ж знаків комою праворуч у результаті."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask11() {
+        const type = getRandomChoice(['1x1', '2x1', '1x2']);
+        let aDigits, bDigits, aDec, bDec;
+
+        if (type === '1x1') {
+            aDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9, 11, 12]);
+            bDigits = getRandomChoice([3, 4, 6, 7, 8, 9]);
+            aDec = 1; bDec = 1;
+        } else if (type === '2x1') {
+            aDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9, 11, 12, 15, 25]);
+            bDigits = getRandomChoice([2, 3, 4, 5]);
+            aDec = 2; bDec = 1;
+        } else {
+            aDigits = getRandomChoice([3, 4, 6, 7, 8, 9]);
+            bDigits = getRandomChoice([11, 12, 14, 15, 25]);
+            aDec = 1; bDec = 2;
+        }
+
+        const aVal = aDigits / Math.pow(10, aDec);
+        const bVal = bDigits / Math.pow(10, bDec);
+
+        const aStr = aVal.toFixed(aDec);
+        const bStr = bVal.toFixed(bDec);
+
+        const prod = (aVal * bVal).toFixed(aDec + bDec);
+        const ans = parseFloat(prod).toString();
+
+        return {
+            title: `11) Множення десяткових дробів: \\( ${aStr.replace('.', ',')} \\cdot ${bStr.replace('.', ',')} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Помнож числа як цілі (без урахування ком) в умі.",
+                "<strong>Крок 2:</strong> Порахуй сумарну кількість цифр після коми в обох множниках разом.",
+                "<strong>Крок 3:</strong> Відрахуй справа наліво у добутку отриману кількість знаків та постав кому."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function genTask12() {
+        const type = getRandomChoice(['3x1', '2x2', '1x3']);
+        let aDigits, bDigits, aDec, bDec;
+
+        if (type === '3x1') {
+            aDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9, 12]);
+            bDigits = getRandomChoice([2, 3, 4, 5]);
+            aDec = 3; bDec = 1;
+        } else if (type === '2x2') {
+            aDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9]);
+            bDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9]);
+            aDec = 2; bDec = 2;
+        } else {
+            aDigits = getRandomChoice([2, 3, 4, 5]);
+            bDigits = getRandomChoice([2, 3, 4, 6, 7, 8, 9, 12]);
+            aDec = 1; bDec = 3;
+        }
+
+        const aVal = aDigits / Math.pow(10, aDec);
+        const bVal = bDigits / Math.pow(10, bDec);
+
+        const aStr = aVal.toFixed(aDec);
+        const bStr = bVal.toFixed(bDec);
+
+        const prod = (aVal * bVal).toFixed(aDec + bDec);
+        const ans = parseFloat(prod).toString();
+
+        return {
+            title: `12) Множення десяткових дробів: \\( ${aStr.replace('.', ',')} \\cdot ${bStr.replace('.', ',')} \\)`,
+            hints: [
+                "<strong>Крок 1:</strong> Перемнож значущі цифри без урахування ком.",
+                "<strong>Крок 2:</strong> Порахуй загальну кількість десяткових знаків у першому та другому множниках разом.",
+                "<strong>Крок 3:</strong> Відокрем комою потрібну кількість знаків справа наліво, дописуючи нулі попереду за потреби."
+            ],
+            validAnswers: [ans]
+        };
+    }
+
+    function renderTaskCard(id, data) {
+        let hintsHtml = '';
+        data.hints.forEach((h, idx) => {
+            hintsHtml += `<div class="hint-step" data-step="${idx + 1}">${h}</div>`;
+        });
+
+        return `
+            <div class="task-card" id="task-${id}">
+                <div class="task-title">${data.title}</div>
+                <button class="btn-hint" id="btn-hint-${id}" onclick="showNextHint('${id}')">💡 Потрібна підказка?</button>
+                <div class="hints-container" id="hints-${id}">
+                    ${hintsHtml}
+                </div>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>Відповідь:</label>
+                        <input type="text" id="ans-${id}" placeholder="введіть відповідь">
+                    </div>
+                </div>
+                <button class="btn-check" onclick="checkTask('${id}')">Перевірити</button>
+                <div id="res-${id}" class="result-message"></div>
+            </div>
+        `;
+    }
+
+    function generateAllTasks() {
+        const generators = [
+            { block: 'tasks-block-1', gen: genTask1, id: 1 },
+            { block: 'tasks-block-1', gen: genTask2, id: 2 },
+            { block: 'tasks-block-1', gen: genTask3, id: 3 },
+            { block: 'tasks-block-1', gen: genTask4, id: 4 },
+            { block: 'tasks-block-2', gen: genTask5, id: 5 },
+            { block: 'tasks-block-2', gen: genTask6, id: 6 },
+            { block: 'tasks-block-2', gen: genTask7, id: 7 },
+            { block: 'tasks-block-3', gen: genTask8, id: 8 },
+            { block: 'tasks-block-3', gen: genTask9, id: 9 },
+            { block: 'tasks-block-4', gen: genTask10, id: 10 },
+            { block: 'tasks-block-4', gen: genTask11, id: 11 },
+            { block: 'tasks-block-4', gen: genTask12, id: 12 }
+        ];
+
+        ['tasks-block-1', 'tasks-block-2', 'tasks-block-3', 'tasks-block-4'].forEach(id => {
+            document.getElementById(id).innerHTML = '';
+        });
+
+        generators.forEach(item => {
+            currentSteps[item.id] = 0;
+            const data = item.gen();
+            taskData[item.id] = data;
+            document.getElementById(item.block).innerHTML += renderTaskCard(item.id, data);
+        });
+
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+    }
+
+    function showNextHint(taskId) {
+        if (!currentSteps[taskId]) currentSteps[taskId] = 0;
+        currentSteps[taskId]++;
+        
+        const container = document.getElementById(`hints-${taskId}`);
+        const hintStep = container.querySelector(`[data-step="${currentSteps[taskId]}"]`);
+        const btn = document.getElementById(`btn-hint-${taskId}`);
+        
+        if (hintStep) {
+            hintStep.style.display = "block";
+            btn.textContent = "💡 Потрібна наступна підказка? Натисни ще раз!";
+        } else {
+            btn.textContent = "✅ Усі підказки вже відкрито!";
+            btn.style.backgroundColor = "#7f8c8d";
+        }
+    }
+
+    function triggerFireworks() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        }
+    }
+
+    function cleanString(str) {
+        if (!str) return '';
+        return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/\*/g, '').replace(/,/g, '.');
+    }
+
+    function checkTask(taskId) {
+        const inputElem = document.getElementById(`ans-${taskId}`);
+        const resElem = document.getElementById(`res-${taskId}`);
+
+        const userAns = cleanString(inputElem.value);
+        const validAnswers = taskData[taskId].validAnswers;
+        const cleanedValidAnswers = validAnswers.map(a => cleanString(a));
+
+        const isCorrect = cleanedValidAnswers.includes(userAns);
+
+        if (isCorrect) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Чудово! Все правильно! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerFireworks();
+        } else {
+            inputElem.className = "incorrect-input";
+            if (taskId >= 1 && taskId <= 4) {
+                resElem.innerHTML = "Є помилка. Перевірте обчислення!<br>💡 <strong>Нагадування:</strong> дріб обов'язково треба скоротити, а з неправильного дробу — виділити цілу частину (записати у вигляді мішаного числа)!";
+            } else {
+                resElem.textContent = "Є помилка. Перевірте свої обчислення!";
+            }
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+
+    window.onload = function() {
+        generateAllTasks();
+    };
+</script>
+
+</body>
+</html>
