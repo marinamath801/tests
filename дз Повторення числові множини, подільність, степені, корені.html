@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Інтерактивний тренажер — Числові множини, модуль, степінь</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      min-height: 100vh;
+    }
+
+    .math-text {
+      font-family: 'Roboto', serif;
+    }
+
+    .italic {
+      font-style: italic;
+    }
+
+    /* Двоповерховий вигляд дробів */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 4px;
+      line-height: 1.1;
+    }
+    .frac .top {
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 2px;
+    }
+    .frac .bottom {
+      padding-top: 2px;
+    }
+
+    /* Академічне відображення коренів з вирівнюванням множників на один рівень */
+    .radical {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .surd {
+      font-size: 1.15em;
+      margin-right: -1px;
+      font-family: sans-serif;
+    }
+    .vinculum {
+      border-top: 2px solid #1e293b;
+      padding-top: 2px;
+      display: inline-block;
+      line-height: 1;
+    }
+
+    @keyframes flyToPiggy {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(var(--tw-translate-x), -120px) scale(1.4) rotate(180deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--target-x), var(--target-y)) scale(0.2) rotate(360deg);
+      }
+    }
+
+    .flying-coin {
+      position: fixed;
+      z-index: 100;
+      pointer-events: none;
+      padding: 4px 10px;
+      background: radial-gradient(circle, #fde047 0%, #eab308 70%, #ca8a04 100%);
+      border: 2px solid #a16207;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #854d0e;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      font-size: 14px;
+    }
+
+    @keyframes bump {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3) rotate(-8deg); }
+      100% { transform: scale(1); }
+    }
+    .piggy-bounce {
+      animation: bump 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 p-3 md:p-6">
+
+  <!-- Шапка з навігацією та Скарбничкою -->
+  <header class="max-w-4xl mx-auto w-full bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-emerald-100 flex flex-col gap-3 sticky top-2 z-40 mb-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="piggy-icon" class="text-4xl transition-transform cursor-pointer">🐷</div>
+        <div>
+          <h1 class="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-wider">Ваша скарбничка</h1>
+          <div class="text-2xl md:text-3xl font-extrabold text-emerald-600 flex items-center gap-1">
+            <span id="score-display">0</span> <span class="text-lg font-bold text-amber-500">грн</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-right">
+        <span id="progress-text" class="text-sm font-semibold text-slate-600">Завдання 1 з 25</span>
+        <div class="w-28 md:w-48 bg-slate-200 h-3 rounded-full overflow-hidden mt-1">
+          <div id="progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Швидка навігація по всіх 25 завданнях -->
+    <div id="nav-dots" class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100 justify-center"></div>
+  </header>
+
+  <!-- Основний контент -->
+  <main class="max-w-3xl mx-auto w-full flex-grow flex flex-col justify-center">
+    <div id="quiz-card" class="bg-white rounded-3xl p-5 md:p-8 shadow-xl border border-slate-100 relative overflow-hidden transition-all">
+      <div class="mb-5">
+        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full mb-3" id="task-category">ДЗ: Повторення</span>
+        <div id="question-text" class="text-xl md:text-2xl font-semibold text-slate-800 leading-relaxed math-text"></div>
+      </div>
+
+      <!-- Контейнер для вибору відповіді -->
+      <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"></div>
+
+      <!-- Контейнер для відповідей на відповідність -->
+      <div id="match-container" class="hidden space-y-4 mb-4"></div>
+
+      <!-- Панель дій та фідбеку -->
+      <div id="feedback-panel" class="hidden rounded-xl p-4 mb-2 font-medium flex items-center justify-between">
+        <span id="feedback-text"></span>
+        <button id="next-btn" onclick="nextQuestion()" class="px-5 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 shadow-md transition">Далі ➔</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Віконце з кінцевою сумою -->
+  <div id="result-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform transition-all scale-95 opacity-0" id="modal-content">
+      <div class="text-6xl mb-4">🎉</div>
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">Чудова робота!</h2>
+      <p class="text-slate-600 mb-6">Усі завдання з домашньої роботи пройдено!</p>
+      
+      <div class="bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 border-2 border-amber-300 rounded-2xl p-6 mb-6 shadow-inner">
+        <div class="text-xs uppercase font-bold text-amber-800 tracking-widest mb-1">Разом у скарбничці</div>
+        <div class="text-4xl font-extrabold text-amber-600 flex items-center justify-center gap-2">
+          <span>🪙</span>
+          <span id="final-score">0</span>
+          <span class="text-xl">грн</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button onclick="closeModal()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition">Подивитись свої відповіді 🔍</button>
+        <button onclick="restartQuiz()" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-700 transition">Пройти знову 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playCoinSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(987.77, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1318.51, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    function playErrorSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    const r = (inner, prefix = '') => `<span class="radical">${prefix ? `<span>${prefix}</span>` : ''}<span class="surd">√</span><span class="vinculum">${inner}</span></span>`;
+
+    const questions = [
+      { num: 1, category: "Подільність чисел", type: "single", question: `Яку з наведених цифр потрібно поставити замість зірочки в записі числа 257*, щоб отримане число ділилося націло на 3?`, options: [{ text: `2`, correct: true }, { text: `3`, correct: false }, { text: `6`, correct: false }, { text: `7`, correct: false }, { text: `9`, correct: false }], reward: 0.5 },
+      { num: 2, category: "Раціональні числа", type: "single", question: `Яке з наведених чисел є раціональним числом?`, options: [{ text: `∛9`, correct: false }, { text: `${r('10')}`, correct: false }, { text: `π`, correct: false }, { text: `${r('3,6')}`, correct: false }, { text: `${r('0,64')}`, correct: true }], reward: 0.5 },
+      { num: 3, category: "Установіть відповідність", type: "matching", question: `Установіть відповідність між запитаннями (1–4) та правильною відповіддю на нього (А–Д).`, items: [{ id: 1, label: "1. Яке число є квадратом натурального числа?" }, { id: 2, label: "2. Яке число є простим?" }, { id: 3, label: "3. Яке число є дільником 8?" }, { id: 4, label: "4. Яке число кратне 7?" }], targets: [{ key: "A", label: "А: 8" }, { key: "B", label: "Б: 16" }, { key: "C", label: "В: 17" }, { key: "D", label: "Г: 27" }, { key: "E", label: "Д: 56" }], correctAnswers: { 1: "B", 2: "C", 3: "A", 4: "E" }, rewardPerMatch: 0.5 },
+      { num: 4, category: "Порівняння дробів", type: "single", question: `Розташуйте в порядку зростання числа: <div class="frac"><span class="top">5</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">18</span></div>, <div class="frac"><span class="top">6</span><span class="bottom">17</span></div>.`, options: [{ text: `<div class="frac"><span class="top">5</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">18</span></div>, <div class="frac"><span class="top">6</span><span class="bottom">17</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">18</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">6</span><span class="bottom">17</span></div>`, correct: true }, { text: `<div class="frac"><span class="top">6</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">18</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">18</span></div>, <div class="frac"><span class="top">6</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">17</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">6</span><span class="bottom">17</span></div>, <div class="frac"><span class="top">5</span><span class="bottom">18</span></div>`, correct: false }], reward: 0.5 },
+      { num: 5, category: "Модуль числа", type: "single", question: `Якщо <span class="italic">a</span> < 1, то |<span class="italic">a</span> - 1| + |-7| =`, options: [{ text: `<span class="italic">a</span> - 8`, correct: false }, { text: `<span class="italic">a</span> + 6`, correct: false }, { text: `-<span class="italic">a</span> + 6`, correct: false }, { text: `-<span class="italic">a</span> - 6`, correct: false }, { text: `-<span class="italic">a</span> + 8`, correct: true }], reward: 0.5 },
+      { num: 6, category: "Десяткові дроби", type: "single", question: `Запишіть число <div class="frac"><span class="top">5</span><span class="bottom">3</span></div> у вигляді десяткового дробу, округливши його до десятих.`, options: [{ text: `1,2`, correct: false }, { text: `1,67`, correct: false }, { text: `1,7`, correct: true }, { text: `2,7`, correct: false }, { text: `5,3`, correct: false }], reward: 0.5 },
+      { num: 7, category: "Цілі числа в інтервалі", type: "single", question: `Скільки всього цілих чисел містить інтервал (${r('8')}; ${r('81')})?`, options: [{ text: `8`, correct: false }, { text: `7`, correct: false }, { text: `6`, correct: false }, { text: `5`, correct: true }, { text: `4`, correct: false }], reward: 0.5 },
+      { num: 8, category: "Модуль з коренем", type: "single", question: `Обчисліть: |${r('2', '2')} - 3| =`, options: [{ text: `3 - ${r('2', '2')}`, correct: true }, { text: `${r('2', '2')} - 3`, correct: false }, { text: `${r('2', '2')} + 3`, correct: false }, { text: `-${r('2', '2')} - 3`, correct: false }, { text: `${r('2')}`, correct: false }], reward: 0.5 },
+      { num: 9, category: "Цілі числа в інтервалі", type: "single", question: `Скільки всього цілих чисел містить інтервал (-2,07; 15,9)?`, options: [{ text: `19`, correct: false }, { text: `15`, correct: false }, { text: `13`, correct: false }, { text: `17`, correct: false }, { text: `18`, correct: true }], reward: 0.5 },
+      { num: 10, category: "Степені", type: "single", question: `Обчисліть: <div class="frac"><span class="top">2<sup>5</sup> ⋅ 5<sup>7</sup></span><span class="bottom">10<sup>8</sup></span></div> =`, options: [{ text: `10<sup>4</sup>`, correct: false }, { text: `<div class="frac"><span class="top">1</span><span class="bottom">25</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">1</span><span class="bottom">40</span></div>`, correct: true }, { text: `<div class="frac"><span class="top">1</span><span class="bottom">8</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">8</span></div>`, correct: false }], reward: 0.5 },
+      { num: 11, category: "Модуль", type: "single", question: `Обчисліть: |2 - ${r('7')}| =`, options: [{ text: `2 + ${r('7')}`, correct: false }, { text: `${r('3')}`, correct: false }, { text: `2 - ${r('7')}`, correct: false }, { text: `${r('7')} - 2`, correct: true }, { text: `${r('5')}`, correct: false }], reward: 0.5 },
+      { num: 12, category: "Квадратний корінь", type: "single", question: `Спростіть вираз: ${r(`(-1 - ${r('6')})<sup>2</sup>`)} =`, options: [{ text: `1 - ${r('6')}`, correct: false }, { text: `1 + ${r('6')}`, correct: true }, { text: `-1 - ${r('6')}`, correct: false }, { text: `-${r('7')}`, correct: false }, { text: `${r('6')} - 1`, correct: false }], reward: 0.5 },
+      { num: 13, category: "Обчислення виразів", type: "single", question: `Обчисліть: |2,1 ⋅ 10<sup>3</sup> - 50| =`, options: [{ text: `2050`, correct: true }, { text: `1995`, correct: false }, { text: `160`, correct: false }, { text: `2150`, correct: false }, { text: `20950`, correct: false }], reward: 0.5 },
+      { num: 14, category: "Нерівності", type: "single", question: `Скільки всього цілих чисел є розв'язками нерівності -4 < <span class="italic">x</span> ≤ 2,2?`, options: [{ text: `5`, correct: false }, { text: `6`, correct: true }, { text: `7`, correct: false }, { text: `8`, correct: false }, { text: `9`, correct: false }], reward: 0.5 },
+      { num: 15, category: "Модуль від'ємного степеня", type: "single", question: `Обчисліть: |5<sup>-1</sup> - 3| =`, options: [{ text: `8`, correct: false }, { text: `2,8`, correct: true }, { text: `2,5`, correct: false }, { text: `-2,8`, correct: false }, { text: `-8`, correct: false }], reward: 0.5 },
+      { num: 16, category: "Спрощення виразів", type: "single", question: `Спростіть вираз: <div class="frac"><span class="top"><span class="italic">b</span><sup>2</sup> ⋅ <span class="italic">b</span><sup>10</sup></span><span class="bottom"><span class="italic">b</span><sup>4</sup></span></div>, де <span class="italic">b</span> ≠ 0.`, options: [{ text: `<span class="italic">b</span><sup>16</sup>`, correct: false }, { text: `<span class="italic">b</span><sup>8</sup>`, correct: true }, { text: `<span class="italic">b</span><sup>5</sup>`, correct: false }, { text: `<span class="italic">b</span><sup>4</sup>`, correct: false }, { text: `<span class="italic">b</span><sup>3</sup>`, correct: false }], reward: 0.5 },
+      { num: 17, category: "Властивості степеня", type: "single", question: `Спростіть вираз: (<span class="italic">a</span><sup>6</sup>)<sup>4</sup> : <span class="italic">a</span><sup>2</sup>, де <span class="italic">a</span> ≠ 0.`, options: [{ text: `<span class="italic">a</span><sup>5</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>8</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>10</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>12</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>22</sup>`, correct: true }], reward: 0.5 },
+      { num: 18, category: "Скорочення дробів", type: "single", question: `Скоротіть дріб: <div class="frac"><span class="top">10<span class="italic">a</span><span class="italic">b</span><sup>3</sup></span><span class="bottom">5<span class="italic">a</span><sup>2</sup><span class="italic">b</span></span></div>.`, options: [{ text: `<div class="frac"><span class="top">2<span class="italic">b</span><sup>2</sup></span><span class="bottom"><span class="italic">a</span></span></div>`, correct: true }, { text: `<div class="frac"><span class="top"><span class="italic">b</span><sup>4</sup></span><span class="bottom">2<span class="italic">a</span><sup>3</sup></span></div>`, correct: false }, { text: `50<span class="italic">a</span><sup>3</sup><span class="italic">b</span><sup>4</sup>`, correct: false }, { text: `<div class="frac"><span class="top">2<span class="italic">b</span><sup>4</sup></span><span class="bottom"><span class="italic">a</span><sup>3</sup></span></div>`, correct: false }, { text: `<div class="frac"><span class="top"><span class="italic">b</span><sup>2</sup></span><span class="bottom">2<span class="italic">a</span></span></div>`, correct: false }], reward: 0.5 },
+      { num: 19, category: "Спрощення виразів", type: "single", question: `Спростіть вираз: <div class="frac"><span class="top"><span class="italic">a</span><sup>24</sup></span><span class="bottom">(<span class="italic">a</span><sup>4</sup>)<sup>2</sup></span></div>.`, options: [{ text: `<span class="italic">a</span><sup>18</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>3</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>8</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>4</sup>`, correct: false }, { text: `<span class="italic">a</span><sup>16</sup>`, correct: true }], reward: 0.5 },
+      { num: 20, category: "Від'ємний показник", type: "single", question: `Укажіть проміжок, якому належить значення виразу: (<div class="frac"><span class="top">1</span><span class="bottom">4</span></div>)<sup>-2</sup>.`, options: [{ text: `(-∞; -10]`, correct: false }, { text: `(-10; 0]`, correct: false }, { text: `(0; 1]`, correct: false }, { text: `(1; 10]`, correct: false }, { text: `(10; +∞)`, correct: true }], reward: 0.5 },
+      { num: 21, category: "Одночлени", type: "single", question: `(-2<span class="italic">x</span><sup>4</sup>)<sup>3</sup> =`, options: [{ text: `-6<span class="italic">x</span><sup>7</sup>`, correct: false }, { text: `-8<span class="italic">x</span><sup>12</sup>`, correct: true }, { text: `-8<span class="italic">x</span><sup>7</sup>`, correct: false }, { text: `8<span class="italic">x</span><sup>12</sup>`, correct: false }, { text: `6<span class="italic">x</span><sup>12</sup>`, correct: false }], reward: 0.5 },
+      { num: 22, category: "Узгодження виразів", type: "matching", question: `Узгодьте вираз (1–3) із його значенням (А–Д), якщо <span class="italic">m</span> = -<div class="frac"><span class="top">4</span><span class="bottom">3</span></div>.`, items: [{ id: 1, label: "1. |m - 4|" }, { id: 2, label: "2. 4m⁻¹" }, { id: 3, label: "3. (3m + 1)⁰" }], targets: [{ key: "A", label: "А: -3" }, { key: "B", label: "Б: 1" }, { key: "C", label: "В: 0" }, { key: "D", label: "Г: 3" }, { key: "E", label: "Д: 16/3" }], correctAnswers: { 1: "E", 2: "A", 3: "B" }, rewardPerMatch: 0.5 },
+      { num: 23, category: "Степені з дробами", type: "single", question: `Обчисліть: <div class="frac"><span class="top">5<sup>3</sup> ⋅ 2<sup>4</sup></span><span class="bottom">4<sup>3</sup> ⋅ 5<sup>2</sup></span></div> =`, options: [{ text: `<div class="frac"><span class="top">1</span><span class="bottom">2</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">2</span><span class="bottom">5</span></div>`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">2</span></div>`, correct: false }, { text: `1`, correct: false }, { text: `<div class="frac"><span class="top">5</span><span class="bottom">4</span></div>`, correct: true }], reward: 0.5 },
+      { num: 24, category: "Квадрат кореня", type: "single", question: `Обчисліть (-${r('2', '2')})<sup>2</sup>.`, options: [{ text: `-4`, correct: false }, { text: `8`, correct: true }, { text: `${r('2', '4')}`, correct: false }, { text: `-8`, correct: false }, { text: `4`, correct: false }], reward: 0.5 },
+      { num: 25, category: "Множення одночленів", type: "single", question: `Спростіть вираз 7<span class="italic">a</span><span class="italic">b</span><sup>2</sup> ⋅ <span class="italic">a</span><span class="italic">b</span><sup>2</sup>.`, options: [{ text: `8<span class="italic">a</span><span class="italic">b</span><sup>2</sup>`, correct: false }, { text: `7<span class="italic">a</span><span class="italic">b</span><sup>4</sup>`, correct: false }, { text: `7<span class="italic">a</span><sup>2</sup><span class="italic">b</span><sup>4</sup>`, correct: true }, { text: `8<span class="italic">a</span><sup>2</sup><span class="italic">b</span><sup>4</sup>`, correct: false }, { text: `7<span class="italic">a</span><span class="italic">b</span><sup>2</sup>`, correct: false }], reward: 0.5 }
+    ];
+
+    let userAnswers = {};
+    let currentQuestionIndex = 0;
+    let totalScore = 0;
+
+    function initQuiz() {
+      currentQuestionIndex = 0;
+      totalScore = 0;
+      userAnswers = {};
+      updateScoreDisplay();
+      showQuestion();
+    }
+
+    function renderNavDots() {
+      const navContainer = document.getElementById('nav-dots');
+      navContainer.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        const state = userAnswers[idx];
+        
+        let colorClasses = 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
+        if (state) {
+          if (state.isCorrect) {
+            colorClasses = 'bg-emerald-500 text-white border-emerald-600';
+          } else {
+            colorClasses = 'bg-rose-500 text-white border-rose-600';
+          }
+        }
+
+        const isCurrent = idx === currentQuestionIndex ? 'ring-2 ring-emerald-600 ring-offset-1 font-black scale-110 z-10' : '';
+
+        btn.className = `w-7 h-7 text-xs font-bold rounded-lg border transition ${colorClasses} ${isCurrent}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          currentQuestionIndex = idx;
+          showQuestion();
+        };
+        navContainer.appendChild(btn);
+      });
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestionIndex];
+      const state = userAnswers[currentQuestionIndex];
+      
+      renderNavDots();
+
+      document.getElementById('task-category').innerText = `${q.num}. ${q.category}`;
+      document.getElementById('question-text').innerHTML = q.question;
+      
+      const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+      document.getElementById('progress-text').innerText = `Завдання ${currentQuestionIndex + 1} з ${questions.length}`;
+
+      const optionsContainer = document.getElementById('options-container');
+      const matchContainer = document.getElementById('match-container');
+      const feedbackPanel = document.getElementById('feedback-panel');
+
+      feedbackPanel.classList.add('hidden');
+
+      if (q.type === 'single') {
+        optionsContainer.classList.remove('hidden');
+        matchContainer.classList.add('hidden');
+        optionsContainer.innerHTML = '';
+
+        const labels = ['А', 'Б', 'В', 'Г', 'Д'];
+        const isLocked = state && state.attemptsCount >= 2;
+
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          let btnStyle = "w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition flex items-center gap-3 font-semibold text-lg math-text bg-white shadow-sm";
+          
+          if (state && state.selectedIndex === idx) {
+            btnStyle = state.isCorrect 
+              ? "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-100 text-emerald-900 flex items-center gap-3 font-semibold text-lg math-text shadow-sm"
+              : "w-full text-left p-4 rounded-xl border-2 border-rose-400 bg-rose-100 text-rose-900 flex items-center gap-3 font-semibold text-lg math-text shadow-sm";
+          }
+
+          if (isLocked) {
+            btn.disabled = true;
+            btnStyle += " opacity-70 cursor-not-allowed";
+          } else {
+            btn.onclick = (e) => selectOption(idx, btn, e);
+          }
+
+          btn.className = btnStyle;
+          btn.innerHTML = `
+            <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">${labels[idx]}</span>
+            <span class="flex-grow">${opt.text}</span>
+          `;
+          optionsContainer.appendChild(btn);
+        });
+
+        if (state) {
+          feedbackPanel.classList.remove('hidden');
+          const feedbackText = document.getElementById('feedback-text');
+          if (state.isCorrect) {
+            feedbackPanel.className = "rounded-xl p-4 mb-2 font-medium flex items-center justify-between bg-emerald-100 text-emerald-800 border border-emerald-200";
+            feedbackText.innerText = state.earnedReward > 0 ? `Правильно! +${state.earnedReward} грн` : `Правильно!`;
+          } else {
+            feedbackPanel.className = "rounded-xl p-4 mb-2 font-medium flex items-center justify-between bg-rose-100 text-rose-800 border border-rose-200";
+            if (state.attemptsCount < 2) {
+              feedbackText.innerText = `Невірно. У тебе залишилася 1 спроба переобрати!`;
+            } else {
+              feedbackText.innerText = `Невірно. Спроби для цього завдання вичерпано.`;
+            }
+          }
+        }
+      } else if (q.type === 'matching') {
+        optionsContainer.classList.add('hidden');
+        matchContainer.classList.remove('hidden');
+        matchContainer.innerHTML = '';
+
+        const isLocked = state && state.attemptsCount >= 2;
+
+        q.items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3";
+          
+          let selectHTML = `<select id="match-select-${item.id}" ${isLocked ? 'disabled' : ''} class="bg-white border-2 border-slate-300 rounded-lg p-2 font-bold text-slate-700 focus:outline-none focus:border-emerald-500 ${isLocked ? 'opacity-70 cursor-not-allowed' : ''}">
+            <option value="">-- Оберіть --</option>`;
+          q.targets.forEach(target => {
+            const isSelected = state && state.selectedValues && state.selectedValues[item.id] === target.key;
+            selectHTML += `<option value="${target.key}" ${isSelected ? 'selected' : ''}>${target.label}</option>`;
+          });
+          selectHTML += `</select>`;
+
+          row.innerHTML = `
+            <div class="font-semibold text-slate-800 math-text">${item.label}</div>
+            <div>${selectHTML}</div>
+          `;
+          matchContainer.appendChild(row);
+        });
+
+        const checkBtn = document.createElement('button');
+        checkBtn.id = 'check-match-btn';
+        if (isLocked) {
+          checkBtn.disabled = true;
+          checkBtn.className = "w-full py-3 bg-slate-400 text-white font-bold rounded-xl cursor-not-allowed shadow-md mt-2";
+          checkBtn.innerText = "Спроби вичерпано";
+        } else {
+          checkBtn.className = "w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition shadow-md mt-2";
+          checkBtn.innerText = state ? "Перевірити повторно (остання спроба)" : "Перевірити відповідність";
+          checkBtn.onclick = (e) => checkMatching(e);
+        }
+        matchContainer.appendChild(checkBtn);
+
+        if (state) {
+          feedbackPanel.classList.remove('hidden');
+          const feedbackText = document.getElementById('feedback-text');
+          if (state.isCorrect) {
+            feedbackPanel.className = "rounded-xl p-4 mb-2 font-medium flex items-center justify-between bg-emerald-100 text-emerald-800 border border-emerald-200";
+            feedbackText.innerText = state.earnedReward > 0 ? `Все вірно! +${state.earnedReward} грн` : `Усе правильно!`;
+          } else {
+            feedbackPanel.className = "rounded-xl p-4 mb-2 font-medium flex items-center justify-between bg-rose-100 text-rose-800 border border-rose-200";
+            if (state.attemptsCount < 2) {
+              feedbackText.innerText = `Є помилки. У тебе залишилася 1 спроба змінити вибір!`;
+            } else {
+              feedbackText.innerText = `Є помилки. Спроби для цього завдання вичерпано.`;
+            }
+          }
+        }
+      }
+    }
+
+    function selectOption(index, btnElement, event) {
+      const q = questions[currentQuestionIndex];
+      const previousState = userAnswers[currentQuestionIndex];
+      const attempts = previousState ? previousState.attemptsCount + 1 : 1;
+
+      if (previousState && previousState.attemptsCount >= 2) return;
+
+      const isCorrect = q.options[index].correct;
+      let newlyEarned = 0;
+
+      if (isCorrect && (!previousState || !previousState.rewardGiven)) {
+        newlyEarned = q.reward;
+        totalScore += newlyEarned;
+        playCoinSound();
+        triggerCoinAnimation(event.clientX, event.clientY, newlyEarned);
+      } else if (!isCorrect) {
+        playErrorSound();
+      }
+
+      userAnswers[currentQuestionIndex] = {
+        selectedIndex: index,
+        isCorrect: isCorrect,
+        rewardGiven: (previousState && previousState.rewardGiven) || isCorrect,
+        earnedReward: newlyEarned,
+        attemptsCount: attempts
+      };
+
+      updateScoreDisplay();
+      showQuestion();
+    }
+
+    function checkMatching(event) {
+      const q = questions[currentQuestionIndex];
+      const previousState = userAnswers[currentQuestionIndex] || { rewardedMatches: {}, attemptsCount: 0 };
+
+      if (previousState.attemptsCount >= 2) return;
+
+      const attempts = previousState.attemptsCount + 1;
+      let allCorrect = true;
+      let selectedAll = true;
+      let newlyEarned = 0;
+      const selectedValues = {};
+      const rewardedMatches = { ...previousState.rewardedMatches };
+
+      q.items.forEach(item => {
+        const select = document.getElementById(`match-select-${item.id}`);
+        const val = select ? select.value : '';
+        selectedValues[item.id] = val;
+        
+        if (!val) selectedAll = false;
+
+        if (val === q.correctAnswers[item.id]) {
+          if (!rewardedMatches[item.id]) {
+            newlyEarned += q.rewardPerMatch;
+            rewardedMatches[item.id] = true;
+          }
+        } else {
+          allCorrect = false;
+        }
+      });
+
+      if (!selectedAll) {
+        alert('Будь ласка, оберіть відповіді для всіх пунктів!');
+        return;
+      }
+
+      if (newlyEarned > 0) {
+        totalScore += newlyEarned;
+        playCoinSound();
+        triggerCoinAnimation(event.clientX, event.clientY, newlyEarned);
+      } else if (!allCorrect) {
+        playErrorSound();
+      }
+
+      userAnswers[currentQuestionIndex] = {
+        selectedValues: selectedValues,
+        isCorrect: allCorrect,
+        rewardedMatches: rewardedMatches,
+        earnedReward: newlyEarned,
+        attemptsCount: attempts
+      };
+
+      updateScoreDisplay();
+      showQuestion();
+    }
+
+    function triggerCoinAnimation(startX, startY, reward) {
+      const piggy = document.getElementById('piggy-icon');
+      const piggyRect = piggy.getBoundingClientRect();
+      
+      const targetX = piggyRect.left + piggyRect.width / 2;
+      const targetY = piggyRect.top + piggyRect.height / 2;
+
+      const coin = document.createElement('div');
+      coin.className = 'flying-coin';
+      coin.innerText = `+${reward} грн`;
+      coin.style.left = `${startX - 25}px`;
+      coin.style.top = `${startY - 15}px`;
+
+      const deltaX = targetX - startX;
+      const deltaY = targetY - startY;
+
+      coin.style.setProperty('--tw-translate-x', `${deltaX / 2}px`);
+      coin.style.setProperty('--target-x', `${deltaX}px`);
+      coin.style.setProperty('--target-y', `${deltaY}px`);
+
+      coin.style.animation = 'flyToPiggy 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards';
+      document.body.appendChild(coin);
+
+      setTimeout(() => {
+        coin.remove();
+        piggy.classList.add('piggy-bounce');
+        updateScoreDisplay();
+        setTimeout(() => piggy.classList.remove('piggy-bounce'), 400);
+      }, 800);
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('score-display').innerText = totalScore.toFixed(1);
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('progress-bar').style.width = '100%';
+      const modal = document.getElementById('result-modal');
+      const content = document.getElementById('modal-content');
+      
+      document.getElementById('final-score').innerText = totalScore.toFixed(1);
+      
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      }, 50);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('result-modal');
+      const content = document.getElementById('modal-content');
+      
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        currentQuestionIndex = 0;
+        showQuestion();
+      }, 200);
+    }
+
+    function restartQuiz() {
+      const modal = document.getElementById('result-modal');
+      const content = document.getElementById('modal-content');
+      
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        initQuiz();
+      }, 200);
+    }
+
+    initQuiz();
+  </script>
+</body>
+</html>
