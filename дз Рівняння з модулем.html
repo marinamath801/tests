@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: ДЗ Рівняння з модулем</title>
+    <!-- MathJax для математичного відображення дробів -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Canvas-confetti для салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 850px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        .instruction-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+        .instruction-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2980b9;
+        }
+        .instruction-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #16a085;
+            border-bottom: 2px solid #16a085;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 1.15rem;
+        }
+        .btn-hint {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-hint:hover {
+            background-color: #d35400;
+        }
+        .hints-container {
+            margin-bottom: 12px;
+        }
+        .hint-step {
+            display: none;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 4px;
+            color: #856404;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        input[type="text"], select {
+            padding: 9px 12px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            flex: 1;
+            min-width: 220px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .btn-check {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-check:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .correct-input { border-color: #2ecc71 !important; background-color: #e8f8f5 !important; }
+        .incorrect-input { border-color: #e74c3c !important; background-color: #fadbd8 !important; }
+        .correct-msg { background-color: #d4edda; color: #155724; display: block; }
+        .incorrect-msg { background-color: #f8d7da; color: #721c24; display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ДЗ Рівняння з модулем</h1>
+
+    <div class="instruction-box">
+        <h3>📌 Інструкція для учня:</h3>
+        <ul>
+            <li>У <strong>№1</strong> та <strong>№3</strong> записуй відповідь у полі вводу:
+                <ul>
+                    <li>Якщо розв'язком є одне число — впиши його.</li>
+                    <li>Якщо розв'язками є кілька чисел — запиши їх через крапку з комою або пробіл (наприклад: <code>5; -5</code>).</li>
+                    <li>Якщо рівняння не має розв'язків — напиши словами: <code>немає розв'язків</code>.</li>
+                </ul>
+            </li>
+            <li>У <strong>№2</strong> обери правильний варіант із випадного списку.</li>
+            <li>Якщо виникають труднощі — користуйся кнопкою <strong>«💡 Потрібна підказка?»</strong>.</li>
+        </ul>
+    </div>
+
+    <!-- №1 -->
+    <div class="section-title">Завдання №1</div>
+    <div class="task-card">
+        <div class="task-title">1) Розв'яжіть рівняння: \( -\frac{x}{8} + 1 = \frac{x}{12} \)</div>
+        <button class="btn-hint" onclick="showNextHint('1_1')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-1_1-1">1) Домнож обидві частини рівняння на таке число, щоб скоротились всі знаменники. Перевір, чи помножений на це число кожний доданок!</div>
+            <div class="hint-step" id="hint-1_1-2">2) Скороти дроби і запиши, що вийшло.</div>
+            <div class="hint-step" id="hint-1_1-3">3) Перенеси ікси вліво, числа вправо.</div>
+            <div class="hint-step" id="hint-1_1-4">4) Поділи на число біля ікса. Перевір знаки!</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-1_1" placeholder="введіть число">
+            <button class="btn-check" onclick="checkAnswer('1_1')">Перевірити</button>
+        </div>
+        <div id="res-1_1" class="result-message"></div>
+    </div>
+
+    <!-- №2 -->
+    <div class="section-title">Завдання №2</div>
+    <div class="task-card">
+        <div class="task-title">1) Розв'яжи рівняння: \( |y| = -5 \)</div>
+        <div class="input-group">
+            <label>Обери відповідь:</label>
+            <select id="ans-2_1">
+                <option value="">-- Обери варіант --</option>
+                <option value="5 та -5">1) 5 та -5</option>
+                <option value="-5">2) -5</option>
+                <option value="немає розв'язків">3) немає розв'язків</option>
+            </select>
+            <button class="btn-check" onclick="checkAnswer('2_1')">Перевірити</button>
+        </div>
+        <div id="res-2_1" class="result-message"></div>
+    </div>
+
+    <div class="task-card">
+        <div class="task-title">2) Розв'яжи рівняння: \( |y| = 2 \)</div>
+        <div class="input-group">
+            <label>Обери відповідь:</label>
+            <select id="ans-2_2">
+                <option value="">-- Обери варіант --</option>
+                <option value="2 та -2">1) 2 та -2</option>
+                <option value="2">2) 2</option>
+                <option value="немає розв'язків">3) немає розв'язків</option>
+            </select>
+            <button class="btn-check" onclick="checkAnswer('2_2')">Перевірити</button>
+        </div>
+        <div id="res-2_2" class="result-message"></div>
+    </div>
+
+    <!-- №3 -->
+    <div class="section-title">Завдання №3</div>
+    
+    <!-- 3.1 -->
+    <div class="task-card">
+        <div class="task-title">1) \( |x| - 8 = -5 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_1')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_1-1">1) Залиш модуль ліворуч, а число без модуля перенеси у праву частину, змінивши його знак.</div>
+            <div class="hint-step" id="hint-3_1-2">2) Обчисли значення у правій частині.</div>
+            <div class="hint-step" id="hint-3_1-3">3) Згадай властивість модуля: чи може модуль дорівнювати отриманому числу? Знайди розв'язки.</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_1" placeholder="наприклад: 5; -5 або немає розв'язків">
+            <button class="btn-check" onclick="checkAnswer('3_1')">Перевірити</button>
+        </div>
+        <div id="res-3_1" class="result-message"></div>
+    </div>
+
+    <!-- 3.2 -->
+    <div class="task-card">
+        <div class="task-title">2) \( |x| + 5 = 2 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_2')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_2-1">1) Залиш модуль ліворуч, а число перенеси у праву частину зі зміною знака.</div>
+            <div class="hint-step" id="hint-3_2-2">2) Обчисли праву частину.</div>
+            <div class="hint-step" id="hint-3_2-3">3) Подивись на знак результату: чи може модуль бути від'ємним?</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_2" placeholder="наприклад: 5; -5 або немає розв'язків">
+            <button class="btn-check" onclick="checkAnswer('3_2')">Перевірити</button>
+        </div>
+        <div id="res-3_2" class="result-message"></div>
+    </div>
+
+    <!-- 3.3 -->
+    <div class="task-card">
+        <div class="task-title">3) \( |x + 12| = 3 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_3')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_3-1">1) Модуль дорівнює 3, тому вираз під модулем може дорівнювати 3 або -3.</div>
+            <div class="hint-step" id="hint-3_3-2">2) Запиши два окремих рівняння: \( x + 12 = 3 \) та \( x + 12 = -3 \).</div>
+            <div class="hint-step" id="hint-3_3-3">3) Розв'яжи кожне з них та знайди обидва значення \( x \).</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_3" placeholder="наприклад: 5; -5">
+            <button class="btn-check" onclick="checkAnswer('3_3')">Перевірити</button>
+        </div>
+        <div id="res-3_3" class="result-message"></div>
+    </div>
+
+    <!-- 3.4 -->
+    <div class="task-card">
+        <div class="task-title">4) \( |8 - 0{,}2x| = 12 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_4')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_4-1">1) Розкрий модуль на два випадки: \( 8 - 0{,}2x = 12 \) та \( 8 - 0{,}2x = -12 \).</div>
+            <div class="hint-step" id="hint-3_4-2">2) Перенеси 8 у праву частину в обох рівняннях.</div>
+            <div class="hint-step" id="hint-3_4-3">3) Поділи праву частину на \( -0{,}2 \). Будь уважний зі знаками!</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_4" placeholder="наприклад: 5; -5">
+            <button class="btn-check" onclick="checkAnswer('3_4')">Перевірити</button>
+        </div>
+        <div id="res-3_4" class="result-message"></div>
+    </div>
+
+    <!-- 3.5 -->
+    <div class="task-card">
+        <div class="task-title">5) \( |10x - 7| - 32 = -16 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_5')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_5-1">1) Спочатку виокрем модуль: перенеси \( -32 \) у праву частину з протилежним знаком.</div>
+            <div class="hint-step" id="hint-3_5-2">2) Обчисли праву частину (\( -16 + 32 \)).</div>
+            <div class="hint-step" id="hint-3_5-3">3) Розкрий модуль на два випадки (\( 10x - 7 = 16 \) та \( 10x - 7 = -16 \)) і знайди ікси.</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_5" placeholder="наприклад: 5; -5">
+            <button class="btn-check" onclick="checkAnswer('3_5')">Перевірити</button>
+        </div>
+        <div id="res-3_5" class="result-message"></div>
+    </div>
+
+    <!-- 3.6 -->
+    <div class="task-card">
+        <div class="task-title">6) \( ||x| - 2| = 2 \)</div>
+        <button class="btn-hint" onclick="showNextHint('3_6')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3_6-1">1) Розкрий зовнішній модуль: \( |x| - 2 = 2 \) або \( |x| - 2 = -2 \).</div>
+            <div class="hint-step" id="hint-3_6-2">2) Знайди значення для кожного внутрішнього модуля: \( |x| = 4 \) та \( |x| = 0 \).</div>
+            <div class="hint-step" id="hint-3_6-3">3) Запиши всі можливі значення для \( x \) (їх буде три!).</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3_6" placeholder="наприклад: 5; -5; 0">
+            <button class="btn-check" onclick="checkAnswer('3_6')">Перевірити</button>
+        </div>
+        <div id="res-3_6" class="result-message"></div>
+    </div>
+
+</div>
+
+<script>
+    const hintCounters = {};
+
+    // Правильні відповіді для гнучкого порівняння
+    const correctAnswers = {
+        '1_1': { type: 'single_num', value: [4.8] },
+        '2_1': { type: 'exact', value: ["немає розв'язків"] },
+        '2_2': { type: 'exact', value: ["2 та -2"] },
+        '3_1': { type: 'set_num', value: [3, -3] },
+        '3_2': { type: 'no_roots', value: true },
+        '3_3': { type: 'set_num', value: [-9, -15] },
+        '3_4': { type: 'set_num', value: [-20, 100] },
+        '3_5': { type: 'set_num', value: [2.3, -0.9] },
+        '3_6': { type: 'set_num', value: [4, -4, 0] }
+    };
+
+    function showNextHint(id) {
+        if (!hintCounters[id]) hintCounters[id] = 1;
+        else hintCounters[id]++;
+
+        const stepElem = document.getElementById(`hint-${id}-${hintCounters[id]}`);
+        if (stepElem) {
+            stepElem.style.display = 'block';
+        }
+    }
+
+    function triggerConfetti() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+    }
+
+    function parseNumbers(input) {
+        // Заміна ком у десяткових дробах на крапки
+        let cleaned = input.replace(/,/g, '.');
+        // Пошук усіх чисел (включаючи від'ємні та дробові)
+        let matches = cleaned.match(/-?\d+(\.\d+)?/g);
+        if (!matches) return [];
+        return matches.map(Number);
+    }
+
+    function checkAnswer(id) {
+        const inputElem = document.getElementById(`ans-${id}`);
+        const resElem = document.getElementById(`res-${id}`);
+        const userVal = inputElem.value.trim().toLowerCase();
+        const config = correctAnswers[id];
+
+        let isCorrect = false;
+
+        if (config.type === 'exact') {
+            isCorrect = (userVal === config.value[0].toLowerCase());
+        } 
+        else if (config.type === 'no_roots') {
+            isCorrect = userVal.includes('немає') || userVal.includes('не має') || userVal.includes('нема');
+        } 
+        else if (config.type === 'single_num') {
+            let nums = parseNumbers(userVal);
+            if (nums.length === 1 && Math.abs(nums[0] - config.value[0]) < 1e-4) {
+                isCorrect = true;
+            }
+        } 
+        else if (config.type === 'set_num') {
+            let userNums = parseNumbers(userVal);
+            let targetNums = config.value;
+
+            if (userNums.length === targetNums.length) {
+                let matchedCount = 0;
+                let used = new Array(targetNums.length).fill(false);
+
+                for (let un of userNums) {
+                    for (let i = 0; i < targetNums.length; i++) {
+                        if (!used[i] && Math.abs(un - targetNums[i]) < 1e-4) {
+                            used[i] = true;
+                            matchedCount++;
+                            break;
+                        }
+                    }
+                }
+                if (matchedCount === targetNums.length) {
+                    isCorrect = true;
+                }
+            }
+        }
+
+        if (isCorrect) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Чудово! Все правильно! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerConfetti();
+        } else {
+            inputElem.className = "incorrect-input";
+            resElem.textContent = "Є помилка. Перевірте свої обчислення та скористайтеся підказками!";
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+</script>
+
+</body>
+</html>
