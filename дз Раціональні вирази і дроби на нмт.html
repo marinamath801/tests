@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Раціональні вирази і дроби</title>
+    <!-- MathJax для підручникового вигляду дробів і степенів -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Canvas-Confetti для святкового підсумку -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #4a90e2;
+            --text: #2c3e50;
+            --correct: #2ecc71;
+            --incorrect: #e74c3c;
+            --border: #e0e0e0;
+            --gold: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Анімація грошового дощу */
+        .coin-rain {
+            position: fixed;
+            top: -50px;
+            font-size: 2rem;
+            user-select: none;
+            pointer-events: none;
+            z-index: 9999;
+            animation: fall 2s linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg);
+                opacity: 0.2;
+            }
+        }
+
+        .header {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: var(--card-bg);
+            padding: 12px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #ffeaa7;
+        }
+
+        .piggy-bank {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #d35400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff5e6;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .piggy-bank.bounce {
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease;
+        }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .task-expr {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 110px;
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #eef5fc;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected-correct {
+            background-color: var(--correct) !important;
+            color: white !important;
+            border-color: var(--correct) !important;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .option-btn.selected-incorrect {
+            background-color: var(--incorrect) !important;
+            color: white !important;
+            border-color: var(--incorrect) !important;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .match-select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .finish-btn {
+            margin-top: 25px;
+            padding: 16px 45px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff7675, #d63031);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(214, 48, 49, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .finish-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 22px rgba(214, 48, 49, 0.45);
+        }
+
+        /* Святкове модальне вікно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff, #fdfbf7);
+            padding: 35px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 3px solid #f1c40f;
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: pulseIcon 1s infinite alternate;
+        }
+
+        @keyframes pulseIcon {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .modal-reward-box {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .modal-reward-title {
+            font-size: 1rem;
+            color: #d35400;
+            font-weight: 600;
+        }
+
+        .modal-reward {
+            font-size: 2.5rem;
+            color: #27ae60;
+            font-weight: 900;
+            text-shadow: 1px 1px 0px #fff;
+        }
+
+        .modal-close-btn {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #0984e3, #6c5ce7);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin: 0; font-size: 1.2rem;">Раціональні вирази і дроби</h2>
+        <div class="piggy-bank" id="piggy-bank">
+            <span>🐷</span> Скарбничка: <span id="balance">0</span> грн
+        </div>
+    </div>
+
+    <div class="container" id="tasks-container">
+        <!-- Завдання генеруються динамічно -->
+    </div>
+
+    <button class="finish-btn" onclick="showResults()">✨ Завершити тест</button>
+
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modal-emoji">🏆</div>
+            <div class="modal-title" id="modal-heading">Чудова робота!</div>
+            <div class="modal-reward-box">
+                <div class="modal-reward-title">Твій підсумковий заробіток:</div>
+                <div class="modal-reward"><span id="modal-balance">0</span> грн</div>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal()">🔍 Подивитись свої відповіді</button>
+        </div>
+    </div>
+
+<script>
+const tasksData = [
+    {
+        id: 1,
+        expr: "1) \\(12x^3 - x =\\)",
+        options: [
+            { label: "А", text: "\\(x(12x^2 - 1)\\)" },
+            { label: "Б", text: "\\(12x(x^2 - 1)\\)" },
+            { label: "В", text: "\\(x(11x^3 - 1)\\)" },
+            { label: "Г", text: "\\(12x(x^3 - 1)\\)" },
+            { label: "Д", text: "\\(x(11x^2 - x)\\)" }
+        ],
+        correct: 0
+    },
+    {
+        id: 2,
+        expr: "2) \\((3 + \\sqrt{b})^2 =\\)",
+        options: [
+            { label: "А", text: "\\(9 + b\\)" },
+            { label: "Б", text: "\\(3 + b\\)" },
+            { label: "В", text: "\\(9 + 3\\sqrt{b} + b\\)" },
+            { label: "Г", text: "\\(9 + 6\\sqrt{b} + b\\)" },
+            { label: "Д", text: "\\(9 - 6\\sqrt{b} + b\\)" }
+        ],
+        correct: 3
+    },
+    {
+        id: 3,
+        expr: "3) \\((3 - 3x)(x + 1) =\\)",
+        options: [
+            { label: "А", text: "\\(3 - 3x^2\\)" },
+            { label: "Б", text: "\\(1 - 3x^2\\)" },
+            { label: "В", text: "\\(-3 - 3x^2\\)" },
+            { label: "Г", text: "\\(-3x - 3x^2\\)" },
+            { label: "Д", text: "\\(3 + 6x - 3x^2\\)" }
+        ],
+        correct: 0
+    },
+    {
+        id: 4,
+        expr: "4) \\(\\left(\\frac{2}{5}x + \\frac{1}{3}\\right)\\left(\\frac{1}{3} - \\frac{2}{5}x\\right) =\\)",
+        options: [
+            { label: "А", text: "\\(\\frac{4}{25}x^2 - \\frac{1}{9}\\)" },
+            { label: "Б", text: "\\(\\frac{1}{9} - \\frac{4}{15}x + \\frac{4}{25}x^2\\)" },
+            { label: "В", text: "\\(\\frac{4}{25}x^2 + \\frac{1}{9}\\)" },
+            { label: "Г", text: "\\(\\frac{2}{5}x^2 - \\frac{1}{3}\\)" },
+            { label: "Д", text: "\\(\\frac{1}{9} - \\frac{4}{25}x^2\\)" }
+        ],
+        correct: 4
+    },
+    {
+        id: 5,
+        expr: "5) Спростіть вираз \\(x(x - 2y) - (x - y)^2\\).",
+        options: [
+            { label: "А", text: "\\(-2xy\\)" },
+            { label: "Б", text: "\\(-4xy\\)" },
+            { label: "В", text: "\\(-y^2\\)" },
+            { label: "Г", text: "\\(-4xy - y^2\\)" },
+            { label: "Д", text: "\\(y^2\\)" }
+        ],
+        correct: 2
+    },
+    {
+        id: 6,
+        expr: "6) Спростіть вираз \\(\\frac{6x + 12}{3}\\).",
+        options: [
+            { label: "А", text: "\\(2x + 12\\)" },
+            { label: "Б", text: "\\(2x + 4\\)" },
+            { label: "В", text: "\\(6x + 4\\)" },
+            { label: "Г", text: "\\(3x + 12\\)" },
+            { label: "Д", text: "\\(3x + 4\\)" }
+        ],
+        correct: 1
+    },
+    {
+        id: 7,
+        expr: "7) Спростіть вираз \\(\\frac{a^2 + 2a}{2a + 4}\\).",
+        options: [
+            { label: "А", text: "\\(\\frac{a^2}{4}\\)" },
+            { label: "Б", text: "\\(\\frac{a}{2}\\)" },
+            { label: "В", text: "\\(4a^2\\)" },
+            { label: "Г", text: "\\(2a\\)" },
+            { label: "Д", text: "\\(\\frac{a}{4}\\)" }
+        ],
+        correct: 1
+    },
+    {
+        id: 8,
+        expr: "8) \\(\\frac{9 - y^2}{3 - y} - 3 =\\)",
+        options: [
+            { label: "А", text: "\\(y\\)" },
+            { label: "Б", text: "\\(\\frac{-y^2 - y}{3 - y}\\)" },
+            { label: "В", text: "\\(1 - y\\)" },
+            { label: "Г", text: "\\(-y\\)" },
+            { label: "Д", text: "\\(\\frac{-y^2 - 3y}{3 - y}\\)" }
+        ],
+        correct: 0
+    },
+    {
+        id: 9,
+        expr: "9) Спростіть вираз \\(\\frac{2a^2 - 50b^2}{5b + a}\\).",
+        options: [
+            { label: "А", text: "\\(2a + 10b\\)" },
+            { label: "Б", text: "\\(\\frac{2}{a - 5b}\\)" },
+            { label: "В", text: "\\(\\frac{2}{5b - a}\\)" },
+            { label: "Г", text: "\\(\\frac{2}{a + 5b}\\)" },
+            { label: "Д", text: "\\(2a - 10b\\)" }
+        ],
+        correct: 4
+    },
+    {
+        id: 10,
+        expr: "10) \\(\\frac{25 - x^2}{x^2 + 5x} =\\)",
+        options: [
+            { label: "А", text: "\\(\\frac{5}{x}\\)" },
+            { label: "Б", text: "\\(\\frac{5 - x}{5 + x}\\)" },
+            { label: "В", text: "\\(\\frac{5 + x}{x}\\)" },
+            { label: "Г", text: "\\(\\frac{5 - x}{5}\\)" },
+            { label: "Д", text: "\\(\\frac{5 - x}{x}\\)" }
+        ],
+        correct: 4
+    },
+    {
+        id: 11,
+        type: "matching",
+        expr: "11) Узгодьте вираз (1–3) із твердженням про його значення (А – Д):",
+        items: [
+            { id: 1, text: "\\(\\sqrt[3]{-27}\\)" },
+            { id: 2, text: "\\(\\frac{\\sqrt{12}}{\\sqrt{300}}\\)" },
+            { id: 3, text: "\\((\\sqrt{3} - 1)^2 + 2\\sqrt{3}\\)" }
+        ],
+        statements: [
+            { label: "А", text: "є цілим від'ємним числом" },
+            { label: "Б", text: "є ірраціональним додатним числом" },
+            { label: "В", text: "є ірраціональним від'ємним числом" },
+            { label: "Г", text: "є натуральним числом" },
+            { label: "Д", text: "є раціональним нецілим числом" }
+        ],
+        correct: { 1: "А", 2: "Д", 3: "Г" }
+    },
+    {
+        id: 12,
+        expr: "12) \\((a + b)^{-2} =\\)",
+        options: [
+            { label: "А", text: "\\(-a^2 - b^2\\)" },
+            { label: "Б", text: "\\(\\frac{1}{a^2 + b^2}\\)" },
+            { label: "В", text: "\\(-a^2 - 2ab - b^2\\)" },
+            { label: "Г", text: "\\(\\frac{a^2 + b^2}{a^2b^2}\\)" },
+            { label: "Д", text: "\\(\\frac{1}{a^2 + 2ab + b^2}\\)" }
+        ],
+        correct: 4
+    },
+    {
+        id: 13,
+        expr: "13) Спростіть вираз \\((a^2 - b^2)(a - b)^{-1}\\).",
+        options: [
+            { label: "А", text: "\\(\\frac{1}{(a + b)}\\)" },
+            { label: "Б", text: "\\(a - b\\)" },
+            { label: "В", text: "\\(\\frac{a + b}{(a - b)^2}\\)" },
+            { label: "Г", text: "\\(a + b\\)" },
+            { label: "Д", text: "\\(\\frac{1}{(a - b)}\\)" }
+        ],
+        correct: 3
+    },
+    {
+        id: 14,
+        expr: "14) Розкладіть на множники \\(x^2 - 6x + 5\\).",
+        options: [
+            { label: "А", text: "\\((x + 1)(x - 5)\\)" },
+            { label: "Б", text: "\\((x - 2)(x - 3)\\)" },
+            { label: "В", text: "\\((x + 1)(x + 5)\\)" },
+            { label: "Г", text: "\\((x - 1)(x - 5)\\)" },
+            { label: "Д", text: "\\((x + 2)(x + 3)\\)" }
+        ],
+        correct: 3
+    },
+    {
+        id: 15,
+        expr: "15) Розкладіть вираз \\(4x^2 - 144\\) на множники.",
+        options: [
+            { label: "А", text: "\\((2x - 12)^2\\)" },
+            { label: "Б", text: "\\((2x - 72)^2\\)" },
+            { label: "В", text: "\\((2x - 12)(2x + 12)\\)" },
+            { label: "Г", text: "\\(2(x - 6)(x + 6)\\)" },
+            { label: "Д", text: "\\((2x - 72)(2x + 72)\\)" }
+        ],
+        correct: 2
+    },
+    {
+        id: 16,
+        expr: "16) Спростіть вираз \\(\\frac{x^2 - 4xy + 4y^2}{x - 2y} : (2y - x)\\).",
+        options: [
+            { label: "А", text: "\\(-1\\)" },
+            { label: "Б", text: "\\(-x^2 + 4xy - y^2\\)" },
+            { label: "В", text: "\\(2y - x\\)" },
+            { label: "Г", text: "\\(1\\)" },
+            { label: "Д", text: "\\(x^2 - 4xy + y^2\\)" }
+        ],
+        correct: 0
+    },
+    {
+        id: 17,
+        expr: "17) Спростіть вираз \\(\\frac{x^2 - y^2}{x - y} : (2x + 2y)\\).",
+        options: [
+            { label: "А", text: "\\(\\frac{x - y}{2x + 2y}\\)" },
+            { label: "Б", text: "\\(2(x + y)^2\\)" },
+            { label: "В", text: "\\(2\\)" },
+            { label: "Г", text: "\\(\\frac{1}{2x + 2y}\\)" },
+            { label: "Д", text: "\\(\\frac{1}{2}\\)" }
+        ],
+        correct: 4
+    },
+    {
+        id: 18,
+        expr: "18) \\(\\frac{4y^2 - x^2}{3x^2 - 6xy - 5x + 10y} =\\)",
+        options: [
+            { label: "А", text: "\\(\\frac{2y - x}{3x - 5}\\)" },
+            { label: "Б", text: "\\(\\frac{2y - x}{3x + 5}\\)" },
+            { label: "В", text: "\\(\\frac{2y + x}{3x - 5}\\)" },
+            { label: "Г", text: "\\(\\frac{2y + x}{5 - 3x}\\)" },
+            { label: "Д", text: "\\(\\frac{2y + x}{3x + 5}\\)" }
+        ],
+        correct: 3
+    },
+    {
+        id: 19,
+        expr: "19) \\(\\frac{3x - 6}{2 - x} =\\)",
+        options: [
+            { label: "А", text: "\\(0\\)" },
+            { label: "Б", text: "\\(-3\\)" },
+            { label: "В", text: "\\(1{,}5\\)" },
+            { label: "Г", text: "\\(3\\)" },
+            { label: "Д", text: "\\(-1{,}5\\)" }
+        ],
+        correct: 1
+    },
+    {
+        id: 20,
+        expr: "20) \\(\\frac{x - 9}{2\\sqrt{x} - 6} =\\)",
+        options: [
+            { label: "А", text: "\\(\\frac{\\sqrt{x} + 3}{2}\\)" },
+            { label: "Б", text: "\\(1{,}5\\)" },
+            { label: "В", text: "\\(\\frac{2}{\\sqrt{x} - 3}\\)" },
+            { label: "Г", text: "\\(\\frac{\\sqrt{x} - 3}{2}\\)" },
+            { label: "Д", text: "\\(\\frac{2}{\\sqrt{x} + 3}\\)" }
+        ],
+        correct: 0
+    },
+    {
+        id: 21,
+        expr: "21) Скільки всього цілих чисел містить проміжок \\([\\sqrt[3]{-27}; \\sqrt[3]{100}]\\)?",
+        options: [
+            { label: "А", text: "4" },
+            { label: "Б", text: "5" },
+            { label: "В", text: "6" },
+            { label: "Г", text: "7" },
+            { label: "Д", text: "8" }
+        ],
+        correct: 4
+    }
+];
+
+let taskStates = {};
+
+function initApp() {
+    const container = document.getElementById('tasks-container');
+    
+    tasksData.forEach((task) => {
+        taskStates[task.id] = {
+            attemptsLeft: 2,
+            isSolvedCorrectly: false
+        };
+
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        card.id = `task-${task.id}`;
+
+        let html = `<div class="task-title">Завдання ${task.id}</div>`;
+        html += `<div class="task-expr">${task.expr}</div>`;
+
+        if (task.type === 'matching') {
+            html += generateMatchingHTML(task);
+        } else {
+            html += generateStandardOptionsHTML(task);
+        }
+
+        card.innerHTML = html;
+        container.appendChild(card);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function generateStandardOptionsHTML(task) {
+    let html = `<div class="options-grid">`;
+    task.options.forEach((opt, idx) => {
+        html += `
+            <button class="option-btn" 
+                    id="btn-${task.id}-${idx}" 
+                    onclick="handleOptionClick(${task.id}, ${idx})">
+                <b>${opt.label}.</b> ${opt.text}
+            </button>
+        `;
+    });
+    html += `</div>`;
+    return html;
+}
+
+function generateMatchingHTML(task) {
+    let html = `<div style="margin-bottom: 10px;"><b>Твердження:</b><br>`;
+    task.statements.forEach(st => {
+        html += `<b>${st.label}</b> — ${st.text}<br>`;
+    });
+    html += `</div>`;
+
+    task.items.forEach(item => {
+        html += `
+            <div class="match-row">
+                <span><b>${item.id}.</b> ${item.text}</span>
+                <select class="match-select" id="match-select-${task.id}-${item.id}">
+                    <option value="">--</option>
+                    ${task.statements.map(s => `<option value="${s.label}">${s.label}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    });
+
+    html += `
+        <button class="option-btn" 
+                style="margin-top: 10px; width: 100%; background: var(--primary); color: white;" 
+                id="btn-submit-match-${task.id}"
+                onclick="handleMatchingSubmit(${task.id})">
+            Відповісти
+        </button>
+    `;
+    return html;
+}
+
+function triggerCoinRain() {
+    const coinsCount = 18;
+    const symbols = ['🪙', '💰', '✨', '⭐'];
+
+    for (let i = 0; i < coinsCount; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div');
+            coin.className = 'coin-rain';
+            coin.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+            coin.style.left = Math.random() * 90 + 5 + 'vw';
+            coin.style.animationDuration = (1.5 + Math.random() * 1) + 's';
+            document.body.appendChild(coin);
+
+            setTimeout(() => coin.remove(), 2000);
+        }, i * 70);
+    }
+
+    const piggy = document.getElementById('piggy-bank');
+    piggy.classList.add('bounce');
+    setTimeout(() => piggy.classList.remove('bounce'), 500);
+}
+
+function handleOptionClick(taskId, optionIdx) {
+    const state = taskStates[taskId];
+    if (state.attemptsLeft <= 0 || state.isSolvedCorrectly) return;
+
+    const task = tasksData.find(t => t.id === taskId);
+    const btn = document.getElementById(`btn-${taskId}-${optionIdx}`);
+
+    if (optionIdx === task.correct) {
+        btn.classList.add('selected-correct');
+        state.isSolvedCorrectly = true;
+        state.attemptsLeft = 0;
+        updateBalance(1);
+        triggerCoinRain();
+        disableAllTaskButtons(taskId);
+    } else {
+        btn.classList.add('selected-incorrect');
+        btn.disabled = true;
+        state.attemptsLeft--;
+
+        if (state.attemptsLeft === 0) {
+            disableAllTaskButtons(taskId);
+        }
+    }
+}
+
+function handleMatchingSubmit(taskId) {
+    const state = taskStates[taskId];
+    if (state.attemptsLeft <= 0 || state.isSolvedCorrectly) return;
+
+    const task = tasksData.find(t => t.id === taskId);
+    let allCorrect = true;
+
+    task.items.forEach(item => {
+        const select = document.getElementById(`match-select-${taskId}-${item.id}`);
+        if (select.value !== task.correct[item.id]) {
+            allCorrect = false;
+        }
+    });
+
+    const submitBtn = document.getElementById(`btn-submit-match-${taskId}`);
+
+    if (allCorrect) {
+        submitBtn.classList.add('selected-correct');
+        submitBtn.innerText = "Правильно!";
+        state.isSolvedCorrectly = true;
+        state.attemptsLeft = 0;
+        updateBalance(1);
+        triggerCoinRain();
+        disableMatchingInputs(task, true);
+    } else {
+        state.attemptsLeft--;
+        if (state.attemptsLeft > 0) {
+            alert(`Є помилки. У вас залишилася ще 1 спроба!`);
+        } else {
+            submitBtn.classList.add('selected-incorrect');
+            submitBtn.innerText = "Спроби вичерпано";
+            disableMatchingInputs(task, true);
+        }
+    }
+}
+
+function disableMatchingInputs(task, disableAll) {
+    task.items.forEach(item => {
+        const select = document.getElementById(`match-select-${task.id}-${item.id}`);
+        select.disabled = disableAll;
+    });
+    const submitBtn = document.getElementById(`btn-submit-match-${task.id}`);
+    submitBtn.disabled = disableAll;
+}
+
+function disableAllTaskButtons(taskId) {
+    const task = tasksData.find(t => t.id === taskId);
+    if (task.type === 'matching') return;
+
+    task.options.forEach((_, idx) => {
+        const btn = document.getElementById(`btn-${taskId}-${idx}`);
+        if (btn) btn.disabled = true;
+    });
+}
+
+function updateBalance(amount) {
+    const balanceEl = document.getElementById('balance');
+    let current = parseInt(balanceEl.innerText);
+    current += amount;
+    balanceEl.innerText = current;
+}
+
+function showResults() {
+    const currentBalance = parseInt(document.getElementById('balance').innerText);
+    document.getElementById('modal-balance').innerText = currentBalance;
+    
+    const emojiEl = document.getElementById('modal-emoji');
+    const headingEl = document.getElementById('modal-heading');
+
+    if (currentBalance >= 18) {
+        emojiEl.innerText = "👑";
+        headingEl.innerText = "Неймовірний результат!";
+    } else if (currentBalance >= 12) {
+        emojiEl.innerText = "🌟";
+        headingEl.innerText = "Чудова робота!";
+    } else {
+        emojiEl.innerText = "👍";
+        headingEl.innerText = "Гарно попрацювали!";
+    }
+
+    document.getElementById('result-modal').style.display = 'flex';
+
+    // Святковий салют конфетті
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+
+        setTimeout(() => {
+            confetti({
+                particleCount: 50,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 50,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+            });
+        }, 250);
+    }
+}
+
+function closeModal() {
+    document.getElementById('result-modal').style.display = 'none';
+}
+
+window.onload = initApp;
+</script>
+</body>
+</html>
