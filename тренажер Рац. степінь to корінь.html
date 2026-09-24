@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Степінь з дробовим показником</title>
+    <!-- MathJax для математичних формул -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Canvas-confetti для салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            border: 1px solid #e1e8ed;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .formula-badge {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            padding: 8px 12px;
+            background-color: #fff5f5;
+            font-size: 1.1rem;
+        }
+        .expression-display {
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            min-height: 50px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .input-row label {
+            width: 180px;
+            color: #475569;
+        }
+        .input-row input {
+            width: 90px;
+            padding: 8px 12px;
+            font-size: 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .input-row input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .status-tag {
+            margin-left: 15px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            display: none;
+        }
+        .status-tag.correct {
+            color: #16a34a;
+            display: inline;
+        }
+        .status-tag.incorrect {
+            color: #dc2626;
+            display: inline;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-check {
+            background-color: #2563eb;
+            color: white;
+        }
+        .btn-check:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-next {
+            background-color: #0d9488;
+            color: white;
+        }
+        .btn-next:hover {
+            background-color: #0f766e;
+        }
+        .btn-hint {
+            background-color: #f59e0b;
+            color: white;
+            flex: 0.6;
+        }
+        .btn-hint:hover {
+            background-color: #d97706;
+        }
+        .hint-box {
+            display: none;
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #92400e;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .correct-border { border-color: #22c55e !important; background-color: #f0fdf4 !important; }
+        .incorrect-border { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="formula-badge">
+        \(a^{\frac{m}{n}} = \sqrt[n]{a^m}\)
+    </div>
+
+    <h2>Спростіть вираз</h2>
+
+    <div class="expression-display" id="math-expression">
+        <!-- Формула генерується скриптом -->
+    </div>
+
+    <div class="input-row">
+        <label for="input-n">Введіть n =</label>
+        <input type="text" id="input-n" autocomplete="off" placeholder="">
+        <span id="status-n" class="status-tag"></span>
+    </div>
+
+    <div class="input-row">
+        <label for="input-m">Введіть m =</label>
+        <input type="text" id="input-m" autocomplete="off" placeholder="">
+        <span id="status-m" class="status-tag"></span>
+    </div>
+
+    <div class="input-row">
+        <label for="input-x">Введіть x =</label>
+        <input type="text" id="input-x" autocomplete="off" placeholder="">
+        <span id="status-x" class="status-tag"></span>
+    </div>
+
+    <div class="hint-box" id="hint-box"></div>
+
+    <div class="controls">
+        <button class="btn btn-check" onclick="checkAnswers()">Перевірити</button>
+        <button class="btn btn-hint" onclick="showHint()">Підказка</button>
+        <button class="btn btn-next" onclick="generateTask()">Нове завдання</button>
+    </div>
+</div>
+
+<script>
+    // База чисел із цілими коренями [основа, корінь n, степінь m, результат підкореневого числа k]
+    const baseDatabase = [
+        { base: 4, n: 2, k: 2 },
+        { base: 9, n: 2, k: 3 },
+        { base: 16, n: 2, k: 4 },
+        { base: 25, n: 2, k: 5 },
+        { base: 36, n: 2, k: 6 },
+        { base: 49, n: 2, k: 7 },
+        { base: 64, n: 2, k: 8 },
+        { base: 81, n: 2, k: 9 },
+        { base: 100, n: 2, k: 10 },
+        { base: 8, n: 3, k: 2 },
+        { base: 27, n: 3, k: 3 },
+        { base: 64, n: 3, k: 4 },
+        { base: 125, n: 3, k: 5 },
+        { base: 216, n: 3, k: 6 },
+        { base: 16, n: 4, k: 2 },
+        { base: 81, n: 4, k: 3 },
+        { base: 32, n: 5, k: 2 }
+    ];
+
+    let currentTask = {};
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateTask() {
+        // Очищення полів та статусів
+        ['n', 'm', 'x'].forEach(key => {
+            const input = document.getElementById(`input-${key}`);
+            const status = document.getElementById(`status-${key}`);
+            input.value = '';
+            input.className = '';
+            status.textContent = '';
+            status.className = 'status-tag';
+        });
+        document.getElementById('hint-box').style.display = 'none';
+
+        // Вибір випадкової основи
+        const item = baseDatabase[getRandomInt(0, baseDatabase.length - 1)];
+        let m = getRandomInt(1, 5);
+        
+        // Гарантуємо, що m/n не дорівнює 1
+        if (m === item.n) m += 1;
+
+        const x = Math.pow(item.base, m / item.n);
+
+        currentTask = {
+            a: item.base,
+            n: item.n,
+            m: m,
+            x: Math.round(x)
+        };
+
+        // Формування математичного виразу під коренем: \left(\sqrt[n]{a^m}\right) або \sqrt[n]{a^m}
+        const exprDiv = document.getElementById('math-expression');
+        exprDiv.innerHTML = `\\( (${currentTask.a})^{\\frac{${currentTask.m}}{${currentTask.n}}} = \\sqrt[n]{${currentTask.a}^m} = x \\)`;
+
+        // Перемальовування MathJax
+        if (window.MathJax) {
+            MathJax.typesetPromise([exprDiv]);
+        }
+    }
+
+    function checkAnswers() {
+        const userN = document.getElementById('input-n').value.trim();
+        const userM = document.getElementById('input-m').value.trim();
+        const userX = document.getElementById('input-x').value.trim();
+
+        const isNCorrect = parseInt(userN, 10) === currentTask.n;
+        const isMCorrect = parseInt(userM, 10) === currentTask.m;
+        const isXCorrect = parseInt(userX, 10) === currentTask.x;
+
+        updateStatus('n', isNCorrect);
+        updateStatus('m', isMCorrect);
+        updateStatus('x', isXCorrect);
+
+        if (isNCorrect && isMCorrect && isXCorrect) {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+    }
+
+    function updateStatus(key, isCorrect) {
+        const input = document.getElementById(`input-${key}`);
+        const status = document.getElementById(`status-${key}`);
+
+        if (input.value.trim() === '') {
+            input.className = 'incorrect-border';
+            status.textContent = 'Заповніть поле';
+            status.className = 'status-tag incorrect';
+            return;
+        }
+
+        if (isCorrect) {
+            input.className = 'correct-border';
+            status.textContent = 'Правильно';
+            status.className = 'status-tag correct';
+        } else {
+            input.className = 'incorrect-border';
+            status.textContent = 'Неправильно';
+            status.className = 'status-tag incorrect';
+        }
+    }
+
+    function showHint() {
+        const hintBox = document.getElementById('hint-box');
+        hintBox.innerHTML = `
+            <strong>Підказка:</strong><br>
+            • Знаменник дробу (${currentTask.n}) стає показником кореня <strong>n</strong>.<br>
+            • Чисельник дробу (${currentTask.m}) стає показником степеня під коренем <strong>m</strong>.<br>
+            • Обчисли: спочатку добуди корінь \\(\\sqrt[${currentTask.n}]{${currentTask.a}}\\), а потім піднеси результат до степеня <strong>${currentTask.m}</strong>.
+        `;
+        hintBox.style.display = 'block';
+        if (window.MathJax) {
+            MathJax.typesetPromise([hintBox]);
+        }
+    }
+
+    // Генерація першого завдання при завантаженні
+    window.onload = generateTask;
+</script>
+
+</body>
+</html>
