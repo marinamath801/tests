@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Корені й скарби — математичний тренажер</title>
+<style>
+:root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#243344;background:#f5f7fb;font-size:17px}*{box-sizing:border-box}body{margin:0}header{background:#183d3a;color:white;padding:36px 24px 65px}.head,main{max-width:1000px;margin:auto}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:12px;color:#a5dfc6;font-weight:750}h1{font-size:clamp(28px,5vw,44px);margin:9px 0}header p{color:#d5e7e0;max-width:670px;line-height:1.6}.dashboard{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:#fff;border:1px solid #e2e8e8;border-radius:20px;padding:21px 25px;margin-top:-35px;box-shadow:0 10px 30px #203d3710}.pig{font-size:40px}.bank{font-weight:800;font-size:27px;color:#226546}.bank small{display:block;font-size:12px;letter-spacing:1px;color:#6a7776;font-weight:600}.progressbox{margin-left:auto;min-width:220px;font-size:14px;color:#61706f}progress{width:100%;height:10px;accent-color:#319b71;display:block;margin-top:10px}main{padding:0 20px 50px}.intro{line-height:1.65;color:#65716f;font-size:14px;margin:24px 4px}.task{background:white;border:1px solid #e0e7e5;border-radius:20px;padding:26px;margin:20px 0}.taskhead{display:flex;gap:14px;align-items:center;margin-bottom:22px}.badge{background:#fff0f7;color:#d73287;border-radius:12px;min-width:43px;height:43px;display:grid;place-items:center;font-weight:800;font-size:23px}h2{font-size:19px;margin:0;line-height:1.4}.source{display:block;font-size:12px;color:#80918b;margin-top:4px;font-weight:500}.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.item{border:1px solid #e3e9e6;border-radius:13px;padding:18px;background:#fafcfb;transition:background .25s,border-color .25s}.item.wide{grid-column:1/-1}.expression{display:flex;align-items:center;gap:12px;min-height:52px;margin-bottom:13px}.subnum{font-size:13px;color:#73847d;align-self:center}math{font-family:'Cambria Math','STIX Two Math',serif;font-size:25px}input{width:150px;max-width:100%;border:1px solid #bbc9c2;border-radius:8px;padding:11px 12px;font:inherit;background:#fff;color:#243344}input:focus{outline:3px solid #6eb49c55;border-color:#338265}input:disabled{opacity:1;color:#243344;background:#fff9}.interval{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.interval input{width:95px}.interval math{font-size:21px}.feedback{font-size:14px;line-height:1.5;margin-top:10px;min-height:21px}.correct{background:#e7f7ed;border-color:#36a669}.correct .feedback{color:#176a37}.incorrect{background:#fff0f0;border-color:#df6262}.incorrect .feedback{color:#b42e39}.actions{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:20px}button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:12px 20px;cursor:pointer;background:#226c52;color:white}button:hover{background:#18533e}button:focus-visible{outline:3px solid #e8b04b;outline-offset:4px}button:disabled{cursor:default;background:#e2eae5;color:#61786a}.status{font-size:14px;color:#526c60}.error{color:#b42e39}.bottom{display:flex;justify-content:center;margin:27px 0}.secondary{background:white;color:#226c52;border:1px solid #b8cfc2}.secondary:hover{background:#e9f4ed}dialog{border:0;border-radius:25px;padding:35px;max-width:460px;width:calc(100% - 32px);text-align:center;box-shadow:0 25px 100px #0003}dialog::backdrop{background:#14342bbd}dialog h2{font-size:28px}dialog p{color:#64736b;line-height:1.6}.total{font-size:58px;color:#226c52;font-weight:850;margin:15px 0}.dialogbuttons{display:grid;gap:10px}.coin{position:fixed;top:-55px;left:var(--x);width:34px;height:34px;display:grid;place-items:center;background:#ffd45c;color:#986407;border:3px solid #e8ad24;border-radius:50%;font-size:19px;font-weight:800;z-index:100;pointer-events:none;animation:rain var(--t) ease-in var(--delay) forwards}@keyframes rain{to{transform:translate(var(--drift),110vh) rotate(650deg)}}footer{text-align:center;font-size:13px;color:#7a8981}.reviewnote{color:#226c52;text-align:center}@media(max-width:650px){.items{grid-template-columns:1fr}.task{padding:18px}.dashboard{padding:17px;gap:12px}.progressbox{width:100%;margin:0}.expression.long math{font-size:20px}.expression.long{gap:3px}header{padding-top:25px}.interval{gap:5px}}@media(prefers-reduced-motion:reduce){.coin{animation:none;display:none}*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="eyebrow">Математика · Корінь n-го степеня</div><h1>Корені й скарби 🪙</h1><p>Розв’язуй завдання, перевіряй відповіді та наповнюй свою скарбничку. Кожна правильна відповідь — ще 1 грн!</p></div></header>
+<main>
+<div class="dashboard"><span class="pig" aria-hidden="true">🐷</span><div class="bank"><small>МОЯ СКАРБНИЧКА</small><span id="balance" aria-live="polite">0 грн</span></div><div class="progressbox"><span id="progressText">Виконано 0 з 4 номерів</span><progress id="progress" max="4" value="0" aria-label="Виконані номери"></progress></div></div>
+<p class="intro">Номери відповідають рожевим позначкам на скриншоті. Заповни всі поля номера й натисни «Перевірити». Для кожного підпункту є дві спроби. Після помилки прочитай підказку й виправ відповідь. За правильну відповідь із будь-якої спроби отримуєш 1 грн. Десяткові дроби вводь через кому або крапку, звичайні — як 2/7. Максимальний заробіток — 11 грн.</p>
+<div id="tasks"></div><p id="reviewNote" class="reviewnote" hidden>Це твої відповіді. Зеленим позначено правильні, червоним — помилкові.</p>
+<div class="bottom"><button id="resultButton" hidden>Показати результат</button></div>
+<footer>Не поспішай: уважно перевіряй знаки перед коренями та степенями.</footer>
+</main>
+<dialog id="result"><div style="font-size:55px" aria-hidden="true">🐷✨</div><h2>Твоя скарбничка наповнена!</h2><div class="total" id="total"></div><p id="summary"></p><div class="dialogbuttons"><button id="review">Подивитись свої відповіді</button><button class="secondary" id="restart">Спробувати ще раз</button></div></dialog>
+<script>
+const n=x=>`<mn>${x}</mn>`,op=x=>`<mo>${x}</mo>`,row=x=>`<mrow>${x}</mrow>`,root=(x,k)=>`<mroot>${row(x)}${n(k)}</mroot>`,pow=(x,k)=>`<msup>${row(x)}${n(k)}</msup>`,par=x=>row(op('(')+x+op(')')),frac=(a,b)=>`<mfrac>${n(a)}${n(b)}</mfrac>`,math=x=>`<math xmlns="http://www.w3.org/1998/Math/MathML">${x}</math>`;
+const tasks=[
+{title:'Чому дорівнює значення виразу?',source:'4.5',items:[{expr:root(n(343),3),answer:7},{expr:n('0,5')+root(op('−')+n(64),3),answer:-2},{expr:op('−')+root(op('−')+n(1024),5),answer:4}]},
+{title:'Знайдіть значення виразу',source:'4.7',items:[{expr:pow(par(root(n(18),8)),8),answer:18},{expr:pow(par(op('−')+root(n(9),9)),9),answer:-9},{expr:pow(par(op('−')+root(n(11),6)),6),answer:11},{expr:pow(par(frac(1,3)+root(n(45),3)),3),answer:5/3}]},
+{title:'Обчисліть',source:'4.13',items:[{expr:n(200)+root(n('0,001'),3)+op('−')+root(op('−')+n('0,00032'),5)+op('−')+pow(par(op('−')+n(4)+`<msqrt>${n(2)}</msqrt>`),2),answer:-11.8,wide:true}]},
+{title:'Між якими двома послідовними цілими числами міститься число на координатній прямій?',source:'4.17',items:[{expr:root(n(18),3),answer:[2,3]},{expr:root(n(139),4),answer:[3,4]},{expr:op('−')+root(n(212),3),answer:[-6,-5]}]}
+];
+const hints=[
+['Яке число в третьому степені дає те, що під коренем?', 'Яке число в третьому степені дає те, що під коренем? Врахуй знак під коренем, а потім помнож результат на 0,5.', 'Яке число в п’ятому степені дає те, що під коренем? Після обчислення кореня врахуй мінус перед ним.'],
+['Пригадай означення кореня: піднесення кореня n-го степеня до n-го степеня повертає підкореневе число.', 'Піднеси до дев’ятого степеня і знак мінус, і корінь. Яким буде знак від’ємного числа в непарному степені?', 'Піднеси до шостого степеня і знак мінус, і корінь. Яким буде знак від’ємного числа в парному степені?', 'Піднеси до третього степеня кожен множник у дужках. У дробі піднеси до степеня і чисельник, і знаменник, а потім скороти результат.'],
+['Обчисли корені окремо: яке число у відповідному степені дає те, що під коренем? У квадраті добутку піднеси до квадрата кожен множник. Потім виконай множення й віднімання, уважно враховуючи знаки.'],
+['Знайди два послідовні цілі числа, куби яких розташовані по різні боки від підкореневого числа.', 'Знайди два послідовні цілі числа, четверті степені яких розташовані по різні боки від підкореневого числа.', 'Спочатку порівняй підкореневе число з кубами сусідніх цілих чисел. Потім врахуй мінус перед коренем: при зміні знаків порядок меж змінюється.']
+];
+let attempts=tasks.map(t=>t.items.map(()=>({count:0,correct:false})));
+let earned=0,completed=0;const checked=new Set();const container=document.getElementById('tasks');
+function render(){container.innerHTML=tasks.map((t,i)=>`<section class="task" id="task-${i}" aria-labelledby="title-${i}"><div class="taskhead"><span class="badge">${i+1}</span><h2 id="title-${i}">${t.title}<span class="source">Завдання ${t.source} зі скриншота</span></h2></div><div class="items">${t.items.map((s,j)=>`<div class="item ${s.wide?'wide':''}" id="item-${i}-${j}"><div class="expression ${s.wide?'long':''}">${t.items.length>1?`<span class="subnum">${j+1})</span>`:''}${math(s.expr)}</div>${Array.isArray(s.answer)?`<div class="interval"><input type="text" inputmode="text" aria-label="Номер ${i+1}, підпункт ${j+1}: нижня межа" placeholder="Менше" autocomplete="off">${math(op('<')+s.expr+op('<'))}<input type="text" inputmode="text" aria-label="Номер ${i+1}, підпункт ${j+1}: верхня межа" placeholder="Більше" autocomplete="off"></div>`:`<input type="text" inputmode="text" aria-label="Відповідь на номер ${i+1}, підпункт ${j+1}" placeholder="Відповідь" autocomplete="off">`}<div class="feedback" aria-live="polite"></div></div>`).join('')}</div><div class="actions"><button data-check="${i}">Перевірити № ${i+1}</button><span class="status" aria-live="polite"></span></div></section>`).join('');}
+function parse(value){let s=value.trim().replace(/\s/g,'').replace(/−/g,'-').replace(/,/g,'.');if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:\/[+-]?(?:\d+(?:\.\d*)?|\.\d+))?$/.test(s))return null;const parts=s.split('/').map(Number);const v=parts.length===2?parts[0]/parts[1]:parts[0];return Number.isFinite(v)?v:null;}
+function coins(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;for(let k=0;k<38;k++){const c=document.createElement('span');c.className='coin';c.textContent='₴';c.setAttribute('aria-hidden','true');c.style.cssText=`--x:${Math.random()*96}vw;--t:${1.8+Math.random()*1.5}s;--delay:${Math.random()*.6}s;--drift:${Math.random()*180-90}px`;document.body.append(c);c.addEventListener('animationend',()=>c.remove(),{once:true});}}
+function check(i){
+ if(checked.has(i))return;
+ const section=document.getElementById(`task-${i}`),inputs=[...section.querySelectorAll('input')],status=section.querySelector('.status');
+ const invalid=inputs.find(x=>!x.disabled&&parse(x.value)===null);
+ if(invalid){status.textContent='Заповни всі поля числами або звичайними дробами. Спробу не використано.';status.classList.add('error');invalid.focus();return;}
+ let gain=0;
+ tasks[i].items.forEach((s,j)=>{
+  const state=attempts[i][j];if(state.correct||state.count>=2)return;
+  const item=document.getElementById(`item-${i}-${j}`),fields=[...item.querySelectorAll('input')],expected=Array.isArray(s.answer)?s.answer:[s.answer];
+  state.count++;state.correct=fields.every((f,k)=>Math.abs(parse(f.value)-expected[k])<1e-9);
+  item.classList.remove('correct','incorrect');item.classList.add(state.correct?'correct':'incorrect');
+  item.querySelector('.feedback').textContent=state.correct?`✓ Правильно! +1 грн · Спроба ${state.count} з 2`:`✗ ${state.count===1?'Спробуй ще раз. Залишилася 1 спроба.':'Обидві спроби використано.'} Підказка: ${hints[i][j]}`;
+  fields.forEach(f=>f.disabled=state.correct||state.count>=2);if(state.correct)gain++;
+ });
+ earned+=gain;
+ const done=attempts[i].every(a=>a.correct||a.count>=2),correct=attempts[i].filter(a=>a.correct).length;
+ if(done){checked.add(i);completed++;}
+ section.querySelector('button').disabled=done;
+ section.querySelector('button').textContent=done?'Перевірено ✓':`Перевірити № ${i+1} · друга спроба`;
+ status.classList.remove('error');status.textContent=`Правильно: ${correct} з ${tasks[i].items.length} · +${gain} грн`+(done?'':' · Виправ відповіді в червоних полях.');
+ document.getElementById('balance').textContent=`${earned} грн`;
+ document.getElementById('progress').value=completed;
+ document.getElementById('progressText').textContent=`Виконано ${completed} з 4 номерів`;
+ if(gain)coins();
+ if(completed===4){document.getElementById('resultButton').hidden=false;showResult();}
+}
+function showResult(){document.getElementById('total').textContent=`${earned} грн`;document.getElementById('summary').textContent=`Правильних відповідей: ${earned} з 11. Усі 4 номери завершено!`;document.getElementById('result').showModal();}
+container.addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(b)check(Number(b.dataset.check));});container.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();check(Number(e.target.closest('.task').id.split('-')[1]));}});
+document.getElementById('review').onclick=()=>{document.getElementById('result').close();document.getElementById('reviewNote').hidden=false;document.getElementById('task-0').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});};document.getElementById('resultButton').onclick=showResult;
+document.getElementById('restart').onclick=()=>{document.getElementById('result').close();earned=0;completed=0;checked.clear();attempts=tasks.map(t=>t.items.map(()=>({count:0,correct:false})));render();document.getElementById('balance').textContent='0 грн';document.getElementById('progress').value=0;document.getElementById('progressText').textContent='Виконано 0 з 4 номерів';document.getElementById('resultButton').hidden=true;document.getElementById('reviewNote').hidden=true;window.scrollTo({top:0,behavior:'smooth'});};render();
+</script>
+</body>
+</html>
