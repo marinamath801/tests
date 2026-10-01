@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Повторення 2 — математична скарбничка</title>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --pink-badge: #ff1f7d;
+      --pink-glow: rgba(255, 31, 125, 0.35);
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --success-border: #86efac;
+      --error: #b91c1c;
+      --error-bg: #fee2e2;
+      --error-border: #fca5a5;
+      --gold: #f59e0b;
+      --gold-dark: #b45309;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: #ffffff;
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background-color: #f8fafc;
+      /* School notebook grid pattern (в клітинку) */
+      background-image: 
+        linear-gradient(to right, rgba(203, 213, 225, 0.45) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.45) 1px, transparent 1px);
+      background-size: 24px 24px;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    /* Fixed Canvas for Gold Coin Rain */
+    #coinCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Top Sticky HUD with Piggy Bank */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      padding: 12px 20px;
+    }
+
+    .header-content {
+      max-width: 1050px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-group h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topic-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+
+    /* Piggy Bank Widget */
+    .piggy-widget {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 2px solid #fde68a;
+      border-radius: 16px;
+      padding: 8px 18px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+      position: relative;
+    }
+
+    .piggy-icon-container {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .piggy-svg {
+      width: 46px;
+      height: 46px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: bottom center;
+    }
+
+    .piggy-svg.bounce {
+      animation: pigJump 0.6s ease-in-out;
+    }
+
+    @keyframes pigJump {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.28) rotate(-6deg); }
+      60% { transform: scale(1.15) rotate(6deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .piggy-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .piggy-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #92400e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .piggy-balance {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #b45309;
+      line-height: 1.1;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .piggy-balance span.currency {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .floating-coin-reward {
+      position: absolute;
+      top: -12px;
+      right: -8px;
+      background: #16a34a;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.3);
+      animation: floatUp 0.8s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(8px) scale(0.6); }
+      30% { opacity: 1; transform: translateY(0) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-24px) scale(0.9); }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      color: #334155;
+    }
+
+    .icon-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1050px;
+      margin: 25px auto 0;
+      padding: 0 20px;
+    }
+
+    /* Review Mode Banner */
+    .review-banner {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #93c5fd;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.1);
+    }
+
+    .review-banner-text {
+      font-size: 0.95rem;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .review-banner-text span {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: #3b82f6;
+      margin-top: 2px;
+    }
+
+    /* Instruction Card */
+    .intro-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .intro-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .intro-text p {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #475569;
+    }
+
+    .intro-text strong {
+      color: #0f172a;
+    }
+
+    /* Task Card */
+    .task-card {
+      background: var(--card-bg);
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 26px;
+      margin-bottom: 26px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .task-card:hover {
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Task Header with Pink Marker */
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 16px;
+    }
+
+    .pink-badge {
+      background: linear-gradient(135deg, #ff2a85 0%, #e60067 100%);
+      color: white;
+      font-size: 1.55rem;
+      font-weight: 900;
+      font-family: inherit;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--pink-glow);
+      flex-shrink: 0;
+    }
+
+    .task-title-wrap h2 {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.35;
+    }
+
+    .task-source-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* Items Grid */
+    .subitems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .subitems-grid.single-item {
+      grid-template-columns: 1fr;
+    }
+
+    /* Individual Question Box */
+    .subitem-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .subitem-box:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .subitem-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      min-height: 48px;
+    }
+
+    .subnum-badge {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #475569;
+      background: #e2e8f0;
+      padding: 2px 7px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .formula-display {
+      font-size: 1.35rem;
+      color: #0f172a;
+      overflow-x: auto;
+      padding: 2px 4px;
+    }
+
+    /* Inputs */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .math-input {
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      background: white;
+      color: #0f172a;
+      width: 155px;
+      transition: all 0.2s;
+    }
+
+    .math-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .math-input:disabled {
+      cursor: not-allowed;
+    }
+
+    /* Two Consecutive Integers Layout for Task 4 */
+    .interval-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: #ffffff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .interval-input {
+      width: 80px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: 8px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      text-align: center;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .interval-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .interval-label {
+      font-size: 0.95rem;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    /* Feedback & Solution */
+    .feedback-msg {
+      font-size: 0.88rem;
+      margin-top: 10px;
+      font-weight: 600;
+      display: none;
+      line-height: 1.45;
+    }
+
+    .solution-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #1e3a8a;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .solution-title {
+      font-weight: 700;
+      color: #1d4ed8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .solution-step {
+      margin-bottom: 4px;
+    }
+
+    /* States: Correct (Green) */
+    .subitem-box.correct {
+      background: var(--success-bg) !important;
+      border-color: var(--success-border) !important;
+    }
+
+    .subitem-box.correct .math-input,
+    .subitem-box.correct .interval-input {
+      border-color: var(--success) !important;
+      background: #f0fdf4 !important;
+      color: var(--success) !important;
+    }
+
+    .subitem-box.correct .feedback-msg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--success);
+    }
+
+    /* States: Incorrect (Red) */
+    .subitem-box.incorrect {
+      background: var(--error-bg) !important;
+      border-color: var(--error-border) !important;
+    }
+
+    .subitem-box.incorrect .math-input,
+    .subitem-box.incorrect .interval-input {
+      border-color: var(--error) !important;
+      background: #fff5f5 !important;
+      color: var(--error) !important;
+    }
+
+    .subitem-box.incorrect .feedback-msg {
+      display: block;
+      color: var(--error);
+    }
+
+    /* Action bar inside each task card */
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-check {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      font-size: 0.98rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-check:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-check:disabled {
+      background: #94a3b8;
+      box-shadow: none;
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    .task-status-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    /* Flying Coin Animation */
+    .flying-coin {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      background: radial-gradient(circle at 35% 35%, #fde047 0%, #eab308 60%, #a16207 100%);
+      border: 2px solid #ca8a04;
+      border-radius: 50%;
+      color: #713f12;
+      font-weight: 900;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease 0.65s;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10005;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: 24px;
+      padding: 36px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .modal-piggy-burst {
+      font-size: 4rem;
+      margin-bottom: 8px;
+      animation: bouncePulse 1s infinite alternate;
+    }
+
+    @keyframes bouncePulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.15) rotate(4deg); }
+    }
+
+    .modal-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .modal-earned-wrap {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 18px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .modal-earned-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #92400e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-earned-val {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #b45309;
+      margin: 4px 0;
+    }
+
+    .modal-score-sub {
+      font-size: 0.95rem;
+      color: #78350f;
+      font-weight: 600;
+    }
+
+    .modal-desc {
+      font-size: 0.96rem;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .modal-buttons {
+      display: grid;
+      gap: 12px;
+    }
+
+    .btn-review-answers {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-review-answers:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-restart {
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 12px 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-restart:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    /* Lightbox for Original Screenshot */
+    .lightbox-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10010;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightbox-overlay.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .lightbox-content img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .title-group {
+        text-align: center;
+      }
+      .title-group h1 {
+        justify-content: center;
+        font-size: 1.15rem;
+      }
+      .piggy-widget {
+        justify-content: center;
+      }
+      .header-actions {
+        justify-content: center;
+      }
+      .task-card {
+        padding: 18px;
+      }
+      .pink-badge {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+      }
+      .subitems-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  .subitems-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.task-card{scroll-margin-top:230px}math{font-family:'Cambria Math',serif;font-size:24px}.choices{display:grid;gap:9px;margin-top:18px}.choice{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:white;cursor:pointer;min-height:55px}.choice:has(input:checked){border-color:#2563eb;background:#eff6ff}.choice:has(input:disabled){cursor:default}.choice input{width:18px;height:18px;flex-shrink:0;accent-color:#2563eb}.choice math{font-size:21px}.subitem-box{min-width:0}.formula-display{overflow-x:auto;padding:8px 0}.feedback-msg{line-height:1.65}.numberline{width:100%;max-width:750px;display:block;margin:15px auto}.sticky-header h1{font-size:clamp(16px,2.4vw,26px)}#progressText{text-align:center;color:#475569;margin:20px}.subitems-grid.single-item{grid-template-columns:1fr}.modal-overlay{z-index:2000}#coinCanvas{z-index:2100;pointer-events:none}@media(max-width:600px){.subitems-grid{grid-template-columns:1fr!important}.header-content{gap:8px}.formula-display math{font-size:22px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}</style>
+</head>
+<body>
+
+  <!-- Fullscreen Canvas for Gold Coin Rain -->
+  <canvas id="coinCanvas"></canvas>
+
+  <!-- Sticky Top HUD with Interactive Piggy Bank -->
+  <header class="sticky-header">
+    <div class="header-content">
+      <div class="title-group">
+        <span class="topic-badge">Підготовка до НМТ · Новий варіант</span>
+        <h1><span>📐</span> Повторення 2: математична скарбничка</h1>
+      </div>
+
+      <!-- Piggy Bank Widget -->
+      <div class="piggy-widget" id="piggyWidget">
+        <div class="piggy-icon-container">
+          <!-- Cute SVG Piggy Bank -->
+          <svg class="piggy-svg" id="piggySvg" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Coin Slot Glow -->
+            <ellipse cx="48" cy="18" rx="14" ry="4" fill="#fb7185" opacity="0.3" />
+            <!-- Slot Opening -->
+            <rect x="38" y="16" width="20" height="4" rx="2" fill="#881337" />
+            <!-- Pig Body -->
+            <ellipse cx="50" cy="52" rx="38" ry="30" fill="url(#pigBodyGrad)" />
+            <!-- Pig Ear Back -->
+            <path d="M 68 28 C 76 16, 88 20, 80 36 Z" fill="#f43f5e" />
+            <!-- Pig Ear Front -->
+            <path d="M 28 26 C 20 14, 8 20, 18 36 Z" fill="#fb7185" />
+            <!-- Pig Snout -->
+            <ellipse cx="18" cy="56" rx="12" ry="9" fill="#fda4af" stroke="#f43f5e" stroke-width="2" />
+            <circle cx="14" cy="56" r="2.5" fill="#9f1239" />
+            <circle cx="21" cy="56" r="2.5" fill="#9f1239" />
+            <!-- Eye -->
+            <circle cx="34" cy="42" r="3.5" fill="#0f172a" />
+            <circle cx="35" cy="40.5" r="1.2" fill="#ffffff" />
+            <!-- Cute Blush -->
+            <ellipse cx="32" cy="52" rx="5" ry="3" fill="#fb7185" opacity="0.6" />
+            <!-- Feet -->
+            <rect x="30" y="76" width="10" height="10" rx="4" fill="#f43f5e" />
+            <rect x="58" y="76" width="10" height="10" rx="4" fill="#f43f5e" />
+            <!-- Belly ₴ Symbol Badge -->
+            <circle cx="56" cy="54" r="14" fill="#fef08a" stroke="#eab308" stroke-width="2" />
+            <text x="56" y="60" font-size="16" font-weight="900" text-anchor="middle" fill="#854d0e">₴</text>
+            <!-- Curly Tail -->
+            <path d="M 88 50 C 94 48, 97 42, 94 38 C 91 35, 87 38, 88 42 C 89 45, 95 45, 96 48" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" fill="none" />
+            <!-- Gradients -->
+            <defs>
+              <linearGradient id="pigBodyGrad" x1="20" y1="20" x2="80" y2="85" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#fecdd3" />
+                <stop offset="0.6" stop-color="#fda4af" />
+                <stop offset="1" stop-color="#fb7185" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="piggy-info">
+          <span class="piggy-label">Скарбничка</span>
+          <div class="piggy-balance">
+            <span id="balanceCount">0</span>
+            <span class="currency">грн</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="btnSoundToggle" title="Увімкнути/Вимкнути звук">
+          <span id="soundIcon">🔊</span> Звук
+        </button>
+        
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+
+    <!-- Review Banner (Hidden until test completion) -->
+    <div class="review-banner" id="reviewBanner" style="display: none;">
+      <div class="review-banner-text">
+        🔍 Режим перегляду відповідей
+        <span>Зеленим кольором підсвічено правильні відповіді, червоним — помилки. Підказки допоможуть розібратися з помилками.</span>
+      </div>
+      <button class="icon-btn" id="btnReopenResult" style="background: white; border-color: #93c5fd; color: #1d4ed8;">
+        🏆 Мій результат
+      </button>
+    </div>
+
+    <!-- Instructions -->
+    <section class="intro-card">
+      <div class="intro-icon">💡</div>
+      <div class="intro-text">
+        <p>
+          29 нових номерів за темами PDF «30.09 Повторення2», у тому самому порядку. Обери відповідь у кожному підпункті й натисни <strong>«Перевірити»</strong>. Маєш <strong>дві спроби</strong> та підказку після помилки. Готові відповіді не відкриваються. За кожну правильну відповідь — <strong>1 грн</strong> і дощ із монеток. Максимум — <strong>40 грн</strong>.
+        </p>
+      </div>
+    </section>
+
+    <!-- Tasks Form / Container -->
+    <p id="progressText" aria-live="polite">Виконано 0 з 29 номерів</p><div id="tasksList"></div>
+
+  </main>
+
+  <!-- Modal Result Window -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-card">
+      <div class="modal-piggy-burst">🐷✨</div>
+      <h2 class="modal-title">Тест завершено!</h2>
+      <p class="modal-desc" id="modalScoreSubtitle">Твоя скарбничка успішно наповнена!</p>
+
+      <div class="modal-earned-wrap">
+        <div class="modal-earned-label">Твій підсумковий заробіток</div>
+        <div class="modal-earned-val"><span id="modalFinalSum">0</span> грн</div>
+        <div class="modal-score-sub" id="modalCorrectCount">Правильних відповідей: 0 з 40</div>
+      </div>
+
+      <p class="modal-desc" id="modalMotivation">
+        Ти завершив математичне повторення!
+      </p>
+
+      <div class="modal-buttons">
+        <button class="btn-review-answers" id="btnModalReview">
+          👀 Подивитись свої відповіді
+        </button>
+        <button class="btn-restart" id="btnModalRestart">
+          🔄 Пройти тест ще раз
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+let soundEnabled=true;
+    /* --- AUDIO SYNTHESIS (NO EXTERNAL FILES NEEDED) --- */
+    let audioCtx = null;
+    function playAudio(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        if (type === 'coin') {
+          // Cheerful high-pitch coin ding
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // B5
+          osc.frequency.exponentialRampToValueAtTime(1318.51, audioCtx.currentTime + 0.08); // E6
+          gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.4);
+        } else if (type === 'wrong') {
+          // Soft lower buzz
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, audioCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.22);
+        } else if (type === 'fanfare') {
+          // Arpeggio fanfare for modal
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            const startTime = audioCtx.currentTime + idx * 0.09;
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.25, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.6);
+          });
+        }
+      } catch (err) {}
+    }
+
+    /* --- PARSE INPUT VALUE (Decimals, commas, fractions) --- */
+    function parseMathInput(raw) {
+      if (raw === null || raw === undefined) return null;
+      let s = String(raw).trim().replace(/\s+/g, ' ').replace(/−/g, '-').replace(/,/g, '.');
+      if (!s) return null;
+
+      // Check mixed fraction e.g. "1 2/3" or "-1 2/3"
+      const mixedMatch = s.match(/^([+-]?\d+)\s+(\d+)\/(\d+)$/);
+      if (mixedMatch) {
+        const whole = parseFloat(mixedMatch[1]);
+        const num = parseFloat(mixedMatch[2]);
+        const den = parseFloat(mixedMatch[3]);
+        if (den === 0) return null;
+        const sign = whole < 0 ? -1 : 1;
+        return whole + sign * (num / den);
+      }
+
+      // Check simple fraction e.g. "5/3" or "-5/3"
+      const fracMatch = s.match(/^([+-]?\d+(?:\.\d+)?)\s*\/\s*([+-]?\d+(?:\.\d+)?)$/);
+      if (fracMatch) {
+        const num = parseFloat(fracMatch[1]);
+        const den = parseFloat(fracMatch[2]);
+        if (den === 0) return null;
+        return num / den;
+      }
+
+      // Standard float / integer
+      const val = parseFloat(s);
+      return isNaN(val) ? null : val;
+    }
+
+    /* --- CANVAS COIN RAIN SYSTEM --- */
+    const canvas = document.getElementById('coinCanvas');
+    const ctx = canvas.getContext('2d');
+    let coins = [];
+    let isRaining = false;
+    let rainAnimId = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class GoldCoin {
+      constructor(isMega) {
+        this.x = Math.random() * canvas.width;
+        this.y = -30 - Math.random() * 80;
+        this.radius = 14 + Math.random() * 8;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = 4 + Math.random() * 5 + (isMega ? 2 : 0);
+        this.angle = Math.random() * Math.PI * 2;
+        this.angleSpeed = 0.08 + Math.random() * 0.12;
+        this.wobble = Math.random() * Math.PI * 2;
+        this.wobbleSpeed = 0.05 + Math.random() * 0.05;
+        this.opacity = 1;
+        this.life = 0;
+        this.maxLife = 160 + Math.random() * 60;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.08; // subtle gravity
+        this.angle += this.angleSpeed;
+        this.wobble += this.wobbleSpeed;
+        this.life++;
+        if (this.y > canvas.height - 20) {
+          this.opacity -= 0.04;
+        }
+      }
+
+      draw(c) {
+        if (this.opacity <= 0) return;
+        c.save();
+        c.globalAlpha = Math.max(0, this.opacity);
+        c.translate(this.x, this.y);
+        c.rotate(Math.sin(this.wobble) * 0.25);
+
+        const cosA = Math.cos(this.angle);
+        const rx = this.radius * Math.abs(cosA);
+        const ry = this.radius;
+
+        // Rim thickness when edge-on
+        if (Math.abs(cosA) > 0.1) {
+          const grad = c.createRadialGradient(-rx*0.2, -ry*0.2, rx*0.1, 0, 0, ry);
+          grad.addColorStop(0, '#fef08a');
+          grad.addColorStop(0.5, '#f59e0b');
+          grad.addColorStop(1, '#b45309');
+
+          c.beginPath();
+          c.ellipse(0, 0, Math.max(1, rx), ry, 0, 0, Math.PI * 2);
+          c.fillStyle = grad;
+          c.fill();
+          c.lineWidth = 1.5;
+          c.strokeStyle = '#78350f';
+          c.stroke();
+
+          // ₴ symbol stamped in center
+          if (Math.abs(cosA) > 0.45) {
+            c.save();
+            c.scale(cosA > 0 ? 1 : -1, 1);
+            c.font = `bold ${Math.round(ry * 1.05)}px sans-serif`;
+            c.fillStyle = '#78350f';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText('₴', 0, 1);
+            c.restore();
+          }
+        } else {
+          // Coin edge view
+          c.fillStyle = '#b45309';
+          c.fillRect(-2, -ry, 4, ry * 2);
+        }
+
+        c.restore();
+      }
+    }
+
+    function triggerCoinRain(isMega = false) { if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const count = isMega ? 90 : 45;
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          coins.push(new GoldCoin(isMega));
+          if (!isRaining) {
+            isRaining = true;
+            animateCoinRain();
+          }
+        }, i * (isMega ? 25 : 35));
+      }
+    }
+
+    function animateCoinRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = coins.length - 1; i >= 0; i--) {
+        const coin = coins[i];
+        coin.update();
+        coin.draw(ctx);
+        if (coin.opacity <= 0 || coin.y > canvas.height + 40 || coin.life > coin.maxLife) {
+          coins.splice(i, 1);
+        }
+      }
+
+      if (coins.length > 0) {
+        rainAnimId = requestAnimationFrame(animateCoinRain);
+      } else {
+        isRaining = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    /* --- FLYING COIN TO PIGGY BANK --- */
+    function animateCoinToPiggy(fromElem) { if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const piggy = document.getElementById('piggySvg');
+      const startRect = fromElem.getBoundingClientRect();
+      const targetRect = piggy.getBoundingClientRect();
+
+      const startX = startRect.left + startRect.width / 2;
+      const startY = startRect.top + startRect.height / 2;
+      const endX = targetRect.left + targetRect.width / 2;
+      const endY = targetRect.top + 16;
+
+      const coinEl = document.createElement('div');
+      coinEl.className = 'flying-coin';
+      coinEl.textContent = '₴';
+      coinEl.style.left = `${startX - 16}px`;
+      coinEl.style.top = `${startY - 16}px`;
+      document.body.appendChild(coinEl);
+
+      // Force reflow
+      coinEl.getBoundingClientRect();
+
+      // Trigger translate animation
+      coinEl.style.transform = `translate(${endX - startX}px, ${endY - startY}px) scale(0.6)`;
+      coinEl.style.opacity = '0';
+
+      setTimeout(() => {
+        coinEl.remove();
+        piggy.classList.remove('bounce');
+        void piggy.offsetWidth; // restart anim
+        piggy.classList.add('bounce');
+
+        // Floating badge "+1 ₴"
+        const badge = document.createElement('div');
+        badge.className = 'floating-coin-reward';
+        badge.textContent = '+1 ₴';
+        document.getElementById('piggyWidget').appendChild(badge);
+        setTimeout(() => badge.remove(), 850);
+      }, 700);
+    }
+
+
+const n=x=>`<mn>${x}</mn>`,v=x=>`<mi>${x}</mi>`,o=x=>`<mo>${x}</mo>`,r=x=>`<mrow>${x}</mrow>`,p=(x,k)=>`<msup>${r(x)}${r(n(k))}</msup>`,f=(a,b)=>`<mfrac>${r(a)}${r(b)}</mfrac>`,q=x=>`<msqrt>${r(x)}</msqrt>`,root=(x,k)=>`<mroot>${r(x)}${n(k)}</mroot>`,par=x=>r(o('(')+x+o(')')),abs=x=>r(o('|')+x+o('|')),mix=(a,b,c)=>n(a)+f(n(b),n(c)),m=x=>`<math xmlns="http://www.w3.org/1998/Math/MathML">${x}</math>`,txt=x=>`<mtext>${x}</mtext>`;
+const x=v('x'),a=v('a'),b=v('b'),y=v('y'),c=v('c');
+const T=[];const item=(expr,options,key,hint)=>({expr,options,key,hint});const add=(title,...items)=>T.push({title,items});const nums=arr=>arr.map(z=>String(z).includes('/')?f(...String(z).split('/').map(n)):n(z));
+add('Обчисліть суму',item(mix(2,7,15)+o('+')+f(n(5),n(6)),[mix(3,3,10),mix(2,12,21),mix(3,1,5),mix(2,3,10),mix(3,7,15)],0,'Зведи дробові частини до спільного знаменника. Якщо сума дробів більша за одиницю, виділи цілу частину.'));
+add('Спростіть вираз, якщо a < 5',item(n(2)+o('+')+abs(a+o('−')+n(5)),[a+o('−')+n(3),n(7)+o('−')+a,n(3)+o('−')+a,a+o('+')+n(7),o('−')+a+o('−')+n(7)],1,'Визнач знак виразу під модулем. Модуль від’ємного виразу дорівнює протилежному виразу.'));
+add('Запишіть десятковим дробом, округливши до десятих',item(f(n(11),n(6)),nums(['1,8','1,83','1,9','1,7','1,6']),0,'Поділи чисельник на знаменник. Для округлення до десятих подивись на цифру сотих.'));
+const productHint='Перемнож коефіцієнти. При множенні степенів з однаковою основою показники додаються.';
+add('Спростіть добуток',item(n('0,7')+p(x,4)+o('·')+n(6)+p(x,3),[n(42)+p(x,7),n('4,2')+p(x,12),n('4,2')+p(x,7),n('0,42')+p(x,7),n(42)+p(x,12)],2,productHint));
+add('Обчисліть, використовуючи властивості степенів',item(f(p(n(30),5)+o('·')+p(n('0,1'),4),p(n(9),3)),nums(['30','10/3','0,3','3','1/3']),1,'Виділи один множник із більшого степеня. Об’єднай множники з однаковими показниками, потім подай основи як степені одного числа.'));
+add('Обчисліть модуль',item(abs(n(3)+o('·')+par(o('−')+f(n(7),n(12)))),[o('−')+f(n(7),n(4)),f(n(7),n(4)),f(n(7),n(12)),f(n(4),n(7)),n(7)],1,'Спочатку виконай множення і скороти дріб. Модуль від’ємного числа є додатним.'));
+add('Обчисліть квадратний корінь',item(q(mix(2,14,25)),[mix(1,2,5),mix(2,3,5),f(n(8),n(5)),f(n(5),n(8)),f(n(64),n(25))],2,'Перетвори мішане число на неправильний дріб. Яке число у квадраті дає чисельник, а яке — знаменник?'));
+const intervals=['(−∞; −3)','[−3; −1)','[−1; 0)','[0; 1)','[1; +∞)'].map(txt);
+add('Установіть відповідність: оберіть проміжок для кожного виразу, якщо a = −0,4',item(abs(a),intervals,3,'Знайди модуль заданого числа, потім перевір межі проміжків.'),item(p(a,3),intervals,2,'Непарний степінь від’ємного числа є від’ємним. Порівняй результат із межами проміжків.'),item(f(n(1),a),intervals,1,'Поділи одиницю на задане число. Квадратна дужка включає межу, кругла — не включає.'));
+add('Виконайте ділення',item(n('4,8')+o(':')+n('0,6'),nums(['0,8','8','80','4,2','2,88']),1,'Помнож ділене і дільник на 10, щоб дільник став цілим числом.'));
+add('Обчисліть',item(abs(n(2)+o('−')+p(n('0,5'),'−4')),nums(['−14','6','18','14','1,9375']),3,'Від’ємний показник степеня означає обернене число. Спочатку обчисли степінь, потім різницю і її модуль.'));
+add('Округліть число до сотих',item(n('2,74699'),nums(['2,74','2,747','2,75','2,7','2,76']),2,'Залиш дві цифри після коми. Цифра тисячних визначає, чи треба збільшувати цифру сотих.'));
+add('Скоротіть дріб, x ≠ 0, y ≠ 0',item(f(n(8)+p(x,3)+y,n(12)+x+p(y,4)),[f(n(2)+p(x,2),n(3)+p(y,3)),f(n(2)+p(x,3),n(3)+p(y,4)),f(n(3)+p(x,2),n(2)+p(y,3)),f(n(2)+p(x,2),n(3)+p(y,5)),f(n(2)+p(x,4),n(3)+p(y,3))],0,'Скороти числові коефіцієнти. При діленні степенів з однаковою основою показники віднімаються.'));
+add('Спростіть добуток',item(n('0,3')+p(x,5)+o('·')+n(8)+p(x,2),[n(24)+p(x,7),n('2,4')+p(x,10),n('0,24')+p(x,7),n('2,4')+p(x,7),n(24)+p(x,10)],3,productHint));
+add('Спростіть вираз, b ≠ 0',item(n('1,2')+p(b,8)+o(':')+par(n(6)+p(b,3)),[n('0,2')+p(b,5),n('0,2')+p(b,11),n(2)+p(b,5),n('7,2')+p(b,5),n('0,2')+p(b,24)],0,'Поділи коефіцієнти, а від показника степеня діленого відніми показник степеня дільника.'));
+const pts=['M','L','P','K','N'].map(v);
+add('Установіть відповідність між виразом і точкою на прямій',item(o('−')+n(2)+a,pts,3,'Помнож координату a на −2. Від’ємний результат лежить ліворуч від нуля.'),item(p(n(2),'a'),pts,2,'Оціни степінь: для 0 < a < 1 значення 2 у степені a лежить між 1 і 2. Уточни: при a > 0,5 воно більше за квадратний корінь із 2.'),item(abs(a+o('−')+n(1)),pts,0,'Відніми одиницю від a й візьми модуль. Познач результат праворуч від нуля.'));
+add('Обчисліть степінь',item(p(par(f(n(1),n(4))),'−2'),[n(-16),f(n(1),n(16)),n(8),n(16),o('−')+f(n(1),n(16))],3,'Заміни основу оберненим дробом і зроби показник додатним.'));
+add('Обчисліть частку степенів',item(f(p(n(12),3),p(n(4),2)),nums([27,108,36,192,48]),1,'Розклади основу чисельника на множники, один із яких дорівнює основі знаменника. Скороти спільні степені.'));
+add('Обчисліть',item(f(p(n(3),4)+o('·')+p(n(2),4),p(n(12),3)),[f(n(3),n(4)),f(n(1),n(4)),n(3),f(n(1),n(12)),f(n(4),n(3))],0,'Об’єднай степені в чисельнику, скориставшись спільним показником. Розклади основу знаменника на множники й скороти.'));
+const vals=[mix(1,1,2),f(n(4),n(21)),mix(3,1,2),o('−')+mix(1,1,2),f(n(21),n(2))];
+add('Установіть відповідність між виразом і значенням, якщо a = 21/4',item(f(n(2)+a,n(3)),vals,2,'Підстав дріб замість a, виконай множення та ділення, скороти результат.'),item(f(n(1),a),vals,1,'Щоб поділити одиницю на дріб, візьми обернений дріб.'),item(abs(n(9)+o('−')+n(2)+a),vals,0,'Обчисли подвоєне a, потім різницю. Модуль не може бути від’ємним.'));
+add('В одному гігабайті 2²⁰ кілобайтів. Скільки кілобайтів у 16 гігабайтах?',item(txt('Оберіть степінь двійки'),[p(n(2),20),p(n(2),24),p(n(2),320),p(n(2),16),p(n(2),80)],1,'Помнож кількість кілобайтів в одному гігабайті на 16. Подай 16 як степінь двійки та додай показники.'));
+add('Обчисліть',item(p(par(mix(2,1,4)),'−1'),[f(n(9),n(4)),o('−')+f(n(4),n(9)),f(n(4),n(9)),f(n(1),n(4)),mix(1,1,4)],2,'Перетвори мішане число на неправильний дріб. Степінь −1 означає обернене число.'));
+add('Спростіть вираз, a ≠ 0',item(f(p(a,17)+p(a,'−3'),p(par(n(2)+p(a,5)),2)),[f(p(a,4),n(4)),f(p(a,9),n(4)),f(p(a,4),n(2)),f(n(1),n(4)+p(a,24)),f(p(a,7),n(4))],0,'У чисельнику додай показники. У знаменнику піднеси до квадрата і коефіцієнт, і степінь. Потім поділи степені.'));
+add('Який вираз тотожно дорівнює заданому степеню?',item(p(n(5),60),[p(n(5),6)+o('·')+p(n(5),10),f(p(n(5),600),p(n(5),10)),p(n(5),30)+o('+')+p(n(5),30),p(par(p(n(5),6)),10),p(par(p(n(5),30)),30)],3,'При множенні степенів показники додаються, при діленні — віднімаються, а при піднесенні степеня до степеня — перемножуються.'));
+add('Виразіть змінну a з формули: оберіть вираз для a',item(a+o('−')+n(3)+b+o('=')+n(2),[n(2)+o('+')+n(3)+b,n(2)+o('−')+n(3)+b,n(3)+b+o('−')+n(2),f(n(2)+o('+')+b,n(3)),n(2)+b],0,'Перенеси доданок із b у праву частину, змінивши його знак.'),item(v('m')+o('=')+n(2)+b+o('−')+a,[v('m')+o('−')+n(2)+b,n(2)+b+o('+')+v('m'),n(2)+b+o('−')+v('m'),f(v('m'),n(2)+b),b+o('−')+n(2)+v('m')],2,'Спочатку додай a до обох частин рівності, потім відніми m.'),item(f(b,a)+o('+')+n(2)+o('=')+c+txt(' (a ≠ 0, c ≠ 2)'),[f(b,c+o('+')+n(2)),f(c+o('−')+n(2),b),b+par(c+o('−')+n(2)),f(b,c+o('−')+n(2)),f(n(2)+o('−')+c,b)],3,'Відніми 2 від обох частин. Помнож рівність на a, потім поділи на коефіцієнт при a.'),item(f(a+o('−')+n(3),b)+o('=')+n(2)+txt(' (b ≠ 0)'),[b+o('+')+n(3),n(2)+b+o('−')+n(3),f(b,n(2))+o('+')+n(3),n(3)+o('−')+n(2)+b,n(2)+b+o('+')+n(3)],4,'Помнож обидві частини на b, а потім додай 3.'));
+add('Обчисліть',item(p(par(o('−')+n(3)+o('·')+root(n(5),3)),3),nums([-135,135,-45,-15,45]),0,'Піднеси до куба кожен множник. Яким буде знак від’ємного числа в непарному степені?'));
+add('Обчисліть корінь',item(root(f(n(16),n(81)),4),[f(n(3),n(4)),f(n(4),n(3)),f(n(16),n(9)),n(4),f(n(2),n(3))],4,'Які числа в четвертому степені дають чисельник і знаменник дробу під коренем?'));
+add('Спростіть вираз',item(p(v('p'),3)+o('·')+p(par(root(p(v('p'),6),3)),5),[p(v('p'),33),p(v('p'),10),p(v('p'),13),p(v('p'),15),p(v('p'),8)],2,'Спочатку обчисли кубічний корінь зі степеня. Потім застосуй правило степеня степеня та правило множення степенів.'));
+add('Розкрийте дужки, b ≥ 0',item(p(par(n(4)+o('+')+q(b)),2),[n(16)+o('+')+b,n(16)+o('+')+n(4)+q(b)+o('+')+b,n(16)+o('−')+n(8)+q(b)+o('+')+b,n(16)+o('+')+n(8)+q(b)+o('+')+b,n(4)+o('+')+b],3,'Застосуй формулу квадрата суми: квадрат першого доданка, плюс подвоєний добуток, плюс квадрат другого доданка.'));
+const types=['ціле від’ємне число','ірраціональне додатне число','ірраціональне від’ємне число','натуральне число','раціональне неціле число'].map(txt);
+add('Узгодьте вираз із твердженням про його значення',item(root(o('−')+n(64),3),types,0,'Яке число в кубі дає підкореневе число? Визнач знак і тип результату.'),item(f(q(n(18)),q(n(450))),types,4,'Об’єднай корені в корінь із частки, скороти дріб та обчисли корінь.'),item(p(par(q(n(5))+o('−')+n(1)),2)+o('+')+n(2)+q(n(5)),types,3,'Розкрий квадрат різниці та зведи подібні доданки. Перевір, чи залишиться корінь у результаті.'));
+const TOTAL=T.reduce((s,t)=>s+t.items.length,0);let states,earnedMoney=0,finalShown=false;
+const letters=['А','Б','В','Г','Д'];
+function line(){const X=z=>75+(z+1.3)*190;return `<svg class="numberline" viewBox="0 0 720 120" role="img" aria-label="Координатна пряма: K ліворуч від мінус одного, L між мінус одним і нулем, M між нулем і a, a між нулем і одиницею, N трохи праворуч від одиниці, P між 1,5 та 2"><path d="M45 65H715l-10 -5m10 5l-10 5" stroke="#334155" fill="none"/>${[-1,0,1,2].map(z=>`<path d="M${X(z)} 59v12" stroke="#334155"/><text x="${X(z)}" y="96" text-anchor="middle">${z}</text>`).join('')}${[['K',-1.2],['L',-.4],['M',.4],['a',.6],['N',1.1],['P',2**.6]].map(([l,z])=>`<circle cx="${X(z)}" cy="65" r="4" fill="${l==='a'?'#e11d78':'#334155'}"/><text x="${X(z)}" y="${l==='a'?25:43}" text-anchor="middle" font-style="italic">${l}</text>`).join('')}</svg>`;}
+function render(){states=T.map(t=>t.items.map(()=>({tries:0,ok:false})));document.getElementById('tasksList').innerHTML=T.map((t,i)=>`<section class="task-card" id="task-card-${i}"><div class="task-header"><div class="pink-badge">${i+1})</div><div class="task-title-wrap"><h2>${t.title}</h2><div class="task-source-label">Аналог № ${i+1} · Новий варіант</div></div></div>${i===14?line():''}<div class="subitems-grid ${t.items.length===1?'single-item':''}">${t.items.map((s,j)=>`<div class="subitem-box" id="subitem-${i}-${j}"><div class="subitem-top">${t.items.length>1?`<span class="subnum-badge">${j+1})</span>`:''}<div class="formula-display">${m(s.expr)}</div></div><div class="choices" role="group" aria-label="Варіанти відповіді ${i+1}.${j+1}">${s.options.map((opt,k)=>`<label class="choice"><input type="radio" name="q${i}-${j}" value="${k}"><strong>${letters[k]}</strong>${opt.startsWith('<mtext>')?`<span>${opt.slice(7,-8)}</span>`:m(opt)}</label>`).join('')}</div><div class="feedback-msg" id="feedback-${i}-${j}" aria-live="polite"></div></div>`).join('')}</div><div class="task-actions"><button class="btn-check" id="check-${i}" onclick="check(${i})">Перевірити № ${i+1}</button><span class="task-status-text" id="status-${i}" aria-live="polite">Дві спроби на кожну відповідь</span></div></section>`).join('');}
+function finished(i){return states[i].every(s=>s.ok||s.tries===2)}
+function check(i){if(finished(i))return;const pending=states[i].map((s,j)=>({s,j})).filter(({s})=>!s.ok&&s.tries<2);if(pending.some(({j})=>!document.querySelector(`input[name="q${i}-${j}"]:checked`))){document.getElementById(`status-${i}`).textContent='Обери відповідь у кожному підпункті. Спробу не використано.';return;}let gain=0;pending.forEach(({s,j})=>{const picked=document.querySelector(`input[name="q${i}-${j}"]:checked`);s.tries++;s.ok=Number(picked.value)===T[i].items[j].key;const box=document.getElementById(`subitem-${i}-${j}`);box.classList.remove('correct','incorrect');box.classList.add(s.ok?'correct':'incorrect');const feedback=document.getElementById(`feedback-${i}-${j}`);feedback.textContent=s.ok?`✓ Правильно! +1 грн · Спроба ${s.tries} з 2`:`✗ ${s.tries===1?'Залишилася одна спроба.':'Обидві спроби використано.'} Підказка: ${T[i].items[j].hint}`;feedback.style.display='block';if(s.ok||s.tries===2)box.querySelectorAll('input').forEach(el=>el.disabled=true);else picked.checked=false;if(s.ok){gain++;animateCoinToPiggy(box);}});earnedMoney+=gain;document.getElementById('balanceCount').textContent=earnedMoney;if(gain){triggerCoinRain();playAudio('coin');}else playAudio('wrong');const done=finished(i);document.getElementById(`check-${i}`).disabled=done;document.getElementById(`check-${i}`).textContent=done?'Номер завершено ✓':`Перевірити № ${i+1} · друга спроба`;document.getElementById(`status-${i}`).textContent=`Правильно: ${states[i].filter(s=>s.ok).length} з ${states[i].length}`;const count=T.filter((_,k)=>finished(k)).length;document.getElementById('progressText').textContent=`Виконано ${count} з ${T.length} номерів`;if(count===T.length&&!finalShown){finalShown=true;showFinal();}}
+function showFinal(){document.getElementById('modalFinalSum').textContent=earnedMoney;document.getElementById('modalCorrectCount').textContent=`Правильних відповідей: ${earnedMoney} з ${TOTAL}`;document.getElementById('modalMotivation').textContent=earnedMoney===TOTAL?'🏆 Бездоганно! Ти зібрав усі 40 грн!':'Переглянь свої відповіді й підказки, щоб закріпити правила.';document.getElementById('resultModal').classList.add('active');playAudio('fanfare');triggerCoinRain(true);document.getElementById('btnModalReview').focus();}
+function review(){document.getElementById('resultModal').classList.remove('active');document.getElementById('reviewBanner').style.display='flex';document.getElementById('task-card-0').scrollIntoView({behavior:'smooth',block:'start'});}
+document.getElementById('btnModalReview').onclick=review;
+document.getElementById('btnModalRestart').onclick=()=>{earnedMoney=0;finalShown=false;document.getElementById('balanceCount').textContent='0';document.getElementById('resultModal').classList.remove('active');document.getElementById('reviewBanner').style.display='none';document.getElementById('progressText').textContent='Виконано 0 з 29 номерів';render();window.scrollTo({top:0,behavior:'smooth'});};
+document.getElementById('btnReopenResult').onclick=showFinal;
+document.getElementById('btnSoundToggle').onclick=()=>{soundEnabled=!soundEnabled;document.getElementById('soundIcon').textContent=soundEnabled?'🔊':'🔇';};
+const modal=document.getElementById('resultModal');modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','Підсумок тесту');modal.addEventListener('keydown',e=>{if(e.key==='Escape')review();if(e.key==='Tab'){const first=document.getElementById('btnModalReview'),last=document.getElementById('btnModalRestart');if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});render();
+
+</script></body></html>
