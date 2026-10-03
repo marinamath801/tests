@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Розкрий дужки і звели подібні доданки</title>
+    <!-- MathJax для математичних формул -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Canvas-confetti для салюту -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        .instruction-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        .task-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fafbfc;
+        }
+        .task-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .btn-hint {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-hint:hover {
+            background-color: #d35400;
+        }
+        .hints-container {
+            margin-bottom: 12px;
+        }
+        .hint-step {
+            display: none;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 8px;
+            border-radius: 4px;
+            color: #856404;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+        input[type="text"] {
+            padding: 9px 12px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            flex: 1;
+            min-width: 200px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .btn-check {
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-check:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .correct-input { border-color: #2ecc71 !important; background-color: #e8f8f5 !important; }
+        .incorrect-input { border-color: #e74c3c !important; background-color: #fadbd8 !important; }
+        .correct-msg { background-color: #d4edda; color: #155724; display: block; }
+        .incorrect-msg { background-color: #f8d7da; color: #721c24; display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Розкрий дужки і звели подібні доданки</h1>
+
+    <div class="instruction-box">
+        <strong>📌 Інструкція:</strong> Введи спрощений вираз у поле. Натискай <strong>«💡 Потрібна підказка?»</strong>, щоб отримувати покрокові підказки. Якщо не вийшло — постав біля прикладу <strong>?</strong> і йди далі!
+    </div>
+
+    <!-- Завдання 1 -->
+    <div class="task-card">
+        <div class="task-title">1) \(15 - (x + 6) =\)</div>
+        <button class="btn-hint" onclick="showNextHint('1')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-1-1"><strong>Крок 1:</strong> Мінус перед дужками ➔ змінюємо всі знаки в дужках на протилежні ➔ \(15 - x - 6\)</div>
+            <div class="hint-step" id="hint-1-2"><strong>Крок 2:</strong> Зводимо подібні доданки ➔ додаємо ікси з іксами, числа з числами (\(15 - 6 = 9\)) ➔ \(9 - x\)</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-1" placeholder="Введіть відповідь або ?">
+            <button class="btn-check" onclick="checkAnswer('1')">Перевірити</button>
+        </div>
+        <div id="res-1" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 2 -->
+    <div class="task-card">
+        <div class="task-title">2) \(15 - (3x + 6) =\)</div>
+        <button class="btn-hint" onclick="showNextHint('2')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-2-1"><strong>Крок 1:</strong> Мінус перед дужками ➔ змінюємо всі знаки в дужках на протилежні ➔ \(15 - 3x - 6\)</div>
+            <div class="hint-step" id="hint-2-2"><strong>Крок 2:</strong> Зводимо подібні доданки ➔ додаємо ікси з іксами, числа з числами (\(15 - 6 = 9\)) ➔ \(9 - 3x\)</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-2" placeholder="Введіть відповідь або ?">
+            <button class="btn-check" onclick="checkAnswer('2')">Перевірити</button>
+        </div>
+        <div id="res-2" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 3 -->
+    <div class="task-card">
+        <div class="task-title">3) \(15 - (3x + 6) + 5x =\)</div>
+        <button class="btn-hint" onclick="showNextHint('3')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-3-1"><strong>Крок 1:</strong> Мінус перед дужками ➔ змінюємо всі знаки в дужках на протилежні ➔ \(15 - 3x - 6 + 5x\)</div>
+            <div class="hint-step" id="hint-3-2"><strong>Крок 2:</strong> Зводимо подібні доданки ➔ додаємо ікси з іксами (\(-3x + 5x = 2x\)), числа з числами (\(15 - 6 = 9\)) ➔ \(9 + 2x\)</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-3" placeholder="Введіть відповідь або ?">
+            <button class="btn-check" onclick="checkAnswer('3')">Перевірити</button>
+        </div>
+        <div id="res-3" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 4 -->
+    <div class="task-card">
+        <div class="task-title">4) \(31 - (3x + 17) + 5x =\)</div>
+        <button class="btn-hint" onclick="showNextHint('4')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-4-1"><strong>Крок 1:</strong> Мінус перед дужками ➔ змінюємо всі знаки в дужках на протилежні ➔ \(31 - 3x - 17 + 5x\)</div>
+            <div class="hint-step" id="hint-4-2"><strong>Крок 2:</strong> Зводимо подібні доданки ➔ додаємо ікси з іксами (\(-3x + 5x = 2x\)), числа з числами (\(31 - 17 = 14\)) ➔ \(14 + 2x\)</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-4" placeholder="Введіть відповідь або ?">
+            <button class="btn-check" onclick="checkAnswer('4')">Перевірити</button>
+        </div>
+        <div id="res-4" class="result-message"></div>
+    </div>
+
+    <!-- Завдання 5 -->
+    <div class="task-card">
+        <div class="task-title">5) \(3x - 7(x - 3) =\)</div>
+        <button class="btn-hint" onclick="showNextHint('5')">💡 Потрібна підказка?</button>
+        <div class="hints-container">
+            <div class="hint-step" id="hint-5-1"><strong>Крок 1:</strong> Множимо \(-7\) на кожен доданок у дужках (\(-7 \cdot (-3) = +21\)) ➔ \(3x - 7x + 21\)</div>
+            <div class="hint-step" id="hint-5-2"><strong>Крок 2:</strong> Зводимо подібні доданки ➔ додаємо ікси з іксами (\(3x - 7x = -4x\)) ➔ \(-4x + 21\) (або \(21 - 4x\))</div>
+        </div>
+        <div class="input-group">
+            <label>Відповідь:</label>
+            <input type="text" id="ans-5" placeholder="Введіть відповідь або ?">
+            <button class="btn-check" onclick="checkAnswer('5')">Перевірити</button>
+        </div>
+        <div id="res-5" class="result-message"></div>
+    </div>
+
+</div>
+
+<script>
+    const hintCounters = {};
+
+    const correctAnswers = {
+        '1': ['9-x', '-x+9', '?'],
+        '2': ['9-3x', '-3x+9', '?'],
+        '3': ['9+2x', '2x+9', '?'],
+        '4': ['14+2x', '2x+14', '?'],
+        '5': ['21-4x', '-4x+21', '?']
+    };
+
+    function showNextHint(id) {
+        if (!hintCounters[id]) hintCounters[id] = 1;
+        else hintCounters[id]++;
+
+        const stepElem = document.getElementById(`hint-${id}-${hintCounters[id]}`);
+        if (stepElem) {
+            stepElem.style.display = 'block';
+            if (window.MathJax) {
+                MathJax.typesetPromise([stepElem]);
+            }
+        }
+    }
+
+    function triggerConfetti() {
+        if (typeof confetti === 'function') {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+    }
+
+    function checkAnswer(id) {
+        const inputElem = document.getElementById(`ans-${id}`);
+        const resElem = document.getElementById(`res-${id}`);
+        
+        let userVal = inputElem.value.trim().toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/х/g, 'x');
+
+        if (!userVal) {
+            resElem.textContent = "Будь ласка, введи відповідь або знак «?»";
+            resElem.className = "result-message incorrect-msg";
+            return;
+        }
+
+        const validAnswers = correctAnswers[id];
+
+        if (userVal === '?') {
+            inputElem.className = "";
+            resElem.textContent = "Нічого страшного! Переглянь підказки вище та спробуй розібрати цей вираз.";
+            resElem.className = "result-message incorrect-msg";
+        } else if (validAnswers.includes(userVal)) {
+            inputElem.className = "correct-input";
+            resElem.textContent = "Чудово! Все правильно! 🎉";
+            resElem.className = "result-message correct-msg";
+            triggerConfetti();
+        } else {
+            inputElem.className = "incorrect-input";
+            resElem.textContent = "Є помилка. Перевірте свої обчислення та скористайтеся підказками!";
+            resElem.className = "result-message incorrect-msg";
+        }
+    }
+</script>
+
+</body>
+</html>
